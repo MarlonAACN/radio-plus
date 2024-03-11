@@ -11,33 +11,33 @@ permissions:
   contents: read
 
 jobs:
-  main:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       # Cache node_modules
       - name: Setup node
-      - uses: actions/setup-node@v3
+        uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'npm'
 
       - name: Install dependencies (using cache)
-      - run: npm ci
-      - uses: nrwl/nx-set-shas@v4
+        run: npm ci
+        uses: nrwl/nx-set-shas@v4
 
       - name: Format
-      - run: npx nx-cloud record -- nx format:check
+        run: npx nx-cloud record -- nx format:check
 
       - name: Lint
-      - run: npx nx affected -t lint
+        run: npx nx affected -t lint
 
       - name: Build
-      - run: npx nx affected -t build
+        run: npx nx affected -t build
 
       - name: Test
-      - run: npx nx affected -t test --ci
+        run: npx nx affected -t test --ci

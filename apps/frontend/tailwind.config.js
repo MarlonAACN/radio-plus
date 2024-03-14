@@ -1,10 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [],
+  content: [
+    './src/pages/**/*.{js,jsx,ts,tsx}',
+    './src/components/**/*.{js,jsx,ts,tsx}',
+  ],
   theme: {
     fontFamily: {
       sans: ['DMSans', 'sans-serif'],
-      serif: ['Neuton', 'serif'],
+      serif: ['Arizonia', 'serif'],
     },
     extend: {
       screens: {
@@ -13,7 +16,7 @@ module.exports = {
       },
       fontFamily: {
         dmsans: ['DMSans', 'sans-serif'],
-        neuton: ['Neuton', 'serif'],
+        arizonia: ['Arizonia', 'serif'],
       },
       colors: {
         primary: {

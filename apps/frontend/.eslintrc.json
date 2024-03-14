@@ -5,6 +5,11 @@
     "next/core-web-vitals",
     "../../.eslintrc.json"
   ],
+  "plugins": [
+    "@aacn.eu/tailwind-classname-order",
+    "unused-imports",
+    "import"
+  ],
   "ignorePatterns": ["!**/*", ".next/**/*"],
   "overrides": [
     {
@@ -27,5 +32,50 @@
         "jest": true
       }
     }
-  ]
+  ],
+  "rules": {
+    "@aacn.eu/tailwind-classname-order/order": 1,
+    "@next/next/no-img-element": 0,
+    "react-hooks/exhaustive-deps": 0,
+    "unused-imports/no-unused-imports": "warn",
+    "import/newline-after-import": [
+      "error",
+      {
+        "count": 1
+      }
+    ],
+    "import/order": [
+      "warn",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "object",
+          "type"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "builtin",
+            "position": "after"
+          },
+          {
+            "pattern": "next",
+            "group": "builtin",
+            "position": "after"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ]
+  }
 }

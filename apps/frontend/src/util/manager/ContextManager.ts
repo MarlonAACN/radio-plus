@@ -1,5 +1,11 @@
 import { GetServerSidePropsContext } from 'next';
 
+import { parse } from 'set-cookie-parser';
+
+import { SupportedCookies } from '@/constants/SupportedCookies';
+import { ApiRouter } from '@/router/api/ApiRouter';
+import { logger } from '@/util/Logger';
+
 class ContextManager {
   public static setNoStoreCacheHeader(ctx: GetServerSidePropsContext): void {
     ctx.res.setHeader('Cache-Control', 'no-store, must-revalidate');
@@ -69,6 +75,87 @@ class ContextManager {
           setCookieHeader.toString(),
           deleteCookie,
         ]);
+      }
+    }
+  }
+
+  /**
+   * Checks the context object of a server side object, if access or refresh tokens exist.
+   * Fetches a new access token if no access token exists, but a refresh token.
+   * Direclty manipluates the Set-Cookie header payload of the given context object.
+   * @param ctx {GetServerSidePropsContext} The getServerSide context object.
+   * @throws {Error} If no tokens exist or the refresh request fails, an error is thrown.
+   */
+  public static async handleCookieAuth(
+    ctx: GetServerSidePropsContext
+  ): Promise<void> {
+    const accessTokenCookie = ctx.req.cookies[SupportedCookies.accessToken];
+    const refreshTokenCookie = ctx.req.cookies[SupportedCookies.refreshToken];
+
+    if (!accessTokenCookie) {
+      // If no access token exists, but a refresh token -> refresh access token.
+      if (refreshTokenCookie) {
+        logger.log(
+          '[checkCookieAuth] Access token is expired, use refresh token to refresh token set...'
+        );
+
+        try {
+          // Use the raw response object to extract set-cookie header.
+          const setAuthCookieResponse = await fetch(
+            new ApiRouter(process.env.API_BASE_URL).get('RefreshToken').build({
+              v: 'v1',
+            }),
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                refreshToken: refreshTokenCookie,
+              }),
+            }
+          );
+
+          // Parse set-cookie header for validation
+          const cookies = parse(setAuthCookieResponse.headers.getSetCookie(), {
+            decodeValues: true, // default: true
+          });
+
+          // Check if set-cookie payload includes access token
+          if (
+            cookies.find(
+              (cookie) => cookie.name === SupportedCookies.accessToken
+            ) === undefined
+          ) {
+            logger.error(
+              "[checkCookieAuth] Request for token refresh, didn't return a new access token."
+            );
+
+            throw new Error(
+              "Request for token refresh, didn't return a new access token."
+            );
+          }
+
+          // Update contexts set-Cookie header.
+          logger.log('[checkCookieAuth] Tokens were refreshed successfully.');
+
+          ctx.res.setHeader(
+            'Set-Cookie',
+            setAuthCookieResponse.headers.getSetCookie()
+          );
+
+          return Promise.resolve();
+        } catch (err) {
+          logger.error('[checkCookieAuth] Refreshing token failed:', err);
+
+          throw new Error('Refreshing token failed.');
+        }
+      } else {
+        // Neither access nor refresh token exists.
+        logger.error(
+          '[BasePage] Neither access nor refresh token found in cookies.'
+        );
+        throw new Error('Neither access nor refresh token found in cookies.');
       }
     }
   }

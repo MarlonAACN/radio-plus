@@ -9,7 +9,8 @@ tmp
 node_modules
 
 # secrets
-.env
+dist/apps/backend/.env
+*.env
 
 # IDEs and editors
 /.idea

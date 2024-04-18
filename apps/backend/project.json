@@ -4,6 +4,17 @@
   "sourceRoot": "apps/backend/src",
   "projectType": "application",
   "targets": {
+    "build": {
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/apps/backend",
+        "main": "apps/backend/src/main.ts",
+        "tsConfig": "apps/backend/tsconfig.app.json",
+        "outputFileName": "main.js"
+      }
+    },
     "serve": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",

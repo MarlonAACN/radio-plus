@@ -1,4 +1,6 @@
 import path from 'path';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cookieParser = require('cookie-parser');
 
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -14,8 +16,8 @@ async function bootstrap() {
 
   const config: ConfigService = app.get(ConfigService);
 
-  const originUrl = config.get('APP_ORIGIN_URL');
-  const validOrigins = (config.get('CORS_ORIGINS') ?? '').split(',');
+  const originUrl = config.get<string>('APP_ORIGIN_URL');
+  const validOrigins = (config.get<string>('CORS_ORIGINS') ?? '').split(',');
 
   app.enableCors({
     allowedHeaders: ['content-type'],
@@ -40,8 +42,10 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
+  app.use(cookieParser());
+
   // Run
-  await app.listen(parseInt(config.get('PORT')!));
+  await app.listen(parseInt(config.get<string>('PORT')!));
 }
 
 bootstrap().finally();

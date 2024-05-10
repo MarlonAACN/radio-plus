@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
-  "files": [],
-  "include": [],
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
   "references": [
     {
       "path": "./tsconfig.app.json"
@@ -11,6 +14,28 @@
     }
   ],
   "compilerOptions": {
-    "esModuleInterop": true
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": false,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
   }
 }

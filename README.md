@@ -11,6 +11,21 @@ provides an interactive UI to view your projects, run tasks, generate code, and 
 comes with a LSP for Vim users.
 
 ## Start the application
+The working directory, from where the application should be started from, should always be the root of the project. (`./radio-plus`)
+Otherwise, problems with the `.env` variables can occur.
+
+#### Frontend
+```ssh
+nx dev frontend
+```
+
+#### Backend
+As defined in the backends `project.json` config file, the default configurations runs
+the development build. (`backend:build:development`)
+
+```ssh
+nx serve backend
+```
 
 Run `npx nx dev frontend` to start the development server. Happy coding!
 

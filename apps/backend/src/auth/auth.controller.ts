@@ -11,11 +11,9 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from '@/auth/auth.service';
-import { RadioPlusError } from '@/util/Error';
-import { getHttpStatusText } from '@/util/getHttpStatusText';
+import { RequestError } from '@/util/Error';
 import { AuthPayloadDto, RefreshTokenDto } from '@/auth/dto';
 import { Response } from 'express';
-import { Spotify } from '@/types/Spotify';
 
 @Controller({
   version: '1',
@@ -44,14 +42,13 @@ export class AuthController {
       .then((redirect: HttpRedirectResponse) => {
         return redirect;
       })
-      .catch((err: RadioPlusError) => {
+      .catch((err: RequestError) => {
         throw new HttpException(
           {
-            status: err.code,
+            status: err.status,
             message: err.message,
-            error: getHttpStatusText(err.code),
           },
-          err.code
+          err.status
         );
       });
   }
@@ -66,14 +63,13 @@ export class AuthController {
       .then((token: Spotify.AuthToken) => {
         return token;
       })
-      .catch((err: RadioPlusError) => {
+      .catch((err: RequestError) => {
         throw new HttpException(
           {
-            status: err.code,
+            status: err.status,
             message: err.message,
-            error: getHttpStatusText(err.code),
           },
-          err.code
+          err.status
         );
       });
   }

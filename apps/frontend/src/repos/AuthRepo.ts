@@ -1,5 +1,4 @@
 import { ApiRouter } from '@/router/api/ApiRouter';
-import { HttpRedirectResponse } from '@/types/http/HttpRedirectResponse';
 import { HttpHandler } from '@/util/HttpHandler';
 
 class AuthRepo {
@@ -15,24 +14,55 @@ class AuthRepo {
     });
   }
 
-  // TODO: Remove
-  example(): Promise<HttpRedirectResponse> {
+  /**
+   * Refresh a token set based on the given refresh token.
+   * This will still automatically update the clients access and refresh tokens, when called from client side.
+   * @param refreshToken {string} The refresh token, which will generated a new token set.
+   * @returns {Promise<Response>} The raw response object to be able to extract stuff like set-Cookie headers.
+   */
+  refreshTokenRawResponse(refreshToken: string): Promise<Response> {
     return fetch(
-      this.router.get('Auth').build({
+      this.router.get('RefreshToken').build({
         v: 'v1',
       }),
       {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          refreshToken: refreshToken,
+        }),
+      }
+    );
+  }
+
+  /**
+   * Refresh a token set based on the given refresh token.
+   * This automatically updates the clients access and refresh tokens, when called from client side.
+   * @param refreshToken {string} The refresh token, which will generated a new token set.
+   * @returns {Promise<Spotify.AuthToken>} The newly generated spotify auth token set.
+   */
+  refreshToken(refreshToken: string): Promise<Spotify.AuthToken> {
+    return fetch(
+      this.router.get('RefreshToken').build({
+        v: 'v1',
+      }),
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          refreshToken: refreshToken,
+        }),
       }
     )
       .then((response: Response) => {
-        return HttpHandler.response<HttpRedirectResponse>(response);
+        return HttpHandler.response<Spotify.AuthToken>(response);
       })
       .catch((errResponse) => {
-        return HttpHandler.error<HttpRedirectResponse>(errResponse);
+        return HttpHandler.error<Spotify.AuthToken>(errResponse);
       });
   }
 }

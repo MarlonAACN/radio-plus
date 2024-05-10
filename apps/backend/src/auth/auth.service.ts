@@ -1,11 +1,14 @@
 import { HttpRedirectResponse, HttpStatus, Injectable } from '@nestjs/common';
 import { generateRandomString } from '@/util/generateRandomString';
-import { SPOTIFY_SCOPE } from '@/constants/spotfiyScope';
-import { RadioPlusError } from '@/util/Error';
+import { SPOTIFY_SCOPE } from '@/constants/SpotifyScope';
+import { RequestError } from '@/util/Error';
 import { logger } from '@/util/Logger';
-import { Spotify } from '@/types/Spotify';
 import { Response } from 'express';
 import { DateFormatter } from '@/util/formatter/date-formatter';
+import { REFRESH_TOKEN_TTL } from '@/constants';
+import { HttpHeader } from '@/util/HttpHeader';
+import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
+import { InternalEndpointURLs } from '@/constants/InternalEndpointURLs';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +21,7 @@ export class AuthService {
     if (!process.env.SPOTIFY_CLIENT_ID) {
       logger.error('Spotify client ID is not set in env');
 
-      throw new RadioPlusError(
+      throw new RequestError(
         HttpStatus.INTERNAL_SERVER_ERROR,
         'Server is missing information to proceed requests'
       );
@@ -31,13 +34,12 @@ export class AuthService {
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID,
       scope: SPOTIFY_SCOPE,
-      redirect_uri: `${process.env.BACKEND_ORIGIN_URL}/v1/auth/callback`,
+      redirect_uri: InternalEndpointURLs.backend.OAuthCallback,
       state: state,
     });
 
     return {
-      url:
-        'https://accounts.spotify.com/authorize/?' + authQueryParams.toString(),
+      url: SpotifyEndpointURLs.UserOAuth(authQueryParams.toString()),
       statusCode: HttpStatus.MOVED_PERMANENTLY,
     };
   }
@@ -57,44 +59,41 @@ export class AuthService {
       );
 
       return Promise.reject({
-        url: `${process.env.APP_ORIGIN_URL}/500?message=${encodeURIComponent(
-          'Server is missing information to proceed requests'
-        )}`,
+        url: InternalEndpointURLs.frontend.InternalServerErrorPage(
+          encodeURIComponent(
+            'Server is missing information to proceed requests'
+          )
+        ),
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
 
-    const authOptions = {
+    const requestParams = {
       method: 'POST',
       headers: {
-        'Authorization':
-          'Basic ' +
-          Buffer.from(
-            process.env.SPOTIFY_CLIENT_ID +
-              ':' +
-              process.env.SPOTIFY_CLIENT_SECRET
-          ).toString('base64'),
+        'Authorization': HttpHeader.getSpotifyBasicAuthorization(),
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         code: code,
-        redirect_uri: `${process.env.BACKEND_ORIGIN_URL}/v1/auth/callback`,
+        redirect_uri: InternalEndpointURLs.backend.OAuthCallback,
         grant_type: 'authorization_code',
       }),
     };
 
     // Fetch access token from spotify
-    return fetch('https://accounts.spotify.com/api/token', authOptions)
+    return fetch(SpotifyEndpointURLs.TokenAuthorization, requestParams)
       .then((response) => response.json())
       .then((data: Spotify.DetailedAuthToken<Spotify.AuthToken>) => {
         // Spotify not always throws an error response, so we have to manually check if a token was provided.
         if (!data.access_token) {
-          const err: Spotify.Error = data as unknown as Spotify.Error;
+          const err: Spotify.AuthenticationError =
+            data as unknown as Spotify.AuthenticationError;
 
           logger.error(
             `[authCallback] Spotify returned no access token. Error: ${err.error_description}`
           );
-          throw Error(err.error_description);
+          throw new Error(err.error_description);
         }
 
         logger.log(
@@ -130,9 +129,9 @@ export class AuthService {
 
         // Redirect to 500 page on frontend, if an error occured.
         return {
-          url: `${process.env.APP_ORIGIN_URL}/500?message=${encodeURIComponent(
-            'Spotify authorization failed'
-          )}`,
+          url: InternalEndpointURLs.frontend.InternalServerErrorPage(
+            encodeURIComponent('Spotify authorization failed')
+          ),
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         };
       });
@@ -146,16 +145,10 @@ export class AuthService {
    * @returns {Spotify.AuthToken} A new set of a valid access and refresh token.
    */
   refreshToken(token: string, response: Response): Promise<Spotify.AuthToken> {
-    const authOptions = {
+    const requestParams = {
       method: 'POST',
       headers: {
-        'Authorization':
-          'Basic ' +
-          Buffer.from(
-            process.env.SPOTIFY_CLIENT_ID +
-              ':' +
-              process.env.SPOTIFY_CLIENT_SECRET
-          ).toString('base64'),
+        'Authorization': HttpHeader.getSpotifyBasicAuthorization(),
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
@@ -164,17 +157,18 @@ export class AuthService {
       }),
     };
 
-    return fetch('https://accounts.spotify.com/api/token', authOptions)
+    return fetch(SpotifyEndpointURLs.TokenAuthorization, requestParams)
       .then((response) => response.json())
       .then((data: Spotify.DetailedAuthToken<Spotify.AccessToken>) => {
         // Spotify not always throws an error response, so we have to manually check if a token was provided.
         if (!data.access_token) {
-          const err: Spotify.Error = data as unknown as Spotify.Error;
+          const err: Spotify.AuthenticationError =
+            data as unknown as Spotify.AuthenticationError;
 
           logger.error(
             `[refreshToken] Spotify returned no access token. Error: ${err.error_description}`
           );
-          throw Error(err.error_description);
+          throw new Error(err.error_description);
         }
 
         logger.log(
@@ -194,7 +188,7 @@ export class AuthService {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,
-          expires: new Date(Date.now() + 604800000), // Date one week from now
+          expires: new Date(Date.now() + REFRESH_TOKEN_TTL),
         });
 
         logger.log('[refreshToken] Token set refreshed successfully.');
@@ -212,10 +206,7 @@ export class AuthService {
         );
 
         return Promise.reject(
-          new RadioPlusError(
-            HttpStatus.UNAUTHORIZED,
-            'Failed to refresh token.'
-          )
+          new RequestError(HttpStatus.UNAUTHORIZED, 'Failed to refresh token.')
         );
       });
   }

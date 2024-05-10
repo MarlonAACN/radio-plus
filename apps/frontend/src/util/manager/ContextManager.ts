@@ -3,7 +3,7 @@ import { GetServerSidePropsContext } from 'next';
 import { parse } from 'set-cookie-parser';
 
 import { SupportedCookies } from '@/constants/SupportedCookies';
-import { ApiRouter } from '@/router/api/ApiRouter';
+import { AuthRepo } from '@/repos/AuthRepo';
 import { logger } from '@/util/Logger';
 
 class ContextManager {
@@ -101,20 +101,9 @@ class ContextManager {
 
         try {
           // Use the raw response object to extract set-cookie header.
-          const setAuthCookieResponse = await fetch(
-            new ApiRouter(process.env.API_BASE_URL).get('RefreshToken').build({
-              v: 'v1',
-            }),
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                refreshToken: refreshTokenCookie,
-              }),
-            }
-          );
+          const setAuthCookieResponse = await new AuthRepo(
+            process.env.API_BASE_URL
+          ).refreshTokenRawResponse(refreshTokenCookie);
 
           // Parse set-cookie header for validation
           const cookies = parse(setAuthCookieResponse.headers.getSetCookie(), {

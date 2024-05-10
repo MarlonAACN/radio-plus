@@ -1,17 +1,16 @@
 import { HttpStatus } from '@nestjs/common';
 
 /**
- * Custom error object for radio plus, which extends the Error interface
- * and adds the 'code' attribute, to be able to provide an additional httpStatus.
+ * Error object to generalize thrown error objects, mostly associated with request handling.
  */
-class RadioPlusError extends Error {
-  public code: HttpStatus;
+class RequestError extends Error {
+  public status: HttpStatus;
 
-  constructor(code: HttpStatus, message: string) {
+  constructor(status: HttpStatus, message: string) {
     super(message);
-    this.name = 'ShophubError';
-    this.code = code;
+    this.name = 'RequestError';
+    this.status = status;
   }
 }
 
-export { RadioPlusError };
+export { RequestError };

@@ -1,6 +1,8 @@
 import '@/styles/globals.css';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { LazyMotion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { SkeletonTheme } from 'react-loading-skeleton';
 
 import type { AppProps } from 'next/app';
 
@@ -12,9 +14,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   return (
-    <LazyMotion strict features={loadFeatures}>
-      <Component {...pageProps} key={router.asPath} />
-    </LazyMotion>
+    <SkeletonTheme baseColor="#202020" highlightColor="#313131">
+      <LazyMotion strict features={loadFeatures}>
+        <Component {...pageProps} key={router.asPath} />
+      </LazyMotion>
+    </SkeletonTheme>
   );
 }
 

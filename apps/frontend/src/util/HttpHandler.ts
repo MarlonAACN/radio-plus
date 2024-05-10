@@ -14,6 +14,14 @@ class HttpHandler {
    */
   public static response<T>(response: Response): Promise<T> {
     if (response.ok) {
+      // Check for empty response
+      if (response.headers.get('content-length') === '0') {
+        logger.log(
+          'Response bodys content length is 0. Returning empty response.'
+        );
+        return Promise.resolve() as Promise<T>;
+      }
+
       return response.json();
     }
 

@@ -32,6 +32,7 @@ module.exports = {
           800: '#31517b',
         },
         spotify: {
+          400: '#55f38d',
           500: '#1ED760',
         },
         base: {

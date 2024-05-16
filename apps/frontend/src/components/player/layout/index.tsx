@@ -29,7 +29,7 @@ function PlayerLayout() {
         Radio<span className="font-dmsans text-secondary-700">⁺</span>
       </h2>
       <div
-        className="radio-plus-player-container w-full h-full h-[600px] flex flex-col justify-center items-center px-5 pt-6 pb-5 bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl"
+        className="radio-plus-player-container w-full h-[600px] flex flex-col justify-center items-center px-5 pt-6 pb-5 bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl"
         style={{ background: getTrackBackgroundCSS(player.currentTrack) }}
       >
         <div className="radio-plus-player-content-wrapper w-full px-7 py-5 bg-gradient-to-r from-black/70 to-black/70 rounded-md max-w-md">

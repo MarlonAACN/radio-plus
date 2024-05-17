@@ -11,6 +11,7 @@ import useAuth from '@/hooks/useAuth';
 import { PlayerRepo } from '@/repos/PlayerRepo';
 import { appRouter } from '@/router/app/AppRouter';
 import { logger } from '@/util/Logger';
+import { AuthTokenManager } from '@/util/manager/AuthTokenManager';
 
 function usePlayer() {
   const { getAuthToken, isAuthenticated } = useAuth();
@@ -27,6 +28,9 @@ function usePlayer() {
   const [eventIsLoading, setEventIsLoading] = useState<boolean>(false);
   /** Determines if the init playback transfer was successfully. */
   const [wasTransfered, setWasTransfered] = useState<boolean>(false);
+  const [showReconnectBtn, setShowReconnectBtn] = useState<boolean>(false);
+  /** On auth or account error from spotify, block player until redirect to login page. */
+  const [errorOccured, setErrorOccured] = useState<boolean>(false);
   const [isPaused, setPaused] = useState<boolean>(true);
   /** Position in current track. */
   const [position, setPosition] = useState<number>(0);
@@ -116,6 +120,19 @@ function usePlayer() {
       logger.error('[SpotifyPlayer] Player failed to authenticate:', message);
       resetPlayer();
     });
+
+    player.on('playback_error', ({ message }) => {
+      logger.error('[SpotifyPlayer] Failed to perform playback:', message);
+      setShowReconnectBtn(true);
+    });
+
+    player.on('account_error', ({ message }) => {
+      logger.error(
+        '[SpotifyPlayer] Failed to validate Spotify account:',
+        message
+      );
+      resetPlayer();
+    });
   }
 
   function togglePause() {
@@ -128,6 +145,10 @@ function usePlayer() {
   }
 
   function skipForward() {
+    console.log(isActive);
+    console.log(wasTransfered);
+    console.log(eventIsLoading);
+    console.log(player);
     logger.log('DEBUG: [SpotifyPlayer] Skipped forwards.');
 
     setEventIsLoading(true);
@@ -209,12 +230,31 @@ function usePlayer() {
 
   /**
    * disconnect the given player instance to spotify.
-   * @param player {Spotify.Player} The existing spotify player instance that should be disconnected.
+   * @param _player {Spotify.Player} The existing spotify player instance that should be disconnected.
    */
-  function disconnectPlayer(player: Spotify.Player) {
+  function disconnectPlayer(_player: Spotify.Player) {
     setActive(false);
     setPlayer(null);
-    player?.disconnect();
+    setWasTransfered(false);
+    _player.disconnect();
+  }
+
+  function reconnectPlayer() {
+    setShowReconnectBtn(false);
+
+    if (player === null) {
+      return router.reload();
+    }
+
+    if (!isActive) {
+      return connectPlayer(player);
+    }
+
+    if (deviceId.current !== null) {
+      return playerIsReadyHandler(deviceId.current);
+    } else {
+      return router.reload();
+    }
   }
 
   /**
@@ -224,11 +264,17 @@ function usePlayer() {
   function resetPlayer() {
     logger.log('[SpotifyPlayer] Resetting player...');
 
+    setErrorOccured(true);
+
     if (player !== null) {
       disconnectPlayer(player);
     }
 
-    router.push(appRouter.get('Login').build());
+    AuthTokenManager.deleteAuthTokenCookies();
+
+    setTimeout(() => {
+      router.push(appRouter.get('Login').build());
+    }, 1000);
   }
 
   /**
@@ -263,6 +309,9 @@ function usePlayer() {
     eventIsLoading,
     position,
     seekPosition,
+    errorOccured,
+    reconnectPlayer,
+    showReconnectBtn,
   };
 }
 

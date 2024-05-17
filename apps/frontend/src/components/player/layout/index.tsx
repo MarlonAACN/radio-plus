@@ -1,4 +1,6 @@
+import { ErrorOverlayView } from '@/components/player/views/ErrorOverlay';
 import { ProgressBarWidget } from '@/components/player/views/ProgressBar';
+import { ReconnectBtnView } from '@/components/player/views/ReconnectBtn';
 import { ButtonHubWidget } from '@/components/player/widgets/ButtonHub';
 import { TrackInfoHubWidget } from '@/components/player/widgets/TrackInfoHub';
 import usePlayer from '@/hooks/usePlayer';
@@ -25,13 +27,16 @@ function PlayerLayout() {
 
   return (
     <>
-      <h2 className="mb-10 font-arizonia text-6xl">
-        Radio<span className="font-dmsans text-secondary-700">⁺</span>
-      </h2>
+      <div className="w-full flex justify-center items-center px-5 py-3 mb-3 bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl">
+        <h2 className="font-arizonia text-6xl">
+          Radio<span className="font-dmsans text-secondary-700">⁺</span>
+        </h2>
+      </div>
       <div
-        className="radio-plus-player-container w-full h-[600px] flex flex-col justify-center items-center px-5 pt-6 pb-5 bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl"
+        className="radio-plus-player-container relative w-full h-[600px] flex flex-col justify-center items-center px-5 pt-6 pb-5 overflow-hidden bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl"
         style={{ background: getTrackBackgroundCSS(player.currentTrack) }}
       >
+        <ErrorOverlayView showError={player.errorOccured} />
         <div className="radio-plus-player-content-wrapper w-full px-7 py-5 bg-gradient-to-r from-black/70 to-black/70 rounded-md max-w-md">
           <TrackInfoHubWidget currentTrack={player.currentTrack} />
           <ProgressBarWidget
@@ -52,6 +57,10 @@ function PlayerLayout() {
             skipFwdHandler={player.skipForward}
           />
         </div>
+        <ReconnectBtnView
+          showReconnectBtn={player.showReconnectBtn}
+          reconnectHandler={player.reconnectPlayer}
+        />
       </div>
       <p>{player.isActive ? 'active' : 'inactive'}</p>
     </>

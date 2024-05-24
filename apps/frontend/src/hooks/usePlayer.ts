@@ -145,10 +145,6 @@ function usePlayer() {
   }
 
   function skipForward() {
-    console.log(isActive);
-    console.log(wasTransfered);
-    console.log(eventIsLoading);
-    console.log(player);
     logger.log('DEBUG: [SpotifyPlayer] Skipped forwards.');
 
     setEventIsLoading(true);

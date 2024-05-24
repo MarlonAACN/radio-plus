@@ -72,7 +72,6 @@ export class PlayerService {
       },
     };
 
-    console.log(SpotifyEndpointURLs.SeekPosition + `?${urlParams}`);
     return fetch(
       SpotifyEndpointURLs.SeekPosition + `?${urlParams}`,
       requestParams

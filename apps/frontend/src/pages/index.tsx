@@ -2,7 +2,7 @@ import { GetServerSidePropsContext } from 'next';
 
 import Head from 'next/head';
 
-import { FilterLayout } from '@/components/filter/layout';
+import { ConfigLayout } from '@/components/config/layout';
 import { PlayerLayout } from '@/components/player/layout';
 import { appRouter } from '@/router/app/AppRouter';
 import { logger } from '@/util/Logger';
@@ -37,8 +37,8 @@ function Base() {
       <Head>
         <title>Radio⁺</title>
       </Head>
-      <main className="relative w-full min-h-screen flex flex-col justify-start items-center p-5 sm:p-7 md:p-10">
-        <FilterLayout />
+      <main className="relative w-full min-h-screen flex flex-col justify-start items-center px-5 pt-10 pb-5 sm:px-7 sm:pb-5 md:px-10 md:pb-10">
+        <ConfigLayout />
         <PlayerLayout />
       </main>
     </>

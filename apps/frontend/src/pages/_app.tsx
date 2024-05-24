@@ -4,6 +4,8 @@ import { LazyMotion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { SkeletonTheme } from 'react-loading-skeleton';
 
+import { ConfigProvider } from '@/context/ConfigContext';
+
 import type { AppProps } from 'next/app';
 
 const loadFeatures = () =>
@@ -16,7 +18,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <SkeletonTheme baseColor="#202020" highlightColor="#313131">
       <LazyMotion strict features={loadFeatures}>
-        <Component {...pageProps} key={router.asPath} />
+        <ConfigProvider>
+          <Component {...pageProps} key={router.asPath} />
+        </ConfigProvider>
       </LazyMotion>
     </SkeletonTheme>
   );

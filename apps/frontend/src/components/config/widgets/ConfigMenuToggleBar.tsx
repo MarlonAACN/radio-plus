@@ -3,17 +3,16 @@ import { Dispatch, SetStateAction } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
 
-type FilterMenuToggleBtnProps = {
+import { RadioOriginTrackPreview } from '@/components/config/views/RadioOriginTrackPreview';
+
+type ConfigMenuToggleBarProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  radioOrigin: string | null;
 };
-
-function ConfigMenuToggleBtnView({
+function ConfigMenuToggleBarWidget({
   isOpen,
   setIsOpen,
-  radioOrigin,
-}: FilterMenuToggleBtnProps) {
+}: ConfigMenuToggleBarProps) {
   return (
     <div className="w-full h-16 flex flex-row justify-between items-center mt-5">
       <button
@@ -30,11 +29,9 @@ function ConfigMenuToggleBtnView({
           )}
         />
       </button>
-      <div>
-        <p>{radioOrigin}</p>
-      </div>
+      <RadioOriginTrackPreview isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 }
 
-export { ConfigMenuToggleBtnView };
+export { ConfigMenuToggleBarWidget };

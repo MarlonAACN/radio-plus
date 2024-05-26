@@ -1,24 +1,53 @@
-import { Dispatch, SetStateAction } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 import clsx from 'clsx';
 
 import { RadioOriginInputInfoView } from '@/components/config/views/RadioOriginInputInfo';
-
-type FormErrors = {
-  radioOriginTrackId: string | null;
-};
+import { RadioPlus } from '@/types/RadioPlus';
 
 type RadioOriginInputProps = {
-  error: FormErrors;
-  setErrors: Dispatch<SetStateAction<FormErrors>>;
+  formErrors: RadioPlus.ConfigFormErrors;
+  setFormErrors: Dispatch<SetStateAction<RadioPlus.ConfigFormErrors>>;
   isLoading: boolean;
+  inputChangeTracker: RadioPlus.Config;
+  updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
 };
 
 function RadioOriginInputWidget({
-  error,
-  setErrors,
+  formErrors,
+  setFormErrors,
   isLoading,
+  inputChangeTracker,
+  updateInputChangeTracker,
 }: RadioOriginInputProps) {
+  /**
+   * Updates the input tracker on change.
+   * Sets the value to null, if the input is an empty string.
+   * @param e {ChangeEvent<HTMLInputElement>} The event object emitted from the input.
+   */
+  function inputChangeHandler(e: ChangeEvent<HTMLInputElement>) {
+    updateInputChangeTracker({
+      ...inputChangeTracker,
+      radioOriginTrackUrl: e.target.value !== '' ? e.target.value : null,
+    });
+  }
+
+  /**
+   * Updates the input tracker, when the focus on the input ends.
+   * Sets the value to null, if the input is an empty string.
+   * Also trims the input to prevent whitespace from occuring in the input.
+   * @param e {React.FocusEvent<HTMLInputElement>} The event object emitted from the input.
+   */
+  function onBlurHandler(e: React.FocusEvent<HTMLInputElement>) {
+    const trimmedInputValue = e.target.value.trim();
+
+    e.target.value = trimmedInputValue;
+    updateInputChangeTracker({
+      ...inputChangeTracker,
+      radioOriginTrackUrl: trimmedInputValue !== '' ? trimmedInputValue : null,
+    });
+  }
+
   return (
     <div className="radio-plus-radio-origin-input-container w-full">
       <label
@@ -33,23 +62,26 @@ function RadioOriginInputWidget({
           id="radio-plus-radio-origin-input"
           name="radio-plus-radio-origin-input"
           disabled={isLoading}
-          onFocus={() => setErrors({ ...error, radioOriginTrackId: null })}
+          onChange={(e) => inputChangeHandler(e)}
+          onFocus={() =>
+            setFormErrors({ ...formErrors, radioOriginTrackUrl: null })
+          }
           onBlur={(e) => {
-            e.target.value = e.target.value.trim();
+            onBlurHandler(e);
           }}
           placeholder="https://open.spotify.com/intl-de/track/0FNLM4iuEwHAb7OTSWI18p?si=e254ad26d2624f71"
           className={clsx(
             'w-full px-5 py-2.5 bg-base-700 border rounded-full border-base-700 transition-colors disabled:bg-base-800 enabled:focus:border-base-0 enabled:active:border-base-0 enabled:focus:outline-none placeholder-base-600',
-            { 'border-red-500': error.radioOriginTrackId }
+            { 'border-red-500': formErrors.radioOriginTrackUrl }
           )}
         ></input>
         <div className="absolute top-0 right-2 h-full flex flex-col justify-center items-center">
           <RadioOriginInputInfoView />
         </div>
       </div>
-      {error.radioOriginTrackId ? (
+      {formErrors.radioOriginTrackUrl ? (
         <p className="radio-plus-error mt-1 mb-3 ml-2.5 text-red-500">
-          {error.radioOriginTrackId}
+          {formErrors.radioOriginTrackUrl}
         </p>
       ) : null}
     </div>

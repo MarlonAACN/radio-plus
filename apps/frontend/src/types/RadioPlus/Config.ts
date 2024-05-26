@@ -1,9 +1,13 @@
 type Config = {
-  radioOriginTrackId: string | null;
+  radioOriginTrackUrl: string | null;
 };
 
 type ConfigErrors = {
-  radioOriginTrackId: string | null;
+  radioOriginTrackUrl: string | null;
 };
 
-export type { Config, ConfigErrors };
+type ConfigFormErrors = {
+  radioOriginTrackUrl: string | null;
+};
+
+export type { Config, ConfigErrors, ConfigFormErrors };

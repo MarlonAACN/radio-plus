@@ -1,4 +1,8 @@
-import { Config, ConfigErrors } from '@/types/RadioPlus/Config';
+import {
+  Config,
+  ConfigErrors,
+  ConfigFormErrors,
+} from '@/types/RadioPlus/Config';
 import {
   TrackAudioFeatures,
   DetailedTrack,
@@ -8,6 +12,7 @@ import { ErrorResponse } from '@/types/RadioPlus/RadioPlusErrorResponse';
 
 declare namespace RadioPlus {
   export {
+    ConfigFormErrors,
     Error,
     ErrorResponse,
     Config,

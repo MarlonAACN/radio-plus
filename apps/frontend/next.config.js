@@ -14,6 +14,9 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  images: {
+    domains: ['i.scdn.co'],
+  },
 };
 
 const plugins = [

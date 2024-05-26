@@ -9,12 +9,14 @@ import {
 
 import { TrackRepo } from '@/repos/TrackRepo';
 import { RadioPlus } from '@/types/RadioPlus';
+import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { logger } from '@/util/Logger';
 
 type ConfigContextProps = {
   data: RadioPlus.Config;
   setData: (data: RadioPlus.Config) => void;
   errors: RadioPlus.ConfigErrors;
+  radioOriginTrack: RadioPlus.DetailedTrack | null;
   isLoading: boolean;
 };
 
@@ -24,14 +26,15 @@ type ConfigProps = {
 
 const configDefaultValues: ConfigContextProps = {
   data: {
-    radioOriginTrackId: null,
+    radioOriginTrackUrl: null,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
   },
   errors: {
-    radioOriginTrackId: null,
+    radioOriginTrackUrl: null,
   },
+  radioOriginTrack: null,
   isLoading: false,
 };
 
@@ -42,22 +45,18 @@ function useConfig() {
 }
 
 function ConfigProvider({ children }: ConfigProps) {
-  const cachedData = useRef<RadioPlus.Config>({ radioOriginTrackId: null });
+  const cachedData = useRef<RadioPlus.Config>({ radioOriginTrackUrl: null });
   const [data, setData] = useState<RadioPlus.Config>({
-    radioOriginTrackId: null,
+    radioOriginTrackUrl: null,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
-    radioOriginTrackId: null,
+    radioOriginTrackUrl: null,
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [radioOriginTrack, setRadioOriginTrack] =
     useState<RadioPlus.DetailedTrack | null>(null);
   const trackRepo = new TrackRepo(process.env.NEXT_PUBLIC_API_BASE_URL);
-
-  useEffect(() => {
-    console.log(radioOriginTrack);
-  }, [radioOriginTrack]);
 
   /** Refetch new data, based on changes in new config. */
   useEffect(() => {
@@ -90,16 +89,17 @@ function ConfigProvider({ children }: ConfigProps) {
 
     // 1. Radio origin track
     // Checks if the track id differs from the currently cached track id.
-    if (_cache.radioOriginTrackId !== _data.radioOriginTrackId) {
-      await newTrackHandler(_data.radioOriginTrackId)
+    if (_cache.radioOriginTrackUrl !== _data.radioOriginTrackUrl) {
+      await newTrackHandler(_data.radioOriginTrackUrl)
         .then(() => {
           // On success, reset error entry and save id in cache.
-          updateErrors.radioOriginTrackId = null;
-          newCache.radioOriginTrackId = _data.radioOriginTrackId;
+          updateErrors.radioOriginTrackUrl = null;
+          newCache.radioOriginTrackUrl = _data.radioOriginTrackUrl;
         })
         .catch((err: string) => {
-          // On failure, update error entry accordingly and don't save new id cache.
-          updateErrors.radioOriginTrackId = err;
+          // On failure, update error entry accordingly and set track id in cache to null. (since the var is reseted inside the track handler)
+          updateErrors.radioOriginTrackUrl = err;
+          newCache.radioOriginTrackUrl = null;
         });
     }
 
@@ -109,7 +109,21 @@ function ConfigProvider({ children }: ConfigProps) {
     setIsLoading(false);
   }
 
-  function newTrackHandler(trackId: string | null): Promise<void> {
+  function newTrackHandler(trackUrl: string | null): Promise<void> {
+    if (!trackUrl) {
+      setRadioOriginTrack(null);
+      return Promise.resolve();
+    }
+
+    let trackId;
+    try {
+      trackId = TrackFormatter.parseTrackUrl(trackUrl);
+    } catch (err) {
+      setRadioOriginTrack(null);
+      logger.error('[newTrackHandler] Track url is malformed.');
+      return Promise.reject('Track url is malformed.');
+    }
+
     if (!trackId) {
       setRadioOriginTrack(null);
       return Promise.resolve();
@@ -126,6 +140,8 @@ function ConfigProvider({ children }: ConfigProps) {
         return;
       })
       .catch((err: RadioPlus.Error) => {
+        setRadioOriginTrack(null);
+
         logger.error(
           '[newTrackHandler] Failed fetching detailed track data:',
           err
@@ -143,6 +159,7 @@ function ConfigProvider({ children }: ConfigProps) {
     data: data,
     setData: setDataHandler,
     errors: errors,
+    radioOriginTrack: radioOriginTrack,
     isLoading: isLoading,
   };
 

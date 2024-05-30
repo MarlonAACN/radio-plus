@@ -24,12 +24,29 @@ function useConfigForm() {
     setFormHasErrors(Object.values(formErrors).some((value) => value !== null));
   }, [formErrors]);
 
-  /** If the config data or the input change tracker data changes, make a comparison check on their equality. */
+  /** If the input change tracker data changes, make a comparison check on their equality, to check for a difference. */
   useEffect(() => {
     setFormHoldsNewData(
       haveDifferentAttributes(inputChangeTracker, config.data)
     );
-  }, [inputChangeTracker, config.data]);
+  }, [inputChangeTracker]);
+
+  /** When the config changes and the two configs don't match (because of local storage fetch), update change tracker.
+   * This will only occur when caused by a ls fetch, since the input change tracker is always up do date before the regular config gets updated by it.
+   * Updates the formHoldsNewData boolean accordingly too.
+   */
+  useEffect(() => {
+    const configsDiffer = haveDifferentAttributes(
+      inputChangeTracker,
+      config.data
+    );
+
+    if (configsDiffer) {
+      setInputChangeTracker(config.data);
+    }
+
+    setFormHoldsNewData(false);
+  }, [config.data]);
 
   /**
    * Compares two config objects on thei similiarity.
@@ -137,7 +154,6 @@ function useConfigForm() {
     formHoldsNewData,
     inputChangeTracker,
     setInputChangeTracker,
-    radioOriginInputEvaluator,
   };
 }
 

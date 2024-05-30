@@ -7,10 +7,12 @@ import {
   useState,
 } from 'react';
 
+import { LocalStorageKeys } from '@/constants/LocalStorageKeys';
 import { TrackRepo } from '@/repos/TrackRepo';
 import { RadioPlus } from '@/types/RadioPlus';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { logger } from '@/util/Logger';
+import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 type ConfigContextProps = {
   data: RadioPlus.Config;
@@ -58,6 +60,11 @@ function ConfigProvider({ children }: ConfigProps) {
     useState<RadioPlus.DetailedTrack | null>(null);
   const trackRepo = new TrackRepo(process.env.NEXT_PUBLIC_API_BASE_URL);
 
+  /** On load fetch config from ls */
+  useEffect(() => {
+    setData(LocalStorageManager.getConfig());
+  }, []);
+
   /** Refetch new data, based on changes in new config. */
   useEffect(() => {
     if (isLoading) {
@@ -92,9 +99,14 @@ function ConfigProvider({ children }: ConfigProps) {
     if (_cache.radioOriginTrackUrl !== _data.radioOriginTrackUrl) {
       await newTrackHandler(_data.radioOriginTrackUrl)
         .then(() => {
-          // On success, reset error entry and save id in cache.
+          // On success, reset error entry, save id in cache and update local storage.
           updateErrors.radioOriginTrackUrl = null;
+
           newCache.radioOriginTrackUrl = _data.radioOriginTrackUrl;
+          LocalStorageManager.updateConfigValue(
+            LocalStorageKeys.radioOriginTrackUrl,
+            _data.radioOriginTrackUrl
+          );
         })
         .catch((err: string) => {
           // On failure, update error entry accordingly and set track id in cache to null. (since the var is reseted inside the track handler)

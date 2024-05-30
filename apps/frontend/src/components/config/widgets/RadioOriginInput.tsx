@@ -41,7 +41,6 @@ function RadioOriginInputWidget({
   function onBlurHandler(e: React.FocusEvent<HTMLInputElement>) {
     const trimmedInputValue = e.target.value.trim();
 
-    e.target.value = trimmedInputValue;
     updateInputChangeTracker({
       ...inputChangeTracker,
       radioOriginTrackUrl: trimmedInputValue !== '' ? trimmedInputValue : null,
@@ -49,7 +48,7 @@ function RadioOriginInputWidget({
   }
 
   return (
-    <div className="radio-plus-radio-origin-input-container w-full">
+    <div className="radio-plus-radio-origin-input-container relative w-full">
       <label
         htmlFor="radio-plus-radio-origin-input"
         className="block pb-2 pl-3"
@@ -62,6 +61,7 @@ function RadioOriginInputWidget({
           id="radio-plus-radio-origin-input"
           name="radio-plus-radio-origin-input"
           disabled={isLoading}
+          value={inputChangeTracker.radioOriginTrackUrl ?? ''}
           onChange={(e) => inputChangeHandler(e)}
           onFocus={() =>
             setFormErrors({ ...formErrors, radioOriginTrackUrl: null })
@@ -80,7 +80,7 @@ function RadioOriginInputWidget({
         </div>
       </div>
       {formErrors.radioOriginTrackUrl ? (
-        <p className="radio-plus-error mt-1 mb-3 ml-2.5 text-red-500">
+        <p className="radio-plus-error absolute -bottom-7 left-0 left-2.5 text-red-500">
           {formErrors.radioOriginTrackUrl}
         </p>
       ) : null}

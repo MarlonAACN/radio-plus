@@ -5,9 +5,11 @@ import { ButtonHubWidget } from '@/components/player/widgets/ButtonHub';
 import { TrackInfoHubWidget } from '@/components/player/widgets/TrackInfoHub';
 import usePlayer from '@/hooks/usePlayer';
 
-function PlayerLayout() {
-  const player = usePlayer();
+type PlayerLayoutProps = {
+  player: ReturnType<typeof usePlayer>;
+};
 
+function PlayerLayout({ player }: PlayerLayoutProps) {
   function getTrackBackgroundCSS(track: Spotify.Track | null): string {
     if (!track || (!track.album.images[0].url && !track.album.images[2].url)) {
       return '#242424';

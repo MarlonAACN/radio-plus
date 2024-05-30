@@ -12,6 +12,7 @@ import { PlayerRepo } from '@/repos/PlayerRepo';
 import { appRouter } from '@/router/app/AppRouter';
 import { logger } from '@/util/Logger';
 import { AuthTokenManager } from '@/util/manager/AuthTokenManager';
+import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 function usePlayer() {
   const { getAuthToken, isAuthenticated } = useAuth();
@@ -256,6 +257,7 @@ function usePlayer() {
   /**
    * When both the access token and the refresh token are expired and thus are not present as cookies anymore (rare potential occasion),
    * Reset the player and redirect user back to login page to authenticate themselves once again.
+   * Can also be called upon user logout.
    */
   function resetPlayer() {
     logger.log('[SpotifyPlayer] Resetting player...');
@@ -267,6 +269,7 @@ function usePlayer() {
     }
 
     AuthTokenManager.deleteAuthTokenCookies();
+    LocalStorageManager.wipeLocalStorage();
 
     setTimeout(() => {
       router.push(appRouter.get('Login').build());
@@ -296,6 +299,7 @@ function usePlayer() {
 
   return {
     currentTrack,
+    logout: resetPlayer,
     togglePause,
     skipBackwards,
     skipForward,

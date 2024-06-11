@@ -4,6 +4,7 @@ import Head from 'next/head';
 
 import { ConfigLayout } from '@/components/config/layout';
 import { PlayerLayout } from '@/components/player/layout';
+import { useAlgorithm } from '@/hooks/useAlgorithm';
 import usePlayer from '@/hooks/usePlayer';
 import { appRouter } from '@/router/app/AppRouter';
 import { logger } from '@/util/Logger';
@@ -34,6 +35,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 function Base() {
   const player = usePlayer();
+  const algorithm = useAlgorithm({ player: player });
 
   return (
     <>
@@ -41,7 +43,12 @@ function Base() {
         <title>Radio⁺</title>
       </Head>
       <main className="relative w-full min-h-screen flex flex-col justify-start items-center px-5 pt-10 pb-5 sm:px-7 sm:pb-5 md:px-10 md:pb-10">
-        <ConfigLayout logout={player.logout} />
+        <ConfigLayout
+          logout={player.logout}
+          playerWasTransferred={player.wasTransferred}
+          userDataFetched={algorithm.userDataFetched}
+          algorithmError={algorithm.error}
+        />
         <PlayerLayout player={player} />
       </main>
     </>

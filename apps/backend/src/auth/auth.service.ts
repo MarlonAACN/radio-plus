@@ -39,7 +39,7 @@ export class AuthService {
     });
 
     return {
-      url: SpotifyEndpointURLs.UserOAuth(authQueryParams.toString()),
+      url: SpotifyEndpointURLs.UserOAuth(authQueryParams),
       statusCode: HttpStatus.MOVED_PERMANENTLY,
     };
   }

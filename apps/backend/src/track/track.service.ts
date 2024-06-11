@@ -81,10 +81,7 @@ export class TrackService {
       },
     };
 
-    return fetch(
-      SpotifyEndpointURLs.track.getAudioFeatures + `/${id}`,
-      requestParams
-    )
+    return fetch(SpotifyEndpointURLs.track.getAudioFeatures(id), requestParams)
       .then((response) => {
         return response.text();
       })
@@ -124,7 +121,7 @@ export class TrackService {
       },
     };
 
-    return fetch(SpotifyEndpointURLs.track.getData + `/${id}`, requestParams)
+    return fetch(SpotifyEndpointURLs.track.getData(id), requestParams)
       .then((response) => {
         return response.text();
       })

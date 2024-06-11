@@ -8,4 +8,19 @@ export const ApiRoutes = {
     vars: { v: 'v1', trackId: '' },
     query: {},
   },
+  initAlgorithm: {
+    path: '/{v}/algorithm',
+    vars: { v: 'v1' },
+    query: {},
+  },
+  updateQueue: {
+    path: '/{v}/algorithm/queue',
+    vars: { v: 'v1' },
+    query: {},
+  },
+  getUserMarket: {
+    path: '/{v}/user/market',
+    vars: { v: 'v1' },
+    query: {},
+  },
 };

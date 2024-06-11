@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 import { m } from 'framer-motion';
 
@@ -8,9 +8,13 @@ import { ConfigMenuToggleBarWidget } from '@/components/config/widgets/ConfigMen
 import { RadioOriginInputWidget } from '@/components/config/widgets/RadioOriginInput';
 import { useConfig } from '@/context/ConfigContext';
 import { useConfigForm } from '@/hooks/useConfigForm';
+import { logger } from '@/util/Logger';
 
 type ConfigLayoutProps = {
   logout: () => void;
+  playerWasTransferred: boolean;
+  userDataFetched: boolean;
+  algorithmError: string | null;
 };
 
 const variants = {
@@ -18,12 +22,31 @@ const variants = {
   closed: { bottom: 0, top: 'unset' },
 };
 
-function ConfigLayout({ logout }: ConfigLayoutProps) {
+function ConfigLayout({
+  logout,
+  playerWasTransferred,
+  userDataFetched,
+  algorithmError,
+}: ConfigLayoutProps) {
   const config = useConfig();
   const configForm = useConfigForm();
   const [isOpen, setIsOpen] = useState(false);
 
+  /** If updating the config fails, open menu again. */
+  useEffect(() => {
+    if (config.hasErrors && !isOpen) {
+      setIsOpen(true);
+    }
+  }, [config.hasErrors]);
+
   function formSubmitHandler(e: FormEvent<HTMLFormElement>) {
+    if (!playerWasTransferred) {
+      logger.warn(
+        '[formSubmitHandler] Tried to update config form, before player was transferred. Aborting.'
+      );
+      return;
+    }
+
     const success = configForm.formSubmitHandler(e);
 
     if (success) {
@@ -63,8 +86,14 @@ function ConfigLayout({ logout }: ConfigLayoutProps) {
             isLoading={config.isLoading}
             formHasErrors={configForm.formHasErrors}
             formHoldsNewData={configForm.formHoldsNewData}
+            playerWasTransferred={playerWasTransferred}
+            userDataFetched={userDataFetched}
           />
-          <ConfigMenuToggleBarWidget isOpen={isOpen} setIsOpen={setIsOpen} />
+          <ConfigMenuToggleBarWidget
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            algorithmError={algorithmError}
+          />
         </m.form>
       </div>
     </>

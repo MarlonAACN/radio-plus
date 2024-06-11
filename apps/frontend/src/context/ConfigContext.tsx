@@ -3,7 +3,6 @@ import {
   ReactNode,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
@@ -15,9 +14,12 @@ import { logger } from '@/util/Logger';
 import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 type ConfigContextProps = {
+  /** The data here, actually referes to the cached data, that gets only updated, if all data fetches for it were successfully. */
   data: RadioPlus.Config;
+  /** This updates the base data object, which change is tracked and evaluated. If evaluation and external fetches were successfull, update cache data. */
   setData: (data: RadioPlus.Config) => void;
   errors: RadioPlus.ConfigErrors;
+  hasErrors: boolean;
   radioOriginTrack: RadioPlus.DetailedTrack | null;
   isLoading: boolean;
 };
@@ -36,6 +38,7 @@ const configDefaultValues: ConfigContextProps = {
   errors: {
     radioOriginTrackUrl: null,
   },
+  hasErrors: false,
   radioOriginTrack: null,
   isLoading: false,
 };
@@ -47,23 +50,24 @@ function useConfig() {
 }
 
 function ConfigProvider({ children }: ConfigProps) {
-  const cachedData = useRef<RadioPlus.Config>({ radioOriginTrackUrl: null });
+  /** Once the changed data has been evaluated and all fetches successfully finished, update the data cache.
+   * This is the source of truth for the config.
+   * */
+  const [cachedData, setCachedData] = useState<RadioPlus.Config>({
+    radioOriginTrackUrl: null,
+  });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
   });
+  const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [radioOriginTrack, setRadioOriginTrack] =
     useState<RadioPlus.DetailedTrack | null>(null);
   const trackRepo = new TrackRepo(process.env.NEXT_PUBLIC_API_BASE_URL);
-
-  /** On load fetch config from ls */
-  useEffect(() => {
-    setData(LocalStorageManager.getConfig());
-  }, []);
 
   /** Refetch new data, based on changes in new config. */
   useEffect(() => {
@@ -71,11 +75,15 @@ function ConfigProvider({ children }: ConfigProps) {
       return;
     }
 
-    configUpdateHandler(data, cachedData.current).finally(() => {
+    configUpdateHandler(data, cachedData).finally(() => {
       logger.log('[ConfigContext] Config related data refresh completed.');
       logger.log(data);
     });
   }, [data]);
+
+  useEffect(() => {
+    setHasErrors(errors.radioOriginTrackUrl !== null);
+  }, [errors]);
 
   /**
    * Handler that is called once the config gets updated.
@@ -117,7 +125,7 @@ function ConfigProvider({ children }: ConfigProps) {
 
     // Update global error object, update global cache.
     setErrors(updateErrors);
-    cachedData.current = newCache;
+    setCachedData(newCache);
     setIsLoading(false);
   }
 
@@ -168,9 +176,10 @@ function ConfigProvider({ children }: ConfigProps) {
   }
 
   const value: ConfigContextProps = {
-    data: data,
+    data: cachedData,
     setData: setDataHandler,
     errors: errors,
+    hasErrors: hasErrors,
     radioOriginTrack: radioOriginTrack,
     isLoading: isLoading,
   };

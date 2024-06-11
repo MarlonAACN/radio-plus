@@ -4,13 +4,14 @@ import { useConfig } from '@/context/ConfigContext';
 import { RadioPlus } from '@/types/RadioPlus';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { isWhitespaceString } from '@/util/is-whitespace-string';
+import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 function useConfigForm() {
   const config = useConfig();
 
   const [inputChangeTracker, setInputChangeTracker] =
     useState<RadioPlus.Config>(config.data);
-  /** Determines if the input of the form has changed, based by comparing the inputChangeTracker data to the saved config data. */
+  /** Determines if the input of the form has changed, based by comparing the inputChangeTracker data with the saved config data. */
   const [formHoldsNewData, setFormHoldsNewData] = useState<boolean>(false);
   /** Holds the errors from the form for each input of it. */
   const [formErrors, setFormErrors] = useState<RadioPlus.ConfigFormErrors>({
@@ -18,6 +19,14 @@ function useConfigForm() {
   });
   /** Determines if any of the form inputs have thrown a warning to the user, based on his inputs. */
   const [formHasErrors, setFormHasErrors] = useState<boolean>(false);
+
+  /** On load fetch config from ls and only update the change tracker.
+   * This way the user still needs to submit the data to radio plus via the config submit button.
+   * This prevents the player to immeditately start playing on origin track change, without user interaction.
+   * */
+  useEffect(() => {
+    setInputChangeTracker(LocalStorageManager.getConfig());
+  }, []);
 
   /** On update of the formError object, check if form holds any errors. */
   useEffect(() => {
@@ -29,24 +38,7 @@ function useConfigForm() {
     setFormHoldsNewData(
       haveDifferentAttributes(inputChangeTracker, config.data)
     );
-  }, [inputChangeTracker]);
-
-  /** When the config changes and the two configs don't match (because of local storage fetch), update change tracker.
-   * This will only occur when caused by a ls fetch, since the input change tracker is always up do date before the regular config gets updated by it.
-   * Updates the formHoldsNewData boolean accordingly too.
-   */
-  useEffect(() => {
-    const configsDiffer = haveDifferentAttributes(
-      inputChangeTracker,
-      config.data
-    );
-
-    if (configsDiffer) {
-      setInputChangeTracker(config.data);
-    }
-
-    setFormHoldsNewData(false);
-  }, [config.data]);
+  }, [inputChangeTracker, config.data]);
 
   /**
    * Compares two config objects on thei similiarity.

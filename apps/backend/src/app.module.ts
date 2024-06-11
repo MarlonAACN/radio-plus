@@ -6,6 +6,10 @@ import { AuthMiddleware } from '@/middleware/auth.middleware';
 import { PlayerController } from '@/player/player.controller';
 import { TrackController } from './track/track.controller';
 import { TrackModule } from './track/track.module';
+import { AlgoModule } from './algo/algo.module';
+import { AlgoController } from '@/algo/algo.controller';
+import { UserModule } from './user/user.module';
+import { UserController } from '@/user/user.controller';
 
 @Module({
   imports: [
@@ -15,6 +19,8 @@ import { TrackModule } from './track/track.module';
     AuthModule,
     PlayerModule,
     TrackModule,
+    AlgoModule,
+    UserModule,
   ],
 })
 @Module({
@@ -22,6 +28,13 @@ import { TrackModule } from './track/track.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(PlayerController, TrackController);
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(
+        PlayerController,
+        TrackController,
+        AlgoController,
+        UserController
+      );
   }
 }

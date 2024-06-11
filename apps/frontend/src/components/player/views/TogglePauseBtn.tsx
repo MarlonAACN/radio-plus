@@ -14,6 +14,7 @@ function TogglePauseBtn({
   playerEventIsLoading,
   disabled = false,
 }: TogglePauseBtnProps) {
+  // https://github.com/vercel/next.js/issues/35558
   const firefoxProps = {
     autoComplete: 'off',
   };

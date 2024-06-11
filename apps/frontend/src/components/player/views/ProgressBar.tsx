@@ -12,7 +12,7 @@ type ProgressBarProps = {
   /** current track position */
   position: number;
   /** Check if init playback transfer is completed successfully. */
-  initPlaybackWasTransfered: boolean;
+  initPlaybackWasTransferred: boolean;
   isPaused: boolean;
   playerEventIsLoading: boolean;
   seekPosition: (positionInMs: number) => Promise<boolean>;
@@ -23,7 +23,7 @@ function ProgressBarWidget({
   trackLength,
   position,
   isPaused,
-  initPlaybackWasTransfered,
+  initPlaybackWasTransferred,
   playerEventIsLoading,
   seekPosition,
 }: ProgressBarProps) {
@@ -32,6 +32,7 @@ function ProgressBarWidget({
   const inputDragDebouncer = useRef<NodeJS.Timer | null>(null);
   const interval = useRef<NodeJS.Timer | null>(null);
   const inputRangeHtml = useRef<HTMLInputElement | null>(null);
+  // https://github.com/vercel/next.js/issues/35558
   const firefoxProps = {
     autoComplete: 'off',
   };
@@ -94,7 +95,7 @@ function ProgressBarWidget({
 
     const sliderValue = inputRangeHtml.current.value;
 
-    if (currentTrack === null || !initPlaybackWasTransfered) {
+    if (currentTrack === null || !initPlaybackWasTransferred) {
       inputRangeHtml.current.style.background = `linear-gradient(to right, #242424 0%, #242424 0%)`;
       return;
     }
@@ -199,7 +200,7 @@ function ProgressBarWidget({
         onChange={progressChangeHandler}
         onMouseDown={mouseDownEventHandler}
         onMouseUp={(e) => mouseUpEventHandler(e)}
-        disabled={!initPlaybackWasTransfered}
+        disabled={!initPlaybackWasTransferred}
         id="radio-plus-track-progress-slider"
         className="radio-plus-track-progress-slider flex-1"
       />

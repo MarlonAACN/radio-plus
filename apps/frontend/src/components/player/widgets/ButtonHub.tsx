@@ -9,7 +9,7 @@ type ButtonHubProps = {
   isPaused: boolean;
   playerEventIsLoading: boolean;
   /** Check if init playback transfer is completed successfully. */
-  initPlaybackWasTransfered: boolean;
+  initPlaybackWasTransferred: boolean;
 };
 
 function ButtonHubWidget({
@@ -18,23 +18,23 @@ function ButtonHubWidget({
   togglePauseHandler,
   isPaused,
   playerEventIsLoading,
-  initPlaybackWasTransfered,
+  initPlaybackWasTransferred,
 }: ButtonHubProps) {
   return (
     <div className="radio-plus-player-button-hub-container flex flex-row justify-center items-center gap-x-5">
       <SkipBackBtn
         skipBackHandler={skipBackHandler}
-        disabled={!initPlaybackWasTransfered}
+        disabled={!initPlaybackWasTransferred}
       />
       <TogglePauseBtn
         toggleHandler={togglePauseHandler}
         isPaused={isPaused}
         playerEventIsLoading={playerEventIsLoading}
-        disabled={!initPlaybackWasTransfered}
+        disabled={!initPlaybackWasTransferred}
       />
       <SkipFwdBtn
         skipFwdHandler={skipFwdHandler}
-        disabled={!initPlaybackWasTransfered}
+        disabled={!initPlaybackWasTransferred}
       />
     </div>
   );

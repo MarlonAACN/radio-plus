@@ -47,14 +47,14 @@ function PlayerLayout({ player }: PlayerLayoutProps) {
             position={player.position}
             seekPosition={player.seekPosition}
             playerEventIsLoading={player.eventIsLoading}
-            initPlaybackWasTransfered={player.wasTransfered}
+            initPlaybackWasTransferred={player.wasTransferred}
             isPaused={player.isPaused}
           />
           <ButtonHubWidget
             togglePauseHandler={player.togglePause}
             isPaused={player.isPaused}
             playerEventIsLoading={player.eventIsLoading}
-            initPlaybackWasTransfered={player.wasTransfered}
+            initPlaybackWasTransferred={player.wasTransferred}
             skipBackHandler={player.skipBackwards}
             skipFwdHandler={player.skipForward}
           />

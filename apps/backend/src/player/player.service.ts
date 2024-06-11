@@ -22,7 +22,7 @@ export class PlayerService {
       body: JSON.stringify({ device_ids: [deviceId], play: false }),
     };
 
-    return fetch(SpotifyEndpointURLs.PlaybackState, requestParams)
+    return fetch(SpotifyEndpointURLs.player.PlaybackState, requestParams)
       .then((response) => {
         return response.text();
       })
@@ -73,7 +73,7 @@ export class PlayerService {
     };
 
     return fetch(
-      SpotifyEndpointURLs.SeekPosition + `?${urlParams}`,
+      SpotifyEndpointURLs.player.SeekPosition(urlParams),
       requestParams
     )
       .then((response) => {

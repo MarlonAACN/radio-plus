@@ -9,8 +9,8 @@ type FilterFormSubmitBtnProps = {
   formHoldsNewData: boolean;
   /** Don't allow config submits, before player was successfully transferred to the radio plus instance. */
   playerWasTransferred: boolean;
-  /** Don't allow config submits, before user data fetch is completed. */
-  userDataFetched: boolean;
+  /** Don't allow config submits, before user fetch is completed. */
+  userFetched: boolean;
 };
 
 function ConfigFormSubmitBtnView({
@@ -18,7 +18,7 @@ function ConfigFormSubmitBtnView({
   formHoldsNewData,
   formHasErrors,
   playerWasTransferred,
-  userDataFetched,
+  userFetched,
 }: FilterFormSubmitBtnProps) {
   // https://github.com/vercel/next.js/issues/35558
   const extraFirefoxProps = {
@@ -34,11 +34,11 @@ function ConfigFormSubmitBtnView({
         !formHoldsNewData ||
         formHasErrors ||
         !playerWasTransferred ||
-        !userDataFetched
+        !userFetched
       }
       type="submit"
     >
-      {isLoading || !playerWasTransferred || !userDataFetched ? (
+      {isLoading || !playerWasTransferred || !userFetched ? (
         <Spinner className="w-6 h-6 py-0.5" />
       ) : (
         'Start'

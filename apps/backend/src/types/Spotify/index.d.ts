@@ -136,6 +136,42 @@ declare namespace Spotify {
   }
 
   /**
+   * Cursor object
+   * [cursor object](https://developer.spotify.com/web-api/object-model/)
+   */
+  interface CursorObject {
+    after: string;
+    before?: string | undefined;
+  }
+
+  /**
+   * Cursor Based Paging Object wrappers used for retrieving collections from the Spotify API.
+   * [](https://developer.spotify.com/web-api/object-model/#cursor-based-paging-object)
+   */
+  interface CursorBasedPagingObject<T> {
+    href: string;
+    items: T[];
+    limit: number;
+    next: string | null;
+    cursors: CursorObject;
+    total?: number | undefined;
+  }
+
+  /**
+   * Paging Object wrapper used for retrieving collections from the Spotify API.
+   * [](https://developer.spotify.com/web-api/object-model/#paging-object)
+   */
+  interface PagingObject<T> {
+    href: string;
+    items: T[];
+    limit: number;
+    next: string | null;
+    offset: number;
+    previous: string | null;
+    total: number;
+  }
+
+  /**
    * Simplified Artist Object
    * [artist object (simplified)](https://developer.spotify.com/web-api/object-model/)
    */
@@ -149,6 +185,32 @@ declare namespace Spotify {
      */
     id: string;
     type: 'artist';
+  }
+
+  /**
+   * Full Artist Object
+   * [artist object (full)](https://developer.spotify.com/web-api/object-model/)
+   */
+  interface ArtistObjectFull extends ArtistObjectSimplified {
+    /**
+     * Information about the followers of the artist.
+     */
+    followers: FollowersObject;
+    /**
+     * A list of the genres the artist is associated with.
+     * For example: `"Prog Rock"` , `"Post-Grunge"`.
+     * (If not yet classified, the array is empty.)
+     */
+    genres: string[];
+    /**
+     * Images of the artist in various sizes, widest first.
+     */
+    images: ImageObject[];
+    /**
+     * The popularity of the artist. The value will be between `0` and `100`, with `100` being the most popular.
+     * The artist’s popularity is calculated from the popularity of all the artist’s tracks.
+     */
+    popularity: number;
   }
 
   /**
@@ -391,4 +453,49 @@ declare namespace Spotify {
     type: 'user';
     uri: string;
   }
+
+  /**
+   * Play History Object
+   * [](https://developer.spotify.com/web-api/web-api-personalization-endpoints/get-recently-played/#play-history-object)
+   */
+  interface PlayHistoryObject {
+    track: TrackObjectFull;
+    played_at: string;
+    context: ContextObject;
+  }
+
+  /**
+   * Get a User’s Recently Played Tracks
+   *
+   * GET /v1/me/player/recently-played
+   * https://developer.spotify.com/web-api/get-users-top-artists-and-tracks/
+   */
+  interface UsersRecentlyPlayedTracksResponse
+    extends CursorBasedPagingObject<PlayHistoryObject> {}
+
+  /**
+   * Get User’s Followed Artists
+   *
+   * GET /v1/me/following
+   * https://developer.spotify.com/web-api/get-followed-artists/
+   */
+  interface UsersFollowedArtistsResponse {
+    artists: CursorBasedPagingObject<ArtistObjectFull>;
+  }
+
+  /**
+   * Get a User’s Top Artists and Tracks (Note: This is only Artists)
+   *
+   * GET /v1/me/top/{type}
+   * https://developer.spotify.com/web-api/get-users-top-artists-and-tracks/
+   */
+  interface UsersTopArtistsResponse extends PagingObject<ArtistObjectFull> {}
+
+  /**
+   * Get a User’s Top Artists and Tracks (Note: This is only Tracks)
+   *
+   * GET /v1/me/top/{type}
+   * https://developer.spotify.com/web-api/get-users-top-artists-and-tracks/
+   */
+  interface UsersTopTracksResponse extends PagingObject<TrackObjectFull> {}
 }

@@ -1,17 +1,15 @@
 class TrackFilter {
   /**
    * Finds and returns the first track that is considered playable by spotify.
+   * Being playable means, that this track is available in the market (country) of the user.
    * @param tracks {Array<Spotify.RecommendationTrackObject>} A list of recommended tracks.
    * @returns {Spotify.RecommendationTrackObject | null} The first track that is considered playable or null if no track is playable.
    */
   private static findFirstPlayable(
     tracks: Array<Spotify.RecommendationTrackObject>
   ): Spotify.RecommendationTrackObject | null {
-    return tracks[0];
-
     for (const track of tracks) {
       if (track.is_playable) {
-        console.log('playable track', track);
         return track;
       }
     }
@@ -27,7 +25,6 @@ class TrackFilter {
   public static filterRecommendations(
     tracks: Array<Spotify.RecommendationTrackObject>
   ): string | null {
-    console.log(tracks);
     const track = this.findFirstPlayable(tracks);
 
     if (track) {

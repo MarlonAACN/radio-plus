@@ -9,6 +9,7 @@ import { REFRESH_TOKEN_TTL } from '@/constants';
 import { HttpHeader } from '@/util/HttpHeader';
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
 import { InternalEndpointURLs } from '@/constants/InternalEndpointURLs';
+import { SupportedCookies } from '@/constants/SupportedCookies';
 
 @Injectable()
 export class AuthService {
@@ -102,14 +103,14 @@ export class AuthService {
         );
 
         // Set auth token cookie header
-        response.cookie('x-radio-plus-access-token', data.access_token, {
+        response.cookie(SupportedCookies.accessToken, data.access_token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,
           expires: DateFormatter.CreateDateAfterDelay(data.expires_in),
         });
 
-        response.cookie('x-radio-plus-refresh-token', data.refresh_token, {
+        response.cookie(SupportedCookies.refreshToken, data.refresh_token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,
@@ -177,14 +178,14 @@ export class AuthService {
         );
 
         // Set auth token cookie header
-        response.cookie('x-radio-plus-access-token', data.access_token, {
+        response.cookie(SupportedCookies.accessToken, data.access_token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,
           expires: DateFormatter.CreateDateAfterDelay(data.expires_in),
         });
 
-        response.cookie('x-radio-plus-refresh-token', token, {
+        response.cookie(SupportedCookies.refreshToken, token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,

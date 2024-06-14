@@ -27,6 +27,13 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     handleConfigChange(config.data);
   }, [config.data]);
 
+  /** If the user hook throws an error update algos error state object accordingly. */
+  useEffect(() => {
+    if (user.error !== null) {
+      setAlgoError(user.error);
+    }
+  }, [user.error]);
+
   /** Update queue if new track comes up.
    * This can be blocked if the blockQueueUpdate is set to true. For example when the starting track is set, this hook should not fire.
    * With this hook there is always one track in the queue of the user, as a new track is added to the queue, once a new track comes up.
@@ -64,7 +71,19 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       return;
     }
 
-    updateTrackQueue(player.deviceId, config.radioOriginTrack.information.id);
+    // user.fetchCompleted would usually be enough, but let's satisfy the compiler here.
+    if (!user.fetchCompleted || !user.data) {
+      logger.log(
+        '[UpdateQueueTracker] Tried to update queue, before user data fetch was completed.'
+      );
+      return;
+    }
+
+    updateTrackQueue(
+      player.deviceId,
+      config.radioOriginTrack.information.id,
+      user.data
+    );
   }, [player.activeTrackId]);
 
   /**
@@ -91,6 +110,14 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       return;
     }
 
+    // Check if user data fetch was completed
+    // user.fetchCompleted would usually be enough, but let's satisfy the compiler here.
+    if (!user.fetchCompleted || !user.data) {
+      setAlgoError("Can't start smart queue before user data is fetched.");
+
+      return;
+    }
+
     let trackId;
     try {
       trackId = TrackFormatter.parseTrackUrl(config.radioOriginTrackUrl);
@@ -109,17 +136,22 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       return;
     }
 
-    setOriginTrack(trackId, player.deviceId);
+    setOriginTrack(trackId, player.deviceId, user.data);
   }
 
   /**
    * Finds a recommendation based on the origin track id and adds it to the users track queue.
    * @param deviceId {string} The device id of the Radio plus instance.
    * @param originTrackId {string} The id of the origin track, that is used to fetch recommendations.
+   * @param user {RadioPlus.User} Data of the user, that is relevant for the algorithm.
    */
-  function updateTrackQueue(deviceId: string, originTrackId: string) {
+  function updateTrackQueue(
+    deviceId: string,
+    originTrackId: string,
+    user: RadioPlus.User
+  ) {
     return algoRepo
-      .updateQueue(deviceId, originTrackId)
+      .updateQueue(deviceId, originTrackId, user)
       .then((res) => {
         logger.log(
           `[updateTrackQueue] Track with id: ${res.trackId} was successfully added to the queue.`
@@ -140,15 +172,20 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
    * This marks the start of the running algorithm.
    * @param trackId {string} The id of the origin track
    * @param deviceId {string} The id of the current device (radio plus instance)
+   * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @returns {boolean} A boolean indicating the outcome of the operation.
    */
-  function setOriginTrack(trackId: string, deviceId: string): Promise<boolean> {
+  function setOriginTrack(
+    trackId: string,
+    deviceId: string,
+    user: RadioPlus.User
+  ): Promise<boolean> {
     setIsLoading(true);
     // Prevent track change hook from adding a track to the queue.
     blockQueueUpdate.current = true;
 
     return algoRepo
-      .initAlgorithm(trackId, deviceId)
+      .initAlgorithm(trackId, user, deviceId)
       .then(() => {
         setAlgoIsActive(true);
         logger.log(
@@ -156,7 +193,7 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
         );
 
         // manually trigger 'update track queue', since hook would not be called, if the set origin track matches the already active one.
-        updateTrackQueue(deviceId, trackId);
+        updateTrackQueue(deviceId, trackId, user);
         return true;
       })
       .catch((err: RadioPlus.Error) => {
@@ -176,8 +213,8 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
 
   return {
     error: algoError,
-    setOriginTrack,
-    userDataFetched: user.fetchCompleted,
+    userFetched: user.fetchCompleted,
+    isLoading: isLoading,
   };
 }
 

@@ -1,4 +1,6 @@
-import { IsString } from 'class-validator';
+import { IsObject, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { UserDto } from '@/algo/dto/user.dto';
 
 class InitAlgorithmDto {
   @IsString()
@@ -6,6 +8,11 @@ class InitAlgorithmDto {
 
   @IsString()
   originTrackId: string;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UserDto)
+  user: UserDto;
 }
 
 export { InitAlgorithmDto };

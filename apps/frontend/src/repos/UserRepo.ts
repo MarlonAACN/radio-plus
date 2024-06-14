@@ -1,4 +1,5 @@
 import { ApiRouter } from '@/router/api/ApiRouter';
+import { RadioPlus } from '@/types/RadioPlus';
 import { HttpHandler } from '@/util/HttpHandler';
 
 class UserRepo {
@@ -8,9 +9,9 @@ class UserRepo {
     this.router = new ApiRouter(apiBase);
   }
 
-  getUserMarket(): Promise<{ market: string }> {
+  getUser(): Promise<RadioPlus.User> {
     return fetch(
-      this.router.get('getUserMarket').build({
+      this.router.get('getUser').build({
         v: 'v1',
       }),
       {
@@ -19,10 +20,10 @@ class UserRepo {
       }
     )
       .then((response: Response) => {
-        return HttpHandler.response<{ market: string }>(response);
+        return HttpHandler.response<RadioPlus.User>(response);
       })
       .catch((errResponse) => {
-        return HttpHandler.error<{ market: string }>(errResponse);
+        return HttpHandler.error<RadioPlus.User>(errResponse);
       });
   }
 }

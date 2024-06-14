@@ -1,4 +1,5 @@
 import { ApiRouter } from '@/router/api/ApiRouter';
+import { RadioPlus } from '@/types/RadioPlus';
 import { HttpHandler } from '@/util/HttpHandler';
 
 class AlgoRepo {
@@ -8,7 +9,11 @@ class AlgoRepo {
     this.router = new ApiRouter(apiBase);
   }
 
-  initAlgorithm(originTrackId: string, deviceId: string): Promise<void> {
+  initAlgorithm(
+    originTrackId: string,
+    user: RadioPlus.User,
+    deviceId: string
+  ): Promise<void> {
     return fetch(
       this.router.get('initAlgorithm').build({
         v: 'v1',
@@ -22,6 +27,7 @@ class AlgoRepo {
         body: JSON.stringify({
           deviceId: deviceId,
           originTrackId: originTrackId,
+          user: user,
         }),
       }
     )
@@ -35,7 +41,8 @@ class AlgoRepo {
 
   updateQueue(
     deviceId: string,
-    originTrackId: string
+    originTrackId: string,
+    user: RadioPlus.User
   ): Promise<{ trackId: string }> {
     return fetch(
       this.router.get('updateQueue').build({
@@ -50,6 +57,7 @@ class AlgoRepo {
         body: JSON.stringify({
           deviceId: deviceId,
           originTrackId: originTrackId,
+          user: user,
         }),
       }
     )

@@ -46,10 +46,10 @@ function Base() {
         <ConfigLayout
           logout={player.logout}
           playerWasTransferred={player.wasTransferred}
-          userDataFetched={algorithm.userDataFetched}
+          userFetched={algorithm.userFetched}
           algorithmError={algorithm.error}
         />
-        <PlayerLayout player={player} />
+        <PlayerLayout player={player} algoIsLoading={algorithm.isLoading} />
       </main>
     </>
   );

@@ -1,7 +1,9 @@
-import { Controller, Get, HttpException, Req } from '@nestjs/common';
+import { Controller, Get, HttpException, Req, Res } from '@nestjs/common';
 import { UserService } from '@/user/user.service';
 import { AuthRequest } from '@/types/misc/AuthRequest';
 import { RequestError } from '@/util/Error';
+import { RadioPlus } from '@/types/RadioPlus';
+import { Response } from 'express';
 
 @Controller({
   version: '1',
@@ -10,10 +12,31 @@ import { RequestError } from '@/util/Error';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Get('market')
-  getUserMarket(@Req() request: AuthRequest): Promise<{ market: string }> {
+  @Get()
+  getUser(
+    @Req() request: AuthRequest,
+    @Res({ passthrough: true }) response: Response
+  ): Promise<RadioPlus.User> {
     return this.userService
-      .getUserMarket(request.accessToken)
+      .getUser(request.accessToken, response)
+      .then((userData) => {
+        return userData;
+      })
+      .catch((err: RequestError) => {
+        throw new HttpException(
+          {
+            status: err.status,
+            message: err.message,
+          },
+          err.status
+        );
+      });
+  }
+
+  @Get('data')
+  getUserData(@Req() request: AuthRequest): Promise<RadioPlus.UserData> {
+    return this.userService
+      .getUserData(request.accessToken)
       .then((userData) => {
         return userData;
       })

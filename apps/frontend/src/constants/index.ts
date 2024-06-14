@@ -16,5 +16,3 @@ export const PROGRESS_BAR_DEFAULT_LENGTH = 60000;
 
 export const BlurDataB64ImagePlaceholder =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8zpD0HwAFqQJasgYuqgAAAABJRU5ErkJggg==';
-
-export const DEFAULT_MARKET = 'DE';

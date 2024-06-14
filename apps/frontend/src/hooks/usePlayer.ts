@@ -12,7 +12,7 @@ import { PlayerRepo } from '@/repos/PlayerRepo';
 import { appRouter } from '@/router/app/AppRouter';
 import { RadioPlus } from '@/types/RadioPlus';
 import { logger } from '@/util/Logger';
-import { AuthTokenManager } from '@/util/manager/AuthTokenManager';
+import { CookieManager } from '@/util/manager/CookieManager';
 import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 function usePlayer(): RadioPlus.PlayerHook {
@@ -288,7 +288,7 @@ function usePlayer(): RadioPlus.PlayerHook {
       disconnectPlayer(player);
     }
 
-    AuthTokenManager.deleteAuthTokenCookies();
+    CookieManager.deleteCookies();
     LocalStorageManager.wipeLocalStorage();
 
     setTimeout(() => {

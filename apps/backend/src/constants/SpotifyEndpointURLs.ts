@@ -1,3 +1,5 @@
+import * as url from 'url';
+
 export const SpotifyEndpointURLs = {
   TokenAuthorization: 'https://accounts.spotify.com/api/token',
   UserOAuth: (urlParams: URLSearchParams) =>
@@ -18,5 +20,13 @@ export const SpotifyEndpointURLs = {
   },
   GetRecommendations: (urlParams: URLSearchParams) =>
     `https://api.spotify.com/v1/recommendations?${urlParams}`,
-  getUserProfile: 'https://api.spotify.com/v1/me',
+  GetUserProfile: 'https://api.spotify.com/v1/me',
+  GetRecentlyPlayedTracks: (urlParams: URLSearchParams) =>
+    `https://api.spotify.com/v1/me/player/recently-played?${urlParams}`,
+  GetFollowedArtists: (urlParams: URLSearchParams) =>
+    `https://api.spotify.com/v1/me/following?${urlParams}`,
+  GetUsersTopArtists: (urlParams: URLSearchParams) =>
+    `https://api.spotify.com/v1/me/top/artists?${urlParams}`,
+  GetUsersTopTracks: (urlParams: URLSearchParams) =>
+    `https://api.spotify.com/v1/me/top/tracks?${urlParams}`,
 };

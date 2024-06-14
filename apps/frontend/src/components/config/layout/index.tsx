@@ -13,7 +13,7 @@ import { logger } from '@/util/Logger';
 type ConfigLayoutProps = {
   logout: () => void;
   playerWasTransferred: boolean;
-  userDataFetched: boolean;
+  userFetched: boolean;
   algorithmError: string | null;
 };
 
@@ -25,7 +25,7 @@ const variants = {
 function ConfigLayout({
   logout,
   playerWasTransferred,
-  userDataFetched,
+  userFetched,
   algorithmError,
 }: ConfigLayoutProps) {
   const config = useConfig();
@@ -87,7 +87,7 @@ function ConfigLayout({
             formHasErrors={configForm.formHasErrors}
             formHoldsNewData={configForm.formHoldsNewData}
             playerWasTransferred={playerWasTransferred}
-            userDataFetched={userDataFetched}
+            userFetched={userFetched}
           />
           <ConfigMenuToggleBarWidget
             isOpen={isOpen}

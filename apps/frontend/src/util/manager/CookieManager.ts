@@ -5,11 +5,13 @@ import { SupportedCookies } from '@/constants/SupportedCookies';
 /**
  * Utility class to manage the auth token cookies.
  */
-class AuthTokenManager {
-  public static deleteAuthTokenCookies() {
+class CookieManager {
+  public static deleteCookies() {
     Cookies.remove(SupportedCookies.accessToken);
     Cookies.remove(SupportedCookies.refreshToken);
+    Cookies.remove(SupportedCookies.userMarket);
+    Cookies.remove(SupportedCookies.userId);
   }
 }
 
-export { AuthTokenManager };
+export { CookieManager };

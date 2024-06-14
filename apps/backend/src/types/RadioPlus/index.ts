@@ -2,10 +2,11 @@ import {
   TrackAudioFeatures,
   DetailedTrack,
 } from '@/types/RadioPlus/DetailedTrack';
-import { UserData } from '@/types/RadioPlus/UserData';
+import { Error } from '@/types/RadioPlus/Error';
+import { UserData, User } from '@/types/RadioPlus/UserData';
 
 declare namespace RadioPlus {
-  export { DetailedTrack, TrackAudioFeatures, UserData };
+  export { DetailedTrack, Error, TrackAudioFeatures, UserData, User };
 }
 
 export { RadioPlus };

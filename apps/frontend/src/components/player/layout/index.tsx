@@ -1,4 +1,5 @@
 import { ErrorOverlayView } from '@/components/player/views/ErrorOverlay';
+import { LoadingOverviewView } from '@/components/player/views/LoadingOverlay';
 import { ProgressBarWidget } from '@/components/player/views/ProgressBar';
 import { ReconnectBtnView } from '@/components/player/views/ReconnectBtn';
 import { ButtonHubWidget } from '@/components/player/widgets/ButtonHub';
@@ -7,9 +8,10 @@ import usePlayer from '@/hooks/usePlayer';
 
 type PlayerLayoutProps = {
   player: ReturnType<typeof usePlayer>;
+  algoIsLoading: boolean;
 };
 
-function PlayerLayout({ player }: PlayerLayoutProps) {
+function PlayerLayout({ player, algoIsLoading }: PlayerLayoutProps) {
   function getTrackBackgroundCSS(track: Spotify.Track | null): string {
     if (!track || (!track.album.images[0].url && !track.album.images[2].url)) {
       return '#242424';
@@ -38,8 +40,15 @@ function PlayerLayout({ player }: PlayerLayoutProps) {
         className="radio-plus-player-container relative w-full h-[600px] flex flex-col justify-center items-center px-5 pt-6 pb-5 overflow-hidden bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl"
         style={{ background: getTrackBackgroundCSS(player.currentTrack) }}
       >
-        <ErrorOverlayView showError={player.errorOccured} />
-        <div className="radio-plus-player-content-wrapper w-full px-7 py-5 bg-gradient-to-r from-black/70 to-black/70 rounded-md max-w-md">
+        <LoadingOverviewView isLoading={algoIsLoading} />
+        <ErrorOverlayView
+          showError={player.errorOccured}
+          isLoading={algoIsLoading}
+        />
+        <div
+          aria-busy={algoIsLoading || player.errorOccured}
+          className="radio-plus-player-content-wrapper w-full px-7 py-5 bg-gradient-to-r from-black/70 to-black/70 rounded-md max-w-md"
+        >
           <TrackInfoHubWidget currentTrack={player.currentTrack} />
           <ProgressBarWidget
             currentTrack={player.currentTrack}

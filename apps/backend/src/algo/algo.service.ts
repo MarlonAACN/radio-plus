@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { HttpHeader } from '@/util/HttpHeader';
 import { SpotifyURI, SpotiyUriType } from '@/util/formatter/SpotifyURI';
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
@@ -6,19 +6,57 @@ import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
 import { logger } from '@/util/Logger';
 import { RequestError } from '@/util/Error';
 import { TrackFilter } from '@/util/TrackFilter';
+import { RadioPlus } from '@/types/RadioPlus';
+import { UserService } from '@/user/user.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { CacheObject, CacheObjectType } from '@/util/formatter/CacheObject';
 
 @Injectable()
 export class AlgoService {
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private userService: UserService
+  ) {}
+
+  /**
+   * Fetch user data based on the given access token and add to cache.
+   * If a cached object already exists, overwrite it.
+   * @param accessToken {string} The access token of the user to authenticate the request.
+   * @param userId {string} The id of the user, used as key for the cache object.
+   */
+  private async cacheUserData(
+    accessToken: string,
+    userId: string
+  ): Promise<void> {
+    // 13-15 kb on average
+    const userData: RadioPlus.UserData =
+      await this.userService.getUserData(accessToken);
+
+    await this.cacheManager.set(
+      CacheObject.constructKey(userId, CacheObjectType.UserData),
+      userData,
+      86400000
+    ); // One day from now
+    await this.cacheManager.set('foo', 'bar', 86400000);
+    console.log('Cache data set successfully.');
+
+    return Promise.resolve();
+  }
+
   /**
    * Marks the start of a running algorithm.
    * This sets based on the given origin track id the track as currently played.
    * This also toggles the playback to play.
+   * This also fetches userData and sets said data as cachable object. When a new init is triggered, this data gets replaced.
    * @param originTrackId {string} The origin track id, that is used in the current lifetime cycle of the running algorithm.
+   * @param user {RadioPlus.user} The user data required to set the cachable object.
    * @param deviceId {string} The id of the current device (radio plus instance)
    * @param accessToken {string} The access token of the user to authenticate the request.
    */
-  initAlgorithm(
+  async initAlgorithm(
     originTrackId: string,
+    user: RadioPlus.User,
     deviceId: string,
     accessToken: string
   ): Promise<void> {
@@ -36,6 +74,8 @@ export class AlgoService {
         uris: [SpotifyURI.construct(originTrackId, SpotiyUriType.track)],
       }),
     };
+
+    await this.cacheUserData(accessToken, user.id);
 
     return fetch(
       SpotifyEndpointURLs.player.StartResumePlayback(urlParams),
@@ -69,16 +109,25 @@ export class AlgoService {
   /**
    * Get a recommendation track based on the given trackId.
    * @param trackId {string} The trackId of the track that should be used as base for the recommendation.
+   * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param accessToken {string} The access token of the user to authenticate the request.
    * @returns {string | null} The recommendation track or null if no eligible recommendation track could be found.
    */
-  private getRecommendation(
+  private async getRecommendation(
     trackId: string,
+    user: RadioPlus.User,
     accessToken: string
   ): Promise<string | null> {
+    const userData = await this.cacheManager.get(
+      CacheObject.constructKey(user.id, CacheObjectType.UserData)
+    );
+
+    return '1QX7A3slzREZDSokxXoJYK';
+
     const urlParams = new URLSearchParams({
       limit: '20',
       seed_tracks: trackId,
+      market: user.market,
     });
 
     const requestParams = {
@@ -128,17 +177,20 @@ export class AlgoService {
    * Adds a new track to the queue of the user.
    * The track is based on a recommendation query, which uses dedicated parameters and the origin track as base.
    * @param originTrackId {string} The id of the origin track id, that is used as base for the current lifetime cycle of the running alogorithm.
+   * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param deviceId {string} The id of the current device (radio plus instance)
    * @param accessToken {string} The access token of the user to authenticate the request.
    * @returns {string} The id of track that was added to the queue.
    */
   async updateQueue(
     originTrackId: string,
+    user: RadioPlus.User,
     deviceId: string,
     accessToken: string
   ): Promise<string> {
     const recommendedTrackId = await this.getRecommendation(
       originTrackId,
+      user,
       accessToken
     )
       .then((recommendation) => {

@@ -1,7 +1,7 @@
 type AlgorithmHook = {
   error: string | null;
-  setOriginTrack: (trackId: string, deviceId: string) => Promise<boolean>;
-  userDataFetched: boolean;
+  userFetched: boolean;
+  isLoading: boolean;
 };
 
 export type { AlgorithmHook };

@@ -18,8 +18,8 @@ export const ApiRoutes = {
     vars: { v: 'v1' },
     query: {},
   },
-  getUserMarket: {
-    path: '/{v}/user/market',
+  getUser: {
+    path: '/{v}/user',
     vars: { v: 'v1' },
     query: {},
   },

@@ -17,7 +17,12 @@ export class AlgoController {
     @Req() request: AuthRequest
   ): Promise<void> {
     return this.algoService
-      .initAlgorithm(dto.originTrackId, dto.deviceId, request.accessToken)
+      .initAlgorithm(
+        dto.originTrackId,
+        dto.user,
+        dto.deviceId,
+        request.accessToken
+      )
       .then(() => {
         return;
       })
@@ -38,7 +43,12 @@ export class AlgoController {
     @Req() request: AuthRequest
   ): Promise<{ trackId: string }> {
     return this.algoService
-      .updateQueue(dto.originTrackId, dto.deviceId, request.accessToken)
+      .updateQueue(
+        dto.originTrackId,
+        dto.user,
+        dto.deviceId,
+        request.accessToken
+      )
       .then((trackId) => {
         return { trackId: trackId };
       })

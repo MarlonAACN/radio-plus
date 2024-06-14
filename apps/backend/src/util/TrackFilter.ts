@@ -1,37 +1,43 @@
 class TrackFilter {
   /**
-   * Finds and returns the first track that is considered playable by spotify.
+   * Remove all tracks that are not considered playable by spotify.
    * Being playable means, that this track is available in the market (country) of the user.
    * @param tracks {Array<Spotify.RecommendationTrackObject>} A list of recommended tracks.
-   * @returns {Spotify.RecommendationTrackObject | null} The first track that is considered playable or null if no track is playable.
+   * @returns {Array<Spotify.RecommendationTrackObject>} A list of all tracks that are considered playable by spotify.
    */
-  private static findFirstPlayable(
+  private static removeUnplayableTracks(
     tracks: Array<Spotify.RecommendationTrackObject>
-  ): Spotify.RecommendationTrackObject | null {
+  ): Array<Spotify.RecommendationTrackObject> {
+    const playableTrackList: Array<Spotify.RecommendationTrackObject> = [];
+
     for (const track of tracks) {
       if (track.is_playable) {
-        return track;
+        playableTrackList.push(track);
       }
     }
-    return null;
+
+    return playableTrackList;
+  }
+
+  private static trackListToTrackIdList(
+    tracks: Array<Spotify.RecommendationTrackObject>
+  ): Array<string> {
+    return tracks.map((track) => {
+      return track.id;
+    });
   }
 
   /**
-   * Get a track recommendation from an array of recommendation tracks.
-   * This runs each applied filter on it to find a fitting track.
+   * Filter a list of recommendation tracks, based on filter settings and general options.
    * @param tracks {Array<Spotify.RecommendationTrackObject>} A list of recommended tracks from spotify.
-   * @returns {string | null} The id of the choosen track, based on filtering the recommendation array or null if no track could be found where all filters could be applied to.
+   * @returns {Array<string>} The filtered list of tracks, now only consisting of the id of each track that was deemed eligible.
    */
   public static filterRecommendations(
     tracks: Array<Spotify.RecommendationTrackObject>
-  ): string | null {
-    const track = this.findFirstPlayable(tracks);
+  ): Array<string> {
+    const filteredTracks = this.removeUnplayableTracks(tracks);
 
-    if (track) {
-      return track.id;
-    }
-
-    return null;
+    return this.trackListToTrackIdList(filteredTracks);
   }
 }
 

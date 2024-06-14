@@ -39,7 +39,13 @@ export class AlgoService {
       86400000
     ); // One day from now
     await this.cacheManager.set('foo', 'bar', 86400000);
-    console.log('Cache data set successfully.');
+
+    // Delete potentially existing recommendation data
+    await this.cacheManager.del(
+      CacheObject.constructKey(userId, CacheObjectType.Recommendations)
+    );
+
+    logger.log('[cacheUserData] Cache data set successfully.');
 
     return Promise.resolve();
   }
@@ -118,14 +124,41 @@ export class AlgoService {
     user: RadioPlus.User,
     accessToken: string
   ): Promise<string | null> {
+    // Check if cached recommendation track list exists.
+    const recommendations: RadioPlus.Recommendations | undefined =
+      await this.cacheManager.get(
+        CacheObject.constructKey(user.id, CacheObjectType.Recommendations)
+      );
+
+    // Check if object exists and user is not at the end of it.
+    if (
+      recommendations &&
+      recommendations.position < recommendations.tracks.length - 1
+    ) {
+      // Update cache objects position
+      await this.cacheManager.set(
+        CacheObject.constructKey(user.id, CacheObjectType.Recommendations),
+        {
+          position: recommendations.position + 1,
+          tracks: recommendations.tracks,
+        },
+        86400000
+      );
+
+      logger.log(
+        `[getRecommendation] Return position ${recommendations.position}/${recommendations.tracks.length} in recommendation track list. (ref. userId: ${user.id})`
+      );
+
+      return recommendations.tracks[recommendations.position];
+    }
+
+    // No recommendations cached or at the end of array -> generate new set.
     const userData = await this.cacheManager.get(
       CacheObject.constructKey(user.id, CacheObjectType.UserData)
     );
 
-    return '1QX7A3slzREZDSokxXoJYK';
-
     const urlParams = new URLSearchParams({
-      limit: '20',
+      limit: '100',
       seed_tracks: trackId,
       market: user.market,
     });
@@ -144,7 +177,7 @@ export class AlgoService {
       .then((response) => {
         return response.text();
       })
-      .then((raw) => {
+      .then(async (raw) => {
         const data: Spotify.RecommendationsObject = raw ? JSON.parse(raw) : {};
 
         throwIfDataIsSpotifyError(data);
@@ -156,7 +189,24 @@ export class AlgoService {
           throw new Error('No recommendations found.');
         }
 
-        return TrackFilter.filterRecommendations(data.tracks);
+        const filteredRecommendationTracks = TrackFilter.filterRecommendations(
+          data.tracks
+        );
+
+        // Add object to cache
+        await this.cacheManager.set(
+          CacheObject.constructKey(user.id, CacheObjectType.Recommendations),
+          {
+            position: 0,
+            tracks: filteredRecommendationTracks,
+          },
+          86400000
+        );
+        logger.log(
+          `[getRecommendation] Created new recommendation track list with ${filteredRecommendationTracks.length} tracks. (ref. userId: ${user.id})`
+        );
+
+        return filteredRecommendationTracks[0];
       })
       .catch((error: Spotify.Error) => {
         logger.error(

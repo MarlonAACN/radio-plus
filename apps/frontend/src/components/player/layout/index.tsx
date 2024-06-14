@@ -4,10 +4,10 @@ import { ProgressBarWidget } from '@/components/player/views/ProgressBar';
 import { ReconnectBtnView } from '@/components/player/views/ReconnectBtn';
 import { ButtonHubWidget } from '@/components/player/widgets/ButtonHub';
 import { TrackInfoHubWidget } from '@/components/player/widgets/TrackInfoHub';
-import usePlayer from '@/hooks/usePlayer';
+import { RadioPlus } from '@/types/RadioPlus';
 
 type PlayerLayoutProps = {
-  player: ReturnType<typeof usePlayer>;
+  player: RadioPlus.PlayerHook;
   algoIsLoading: boolean;
 };
 
@@ -66,6 +66,7 @@ function PlayerLayout({ player, algoIsLoading }: PlayerLayoutProps) {
             initPlaybackWasTransferred={player.wasTransferred}
             skipBackHandler={player.skipBackwards}
             skipFwdHandler={player.skipForward}
+            activeTrackId={player.activeTrackId}
           />
         </div>
         <ReconnectBtnView

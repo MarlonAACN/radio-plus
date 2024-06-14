@@ -8,6 +8,21 @@ export const ApiRoutes = {
     vars: { v: 'v1', trackId: '' },
     query: {},
   },
+  isTrackSaved: {
+    path: '/{v}/track/saved/{trackId}',
+    vars: { v: 'v1', trackId: '' },
+    query: {},
+  },
+  saveTrack: {
+    path: '/{v}/track/saved/{trackId}',
+    vars: { v: 'v1', trackId: '' },
+    query: {},
+  },
+  removeSaveTrack: {
+    path: '/{v}/track/saved/{trackId}',
+    vars: { v: 'v1', trackId: '' },
+    query: {},
+  },
   initAlgorithm: {
     path: '/{v}/algorithm',
     vars: { v: 'v1' },

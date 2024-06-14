@@ -25,7 +25,7 @@ function ButtonHubWidget({
 }: ButtonHubProps) {
   return (
     <div className="flex flex-row flex-nowrap justify-between items-center">
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col justify-center">
         <SaveTrackBtn activeTrackId={activeTrackId} />
       </div>
       <div className="radio-plus-player-button-hub-container flex-1 flex flex-row flex-nowrap justify-center items-center gap-x-5">

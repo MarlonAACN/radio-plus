@@ -37,6 +37,10 @@ jobs:
 
       - name: Record format
         run: npx nx-cloud record -- nx format:check
+      - name: Run lint
+        run: npx nx affected -t lint
+      - name: Run test
+        run: npx nx affected -t test
       - name: Run build
         run: npx nx affected -t build
       - name: Run e2e-ci

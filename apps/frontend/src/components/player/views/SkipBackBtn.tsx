@@ -6,6 +6,7 @@ type SkipBackBtnProps = {
 };
 
 function SkipBackBtn({ skipBackHandler, disabled = false }: SkipBackBtnProps) {
+  // https://github.com/vercel/next.js/issues/35558
   const firefoxProps = {
     autoComplete: 'off',
   };

@@ -10,9 +10,12 @@ import {
 import useAuth from '@/hooks/useAuth';
 import { PlayerRepo } from '@/repos/PlayerRepo';
 import { appRouter } from '@/router/app/AppRouter';
+import { RadioPlus } from '@/types/RadioPlus';
 import { logger } from '@/util/Logger';
+import { CookieManager } from '@/util/manager/CookieManager';
+import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
-function usePlayer() {
+function usePlayer(): RadioPlus.PlayerHook {
   const { getAuthToken, isAuthenticated } = useAuth();
   const router = useRouter();
   const playerRepo = new PlayerRepo(process.env.NEXT_PUBLIC_API_BASE_URL);
@@ -26,11 +29,16 @@ function usePlayer() {
   /** Determines if a current request for an operation is running. */
   const [eventIsLoading, setEventIsLoading] = useState<boolean>(false);
   /** Determines if the init playback transfer was successfully. */
-  const [wasTransfered, setWasTransfered] = useState<boolean>(false);
+  const [wasTransferred, setWasTransferred] = useState<boolean>(false);
+  const [showReconnectBtn, setShowReconnectBtn] = useState<boolean>(false);
+  /** On auth or account error from spotify, block player until redirect to login page. */
+  const [errorOccured, setErrorOccured] = useState<boolean>(false);
   const [isPaused, setPaused] = useState<boolean>(true);
   /** Position in current track. */
   const [position, setPosition] = useState<number>(0);
   const [currentTrack, setTrack] = useState<Spotify.Track | null>(null);
+  /** Different to the current track object, the activeTrackId only updates, when the track itself changes. */
+  const [activeTrackId, setActiveTrackId] = useState<string | null>(null);
   const deviceId = useRef<string | null>(null);
 
   // load Web Playback SDK, when user is authenticated and SDK hasn't been instanciated yet.
@@ -77,6 +85,13 @@ function usePlayer() {
     }
   }, [webPlaybackSDKReady]);
 
+  /** On current track change, check if the actual track changed. */
+  useEffect(() => {
+    if (currentTrack?.id !== activeTrackId) {
+      setActiveTrackId(currentTrack?.id ?? null);
+    }
+  }, [currentTrack]);
+
   /**
    * Add all from radio+ required event handlers to the spotify player.
    * @param player {Spotify.Player} The freshly created spotify player instance.
@@ -116,10 +131,32 @@ function usePlayer() {
       logger.error('[SpotifyPlayer] Player failed to authenticate:', message);
       resetPlayer();
     });
+
+    player.on('playback_error', ({ message }) => {
+      logger.error('[SpotifyPlayer] Failed to perform playback:', message);
+      setShowReconnectBtn(true);
+    });
+
+    player.on('account_error', ({ message }) => {
+      logger.error(
+        '[SpotifyPlayer] Failed to validate Spotify account:',
+        message
+      );
+      resetPlayer();
+    });
+  }
+
+  function pause() {
+    logger.log('DEBUG: [SpotifyPlayer] Player paused.');
+
+    setEventIsLoading(true);
+    player?.pause().finally(() => {
+      setEventIsLoading(false);
+    });
   }
 
   function togglePause() {
-    logger.log('DEBUG: [SpotifyPlayer] Player paused.');
+    logger.log('DEBUG: [SpotifyPlayer] Playing state toggled.');
 
     setEventIsLoading(true);
     player?.togglePlay().finally(() => {
@@ -161,6 +198,7 @@ function usePlayer() {
       return Promise.resolve(false);
     }
 
+    console.log('[SpotifyPlayer] seeking pos');
     setEventIsLoading(true);
     return playerRepo
       .seekPosition(positionMs, deviceId.current)
@@ -209,26 +247,53 @@ function usePlayer() {
 
   /**
    * disconnect the given player instance to spotify.
-   * @param player {Spotify.Player} The existing spotify player instance that should be disconnected.
+   * @param _player {Spotify.Player} The existing spotify player instance that should be disconnected.
    */
-  function disconnectPlayer(player: Spotify.Player) {
+  function disconnectPlayer(_player: Spotify.Player) {
     setActive(false);
     setPlayer(null);
-    player?.disconnect();
+    setWasTransferred(false);
+    _player.disconnect();
+  }
+
+  function reconnectPlayer() {
+    setShowReconnectBtn(false);
+
+    if (player === null) {
+      return router.reload();
+    }
+
+    if (!isActive) {
+      return connectPlayer(player);
+    }
+
+    if (deviceId.current !== null) {
+      return playerIsReadyHandler(deviceId.current);
+    } else {
+      return router.reload();
+    }
   }
 
   /**
    * When both the access token and the refresh token are expired and thus are not present as cookies anymore (rare potential occasion),
    * Reset the player and redirect user back to login page to authenticate themselves once again.
+   * Can also be called upon user logout.
    */
   function resetPlayer() {
     logger.log('[SpotifyPlayer] Resetting player...');
+
+    setErrorOccured(true);
 
     if (player !== null) {
       disconnectPlayer(player);
     }
 
-    router.push(appRouter.get('Login').build());
+    CookieManager.deleteCookies();
+    LocalStorageManager.wipeLocalStorage();
+
+    setTimeout(() => {
+      router.push(appRouter.get('Login').build());
+    }, 1000);
   }
 
   /**
@@ -243,7 +308,7 @@ function usePlayer() {
           '[SpotifyPlayer] Playback was successfully transferred to this player.'
         );
 
-        setWasTransfered(true);
+        setWasTransferred(true);
       })
       .catch(() => {
         logger.error(
@@ -254,15 +319,22 @@ function usePlayer() {
 
   return {
     currentTrack,
-    togglePause,
-    skipBackwards,
-    skipForward,
-    wasTransfered,
+    activeTrackId,
+    deviceId: deviceId.current,
+    errorOccured,
+    eventIsLoading,
     isActive,
     isPaused,
-    eventIsLoading,
+    logout: resetPlayer,
+    pause,
     position,
+    reconnectPlayer,
     seekPosition,
+    showReconnectBtn,
+    skipBackwards,
+    skipForward,
+    togglePause,
+    wasTransferred,
   };
 }
 

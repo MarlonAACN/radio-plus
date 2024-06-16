@@ -4,6 +4,7 @@ module.exports = {
   content: [
     './src/pages/**/*.{js,jsx,ts,tsx}',
     './src/components/**/*.{js,jsx,ts,tsx}',
+    './src/icons/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     fontFamily: {
@@ -32,12 +33,14 @@ module.exports = {
           800: '#31517b',
         },
         spotify: {
+          400: '#55f38d',
           500: '#1ED760',
         },
         base: {
           0: '#FFFFFF',
           500: '#A7A7A7',
           600: '#5A5A5A',
+          650: '#2a2a2a',
           700: '#242424',
           800: '#121212',
           900: '#000',

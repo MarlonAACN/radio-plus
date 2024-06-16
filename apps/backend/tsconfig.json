@@ -5,6 +5,7 @@
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   },
+
   "references": [
     {
       "path": "./tsconfig.app.json"
@@ -36,6 +37,6 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"]
-    },
+    }
   }
 }

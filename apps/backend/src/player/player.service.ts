@@ -1,8 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { HttpHeader } from '@/util/HttpHeader';
+
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
-import { logger } from '@/util/Logger';
 import { RequestError } from '@/util/Error';
+import { HttpHeader } from '@/util/HttpHeader';
+import { logger } from '@/util/Logger';
 import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class PlayerService {
       body: JSON.stringify({ device_ids: [deviceId], play: false }),
     };
 
-    return fetch(SpotifyEndpointURLs.PlaybackState, requestParams)
+    return fetch(SpotifyEndpointURLs.player.PlaybackState, requestParams)
       .then((response) => {
         return response.text();
       })
@@ -72,9 +73,8 @@ export class PlayerService {
       },
     };
 
-    console.log(SpotifyEndpointURLs.SeekPosition + `?${urlParams}`);
     return fetch(
-      SpotifyEndpointURLs.SeekPosition + `?${urlParams}`,
+      SpotifyEndpointURLs.player.SeekPosition(urlParams),
       requestParams
     )
       .then((response) => {

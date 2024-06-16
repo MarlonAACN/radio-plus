@@ -1,14 +1,16 @@
 import { HttpRedirectResponse, HttpStatus, Injectable } from '@nestjs/common';
-import { generateRandomString } from '@/util/generateRandomString';
-import { SPOTIFY_SCOPE } from '@/constants/SpotifyScope';
-import { RequestError } from '@/util/Error';
-import { logger } from '@/util/Logger';
 import { Response } from 'express';
-import { DateFormatter } from '@/util/formatter/date-formatter';
+
 import { REFRESH_TOKEN_TTL } from '@/constants';
-import { HttpHeader } from '@/util/HttpHeader';
-import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
 import { InternalEndpointURLs } from '@/constants/InternalEndpointURLs';
+import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
+import { SPOTIFY_SCOPE } from '@/constants/SpotifyScope';
+import { SupportedCookies } from '@/constants/SupportedCookies';
+import { RequestError } from '@/util/Error';
+import { DateFormatter } from '@/util/formatter/date-formatter';
+import { generateRandomString } from '@/util/generateRandomString';
+import { HttpHeader } from '@/util/HttpHeader';
+import { logger } from '@/util/Logger';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +41,7 @@ export class AuthService {
     });
 
     return {
-      url: SpotifyEndpointURLs.UserOAuth(authQueryParams.toString()),
+      url: SpotifyEndpointURLs.UserOAuth(authQueryParams),
       statusCode: HttpStatus.MOVED_PERMANENTLY,
     };
   }
@@ -102,14 +104,14 @@ export class AuthService {
         );
 
         // Set auth token cookie header
-        response.cookie('x-radio-plus-access-token', data.access_token, {
+        response.cookie(SupportedCookies.accessToken, data.access_token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,
           expires: DateFormatter.CreateDateAfterDelay(data.expires_in),
         });
 
-        response.cookie('x-radio-plus-refresh-token', data.refresh_token, {
+        response.cookie(SupportedCookies.refreshToken, data.refresh_token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,
@@ -177,14 +179,14 @@ export class AuthService {
         );
 
         // Set auth token cookie header
-        response.cookie('x-radio-plus-access-token', data.access_token, {
+        response.cookie(SupportedCookies.accessToken, data.access_token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,
           expires: DateFormatter.CreateDateAfterDelay(data.expires_in),
         });
 
-        response.cookie('x-radio-plus-refresh-token', token, {
+        response.cookie(SupportedCookies.refreshToken, token, {
           sameSite: 'lax',
           path: '/',
           httpOnly: false,

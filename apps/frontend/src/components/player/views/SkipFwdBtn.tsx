@@ -6,6 +6,7 @@ type SkipFwdBtnProps = {
 };
 
 function SkipFwdBtn({ skipFwdHandler, disabled = false }: SkipFwdBtnProps) {
+  // https://github.com/vercel/next.js/issues/35558
   const firefoxProps = {
     autoComplete: 'off',
   };

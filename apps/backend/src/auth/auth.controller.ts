@@ -10,10 +10,11 @@ import {
   Redirect,
   Res,
 } from '@nestjs/common';
-import { AuthService } from '@/auth/auth.service';
-import { RequestError } from '@/util/Error';
-import { AuthPayloadDto, RefreshTokenDto } from '@/auth/dto';
 import { Response } from 'express';
+
+import { AuthService } from '@/auth/auth.service';
+import { AuthPayloadDto, RefreshTokenDto } from '@/auth/dto';
+import { RequestError } from '@/util/Error';
 
 @Controller({
   version: '1',

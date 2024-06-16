@@ -1,11 +1,17 @@
+import { ErrorOverlayView } from '@/components/player/views/ErrorOverlay';
+import { LoadingOverviewView } from '@/components/player/views/LoadingOverlay';
 import { ProgressBarWidget } from '@/components/player/views/ProgressBar';
+import { ReconnectBtnView } from '@/components/player/views/ReconnectBtn';
 import { ButtonHubWidget } from '@/components/player/widgets/ButtonHub';
 import { TrackInfoHubWidget } from '@/components/player/widgets/TrackInfoHub';
-import usePlayer from '@/hooks/usePlayer';
+import { RadioPlus } from '@/types/RadioPlus';
 
-function PlayerLayout() {
-  const player = usePlayer();
+type PlayerLayoutProps = {
+  player: RadioPlus.PlayerHook;
+  algoIsLoading: boolean;
+};
 
+function PlayerLayout({ player, algoIsLoading }: PlayerLayoutProps) {
   function getTrackBackgroundCSS(track: Spotify.Track | null): string {
     if (!track || (!track.album.images[0].url && !track.album.images[2].url)) {
       return '#242424';
@@ -25,14 +31,24 @@ function PlayerLayout() {
 
   return (
     <>
-      <h2 className="mb-10 font-arizonia text-6xl">
-        Radio<span className="font-dmsans text-secondary-700">⁺</span>
-      </h2>
+      <div className="w-full flex justify-center items-center px-5 py-3 mb-3 bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl">
+        <h2 className="font-arizonia text-6xl">
+          Radio<span className="font-dmsans text-secondary-700">⁺</span>
+        </h2>
+      </div>
       <div
-        className="radio-plus-player-container w-full h-full h-[600px] flex flex-col justify-center items-center px-5 pt-6 pb-5 bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl"
+        className="radio-plus-player-container relative w-full h-[600px] flex flex-col justify-center items-center px-5 pt-6 pb-5 overflow-hidden bg-base-800 rounded-md sm:px-6 md:px-7 max-w-xl"
         style={{ background: getTrackBackgroundCSS(player.currentTrack) }}
       >
-        <div className="radio-plus-player-content-wrapper w-full px-7 py-5 bg-gradient-to-r from-black/70 to-black/70 rounded-md max-w-md">
+        <LoadingOverviewView isLoading={algoIsLoading} />
+        <ErrorOverlayView
+          showError={player.errorOccured}
+          isLoading={algoIsLoading}
+        />
+        <div
+          aria-busy={algoIsLoading || player.errorOccured}
+          className="radio-plus-player-content-wrapper w-full px-7 py-5 bg-gradient-to-r from-black/70 to-black/70 rounded-md max-w-md"
+        >
           <TrackInfoHubWidget currentTrack={player.currentTrack} />
           <ProgressBarWidget
             currentTrack={player.currentTrack}
@@ -40,18 +56,23 @@ function PlayerLayout() {
             position={player.position}
             seekPosition={player.seekPosition}
             playerEventIsLoading={player.eventIsLoading}
-            initPlaybackWasTransfered={player.wasTransfered}
+            initPlaybackWasTransferred={player.wasTransferred}
             isPaused={player.isPaused}
           />
           <ButtonHubWidget
             togglePauseHandler={player.togglePause}
             isPaused={player.isPaused}
             playerEventIsLoading={player.eventIsLoading}
-            initPlaybackWasTransfered={player.wasTransfered}
+            initPlaybackWasTransferred={player.wasTransferred}
             skipBackHandler={player.skipBackwards}
             skipFwdHandler={player.skipForward}
+            activeTrackId={player.activeTrackId}
           />
         </div>
+        <ReconnectBtnView
+          showReconnectBtn={player.showReconnectBtn}
+          reconnectHandler={player.reconnectPlayer}
+        />
       </div>
       <p>{player.isActive ? 'active' : 'inactive'}</p>
     </>

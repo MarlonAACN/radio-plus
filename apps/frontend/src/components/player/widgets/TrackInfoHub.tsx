@@ -1,22 +1,13 @@
 import Skeleton from 'react-loading-skeleton';
 
 import { RadioPlusIcon } from '@/icons/RadioPlusIcon';
+import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 
 type TrackInfoHubProps = {
   currentTrack: Spotify.Track | null;
 };
 
 function TrackInfoHubWidget({ currentTrack }: TrackInfoHubProps) {
-  function generateArtistsNameText(
-    artists: Array<Spotify.Entity> | undefined
-  ): string {
-    if (!artists) {
-      return '';
-    }
-
-    return artists.map((obj) => obj.name).join(', ');
-  }
-
   return (
     <div className="radio-plus-track-info-hub-container w-full mb-4 text-start">
       <div className="flex flex-row justify-start items-center gap-x-2 mb-2">
@@ -29,7 +20,7 @@ function TrackInfoHubWidget({ currentTrack }: TrackInfoHubProps) {
         {currentTrack?.name || <Skeleton width={'65%'} />}
       </h3>
       <h4 className="text-sm text-font-400">
-        {generateArtistsNameText(currentTrack?.artists) || (
+        {TrackFormatter.generateArtistsNameText(currentTrack?.artists) || (
           <Skeleton width={'40%'} />
         )}
       </h4>

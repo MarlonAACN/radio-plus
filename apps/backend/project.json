@@ -5,9 +5,7 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/backend",
         "main": "apps/backend/src/main.ts",
@@ -28,6 +26,13 @@
         "production": {
           "buildTarget": "backend:build:production"
         }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["apps/backend/src/**/*.ts"],
+        "eslintConfig": "apps/backend/.eslintrc.json"
       }
     }
   },

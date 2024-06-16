@@ -1,10 +1,4 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.json",
-    "tsconfigRootDir": "./",
-    "sourceType": "module"
-  },
   "extends": [
     "../../.eslintrc.json",
     "plugin:@typescript-eslint/recommended",
@@ -12,25 +6,8 @@
     "plugin:import/typescript",
     "prettier"
   ],
-  "plugins": [
-    "@typescript-eslint/eslint-plugin",
-    "unused-imports",
-    "prettier"
-  ],
-  "settings": {
-    "import/resolver": {
-      "typescript": {},
-      "node": {}
-    }
-  },
-  "env": {
-    "node": true,
-    "jest": true
-  },
-  "ignorePatterns": [
-    ".eslintrc.js",
-    "*.config.js"
-  ],
+  "plugins": ["@typescript-eslint/eslint-plugin", "unused-imports", "prettier"],
+  "ignorePatterns": ["!**/*", ".eslintrc.js", "*.config.js"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
@@ -45,6 +22,21 @@
       "rules": {}
     }
   ],
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+        "project": "apps/backend/tsconfig.json"
+      }
+    }
+  },
+  "env": {
+    "node": true,
+    "jest": true
+  },
   "rules": {
     "prettier/prettier": "warn",
     "@typescript-eslint/interface-name-prefix": "off",

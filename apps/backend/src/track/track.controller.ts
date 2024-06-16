@@ -7,10 +7,11 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
+
 import { TrackService } from '@/track/track.service';
 import { AuthRequest } from '@/types/misc/AuthRequest';
-import { RequestError } from '@/util/Error';
 import { RadioPlus } from '@/types/RadioPlus';
+import { RequestError } from '@/util/Error';
 
 @Controller({
   version: '1',

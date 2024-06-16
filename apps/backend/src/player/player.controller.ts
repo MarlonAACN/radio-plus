@@ -1,8 +1,9 @@
 import { Body, Controller, HttpException, Put, Req } from '@nestjs/common';
-import { PlayerService } from '@/player/player.service';
+
 import { SeekPositionDto, TransferPlaybackDto } from '@/player/dto';
-import { RequestError } from '@/util/Error';
+import { PlayerService } from '@/player/player.service';
 import { AuthRequest } from '@/types/misc/AuthRequest';
+import { RequestError } from '@/util/Error';
 
 @Controller({
   version: '1',

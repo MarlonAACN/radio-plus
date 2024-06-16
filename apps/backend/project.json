@@ -35,7 +35,8 @@
       "options": {
         "lintFilePatterns": [
           "apps/backend/src/**/*.ts"
-        ]
+        ],
+        "eslintConfig": "apps/backend/.eslintrc.json"
       }
     }
   },

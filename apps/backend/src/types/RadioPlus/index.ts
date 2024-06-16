@@ -3,8 +3,8 @@ import {
   DetailedTrack,
 } from '@/types/RadioPlus/DetailedTrack';
 import { Error } from '@/types/RadioPlus/Error';
-import { UserData, User } from '@/types/RadioPlus/UserData';
 import { Recommendations } from '@/types/RadioPlus/Recommendation';
+import { UserData, User } from '@/types/RadioPlus/UserData';
 
 declare namespace RadioPlus {
   export {

@@ -1,8 +1,10 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
+
+import { UserModule } from '@/user/user.module';
+
 import { AlgoController } from './algo.controller';
 import { AlgoService } from './algo.service';
-import { UserModule } from '@/user/user.module';
-import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [AlgoController],

@@ -1,9 +1,10 @@
 import { Controller, Get, HttpException, Req, Res } from '@nestjs/common';
-import { UserService } from '@/user/user.service';
-import { AuthRequest } from '@/types/misc/AuthRequest';
-import { RequestError } from '@/util/Error';
-import { RadioPlus } from '@/types/RadioPlus';
 import { Response } from 'express';
+
+import { AuthRequest } from '@/types/misc/AuthRequest';
+import { RadioPlus } from '@/types/RadioPlus';
+import { UserService } from '@/user/user.service';
+import { RequestError } from '@/util/Error';
 
 @Controller({
   version: '1',

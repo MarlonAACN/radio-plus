@@ -5,10 +5,11 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { NextFunction, Response } from 'express';
-import { SupportedCookies } from '@/constants/SupportedCookies';
-import { logger } from '@/util/Logger';
+
 import { AuthService } from '@/auth/auth.service';
+import { SupportedCookies } from '@/constants/SupportedCookies';
 import { AuthRequest } from '@/types/misc/AuthRequest';
+import { logger } from '@/util/Logger';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

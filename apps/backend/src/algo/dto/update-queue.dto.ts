@@ -1,5 +1,6 @@
-import { IsObject, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsObject, IsString, ValidateNested } from 'class-validator';
+
 import { UserDto } from '@/algo/dto/user.dto';
 
 class UpdateQueueDto {

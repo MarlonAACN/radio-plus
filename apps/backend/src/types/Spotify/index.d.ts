@@ -470,8 +470,8 @@ declare namespace Spotify {
    * GET /v1/me/player/recently-played
    * https://developer.spotify.com/web-api/get-users-top-artists-and-tracks/
    */
-  interface UsersRecentlyPlayedTracksResponse
-    extends CursorBasedPagingObject<PlayHistoryObject> {}
+  type UsersRecentlyPlayedTracksResponse =
+    CursorBasedPagingObject<PlayHistoryObject>;
 
   /**
    * Get User’s Followed Artists
@@ -489,7 +489,7 @@ declare namespace Spotify {
    * GET /v1/me/top/{type}
    * https://developer.spotify.com/web-api/get-users-top-artists-and-tracks/
    */
-  interface UsersTopArtistsResponse extends PagingObject<ArtistObjectFull> {}
+  type UsersTopArtistsResponse = PagingObject<ArtistObjectFull>;
 
   /**
    * Get a User’s Top Artists and Tracks (Note: This is only Tracks)
@@ -497,5 +497,5 @@ declare namespace Spotify {
    * GET /v1/me/top/{type}
    * https://developer.spotify.com/web-api/get-users-top-artists-and-tracks/
    */
-  interface UsersTopTracksResponse extends PagingObject<TrackObjectFull> {}
+  type UsersTopTracksResponse = PagingObject<TrackObjectFull>;
 }

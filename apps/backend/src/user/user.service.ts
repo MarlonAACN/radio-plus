@@ -1,17 +1,18 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { HttpHeader } from '@/util/HttpHeader';
-import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
-import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
-import { logger } from '@/util/Logger';
-import { RequestError } from '@/util/Error';
-import { RadioPlus } from '@/types/RadioPlus';
+import { Response } from 'express';
+
 import {
   SPOTIFY_TOP_ARTISTS_LIMIT,
   SPOTIFY_TOP_TRACKS_LIMIT,
 } from '@/constants';
-import { TrackFormatter } from '@/util/formatter/TrackFormatter';
+import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
 import { SupportedCookies } from '@/constants/SupportedCookies';
-import { Response } from 'express';
+import { RadioPlus } from '@/types/RadioPlus';
+import { RequestError } from '@/util/Error';
+import { TrackFormatter } from '@/util/formatter/TrackFormatter';
+import { HttpHeader } from '@/util/HttpHeader';
+import { logger } from '@/util/Logger';
+import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
 
 @Injectable()
 export class UserService {
@@ -208,8 +209,8 @@ export class UserService {
 
     let allArtists: Array<Spotify.ArtistObjectFull> = [];
     let after: string | null = null;
-    let cursorAtEnd: boolean = false;
-    let counter: number = 0;
+    let cursorAtEnd = false;
+    let counter = 0;
 
     while (!cursorAtEnd) {
       const urlParams = new URLSearchParams({
@@ -283,9 +284,9 @@ export class UserService {
 
     const limit = 50;
     let allArtists: Array<Spotify.ArtistObjectFull> = [];
-    let offset: number = 0;
-    let hasNext: boolean = true;
-    let counter: number = 0;
+    let offset = 0;
+    let hasNext = true;
+    let counter = 0;
 
     while (hasNext) {
       const urlParams = new URLSearchParams({
@@ -363,9 +364,9 @@ export class UserService {
 
     const limit = 50;
     let allTracks: Array<Spotify.TrackObjectFull> = [];
-    let offset: number = 0;
-    let hasNext: boolean = true;
-    let counter: number = 0;
+    let offset = 0;
+    let hasNext = true;
+    let counter = 0;
 
     while (hasNext) {
       const urlParams = new URLSearchParams({

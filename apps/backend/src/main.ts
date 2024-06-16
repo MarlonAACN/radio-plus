@@ -1,7 +1,5 @@
 import path from 'path';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -9,6 +7,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 import { AppModule } from './app.module';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieParser = require('cookie-parser');
 
 async function bootstrap() {

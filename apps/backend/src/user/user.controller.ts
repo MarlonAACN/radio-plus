@@ -3,7 +3,7 @@ import { UserService } from '@/user/user.service';
 import { AuthRequest } from '@/types/misc/AuthRequest';
 import { RequestError } from '@/util/Error';
 import { RadioPlus } from '@/types/RadioPlus';
-import { Response } from '@/types/Better-express';
+import { Response } from 'express';
 
 @Controller({
   version: '1',

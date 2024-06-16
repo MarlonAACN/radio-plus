@@ -3,7 +3,7 @@ import { generateRandomString } from '@/util/generateRandomString';
 import { SPOTIFY_SCOPE } from '@/constants/SpotifyScope';
 import { RequestError } from '@/util/Error';
 import { logger } from '@/util/Logger';
-import { Response } from '@/types/Better-express';
+import { Response } from 'express';
 import { DateFormatter } from '@/util/formatter/date-formatter';
 import { REFRESH_TOKEN_TTL } from '@/constants';
 import { HttpHeader } from '@/util/HttpHeader';

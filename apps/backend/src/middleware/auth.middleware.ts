@@ -4,7 +4,7 @@ import {
   Injectable,
   NestMiddleware,
 } from '@nestjs/common';
-import { NextFunction, Response } from '@/types/Better-express';
+import { NextFunction, Response } from 'express';
 import { SupportedCookies } from '@/constants/SupportedCookies';
 import { logger } from '@/util/Logger';
 import { AuthService } from '@/auth/auth.service';

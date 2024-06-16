@@ -11,7 +11,7 @@ import {
 } from '@/constants';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { SupportedCookies } from '@/constants/SupportedCookies';
-import { Response } from '@/types/Better-express';
+import { Response } from 'express';
 
 @Injectable()
 export class UserService {

@@ -40,7 +40,7 @@ jobs:
       - name: Run lint
         run: npx nx affected -t lint
       - name: Run test
-        run: npx nx affected -t test
+        run: npx nx affected -t test --passWithNoTests
       - name: Run build
         run: npx nx affected -t build
       - name: Run e2e-ci

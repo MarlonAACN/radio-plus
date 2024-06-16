@@ -6,16 +6,8 @@
     "plugin:import/typescript",
     "prettier"
   ],
-  "plugins": [
-    "@typescript-eslint/eslint-plugin",
-    "unused-imports",
-    "prettier"
-  ],
-  "ignorePatterns": [
-    "!**/*",
-    ".eslintrc.js",
-    "*.config.js"
-  ],
+  "plugins": ["@typescript-eslint/eslint-plugin", "unused-imports", "prettier"],
+  "ignorePatterns": ["!**/*", ".eslintrc.js", "*.config.js"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],

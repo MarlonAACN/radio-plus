@@ -13,7 +13,7 @@ import {
 import { AuthService } from '@/auth/auth.service';
 import { RequestError } from '@/util/Error';
 import { AuthPayloadDto, RefreshTokenDto } from '@/auth/dto';
-import { Response } from 'express';
+import { Response } from '@/types/Better-express';
 
 @Controller({
   version: '1',

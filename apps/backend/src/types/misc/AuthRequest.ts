@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { Request } from '@/types/Better-express';
 
 type AuthRequest = {
   accessToken: string;

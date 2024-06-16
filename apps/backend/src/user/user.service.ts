@@ -6,14 +6,12 @@ import { logger } from '@/util/Logger';
 import { RequestError } from '@/util/Error';
 import { RadioPlus } from '@/types/RadioPlus';
 import {
-  DEFAULT_MARKET,
   SPOTIFY_TOP_ARTISTS_LIMIT,
   SPOTIFY_TOP_TRACKS_LIMIT,
 } from '@/constants';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
-import { Response } from 'express';
 import { SupportedCookies } from '@/constants/SupportedCookies';
-import { DateFormatter } from '@/util/formatter/date-formatter';
+import { Response } from '@/types/Better-express';
 
 @Injectable()
 export class UserService {

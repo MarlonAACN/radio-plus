@@ -1,9 +1,8 @@
 {
-  "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "parser": "@typescript-eslint/parser",
     "project": "./tsconfig.json",
-    "tsconfigRootDir": "./",
-    "sourceType": "module"
+    "tsconfigRootDir": "./"
   },
   "extends": [
     "../../.eslintrc.json",
@@ -17,17 +16,8 @@
     "unused-imports",
     "prettier"
   ],
-  "settings": {
-    "import/resolver": {
-      "typescript": {},
-      "node": {}
-    }
-  },
-  "env": {
-    "node": true,
-    "jest": true
-  },
   "ignorePatterns": [
+    "!**/*",
     ".eslintrc.js",
     "*.config.js"
   ],
@@ -45,6 +35,16 @@
       "rules": {}
     }
   ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {},
+      "node": {}
+    }
+  },
+  "env": {
+    "node": true,
+    "jest": true
+  },
   "rules": {
     "prettier/prettier": "warn",
     "@typescript-eslint/interface-name-prefix": "off",

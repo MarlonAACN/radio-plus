@@ -1,16 +1,17 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { HttpHeader } from '@/util/HttpHeader';
-import { SpotifyURI, SpotiyUriType } from '@/util/formatter/SpotifyURI';
+import { Cache } from 'cache-manager';
+
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
-import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
-import { logger } from '@/util/Logger';
-import { RequestError } from '@/util/Error';
-import { TrackFilter } from '@/util/TrackFilter';
 import { RadioPlus } from '@/types/RadioPlus';
 import { UserService } from '@/user/user.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { RequestError } from '@/util/Error';
 import { CacheObject, CacheObjectType } from '@/util/formatter/CacheObject';
+import { SpotifyURI, SpotiyUriType } from '@/util/formatter/SpotifyURI';
+import { HttpHeader } from '@/util/HttpHeader';
+import { logger } from '@/util/Logger';
+import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
+import { TrackFilter } from '@/util/TrackFilter';
 
 @Injectable()
 export class AlgoService {

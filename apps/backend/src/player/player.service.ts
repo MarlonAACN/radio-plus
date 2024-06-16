@@ -1,8 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { HttpHeader } from '@/util/HttpHeader';
+
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
-import { logger } from '@/util/Logger';
 import { RequestError } from '@/util/Error';
+import { HttpHeader } from '@/util/HttpHeader';
+import { logger } from '@/util/Logger';
 import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
 
 @Injectable()

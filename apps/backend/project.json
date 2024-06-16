@@ -29,6 +29,14 @@
           "buildTarget": "backend:build:production"
         }
       }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/backend/src/**/*.ts"
+        ]
+      }
     }
   },
   "tags": []

@@ -1,14 +1,16 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+
+import { AlgoModule } from './algo/algo.module';
+import { AuthModule } from './auth/auth.module';
 import { PlayerModule } from './player/player.module';
-import { AuthMiddleware } from '@/middleware/auth.middleware';
-import { PlayerController } from '@/player/player.controller';
 import { TrackController } from './track/track.controller';
 import { TrackModule } from './track/track.module';
-import { AlgoModule } from './algo/algo.module';
-import { AlgoController } from '@/algo/algo.controller';
 import { UserModule } from './user/user.module';
+
+import { AlgoController } from '@/algo/algo.controller';
+import { AuthMiddleware } from '@/middleware/auth.middleware';
+import { PlayerController } from '@/player/player.controller';
 import { UserController } from '@/user/user.controller';
 
 @Module({

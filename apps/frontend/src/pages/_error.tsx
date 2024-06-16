@@ -1,21 +1,18 @@
 import { NextPageContext } from 'next';
 
-import dynamic from 'next/dynamic';
-
-// The dynamic import probably isn't required, but I'm sick of dealing with this issue.
-const NextError = dynamic(() => import('next/error'), { ssr: false });
+import Error from 'next/error';
 
 type StaticErrorPageProps = {
   statusCode: number;
 };
 
-function Error({ statusCode }: StaticErrorPageProps) {
-  return <NextError statusCode={statusCode} />;
+function Page({ statusCode }: StaticErrorPageProps) {
+  return <Error statusCode={statusCode}></Error>;
 }
 
-Error.getInitialProps = ({ res, err }: NextPageContext) => {
+Page.getInitialProps = ({ res, err }: NextPageContext) => {
   const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
   return { statusCode };
 };
 
-export default Error;
+export default Page;

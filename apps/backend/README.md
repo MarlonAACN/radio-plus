@@ -1,5 +1,4 @@
 ## Requirements
-
 ### .env file variables (.env)
 ```bash
 NODE_ENV="production | development | test"

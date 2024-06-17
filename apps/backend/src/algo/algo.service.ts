@@ -4,6 +4,7 @@ import { Cache } from 'cache-manager';
 
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
 import { RadioPlus } from '@/types/RadioPlus';
+import { RadioPlusError } from '@/types/RadioPlus/Error';
 import { UserService } from '@/user/user.service';
 import { RequestError } from '@/util/Error';
 import { CacheObject, CacheObjectType } from '@/util/formatter/CacheObject';
@@ -116,20 +117,24 @@ export class AlgoService {
   /**
    * Get a recommendation track based on the given trackId.
    * @param trackId {string} The trackId of the track that should be used as base for the recommendation.
+   * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param accessToken {string} The access token of the user to authenticate the request.
    * @returns {string | null} The recommendation track or null if no eligible recommendation track could be found.
    */
   private async getRecommendation(
     trackId: string,
+    freshTracks: boolean,
     user: RadioPlus.User,
     accessToken: string
   ): Promise<string | null> {
     // Check if cached recommendation track list exists.
     const recommendations: RadioPlus.Recommendations | undefined =
-      await this.cacheManager.get(
+      await this.cacheManager.get<RadioPlus.Recommendations>(
         CacheObject.constructKey(user.id, CacheObjectType.Recommendations)
       );
+
+    console.log('rec obj.', recommendations?.position);
 
     // Check if object exists and user is not at the end of it.
     if (
@@ -154,9 +159,10 @@ export class AlgoService {
     }
 
     // No recommendations cached or at the end of array -> generate new set.
-    const userData = await this.cacheManager.get(
-      CacheObject.constructKey(user.id, CacheObjectType.UserData)
-    );
+    const userData: RadioPlus.UserData | undefined =
+      await this.cacheManager.get<RadioPlus.UserData>(
+        CacheObject.constructKey(user.id, CacheObjectType.UserData)
+      );
 
     const urlParams = new URLSearchParams({
       limit: '100',
@@ -187,29 +193,38 @@ export class AlgoService {
           logger.error(
             '[getRecommendation] Array of recommendations is empty.'
           );
-          throw new Error('No recommendations found.');
+          throw new RadioPlusError(
+            HttpStatus.NOT_FOUND,
+            'No recommendations found.'
+          );
         }
 
         const filteredRecommendationTracks = TrackFilter.filterRecommendations(
-          data.tracks
+          data.tracks,
+          userData,
+          { freshTracks: freshTracks }
         );
 
         // Add object to cache
         await this.cacheManager.set(
           CacheObject.constructKey(user.id, CacheObjectType.Recommendations),
           {
-            position: 0,
+            position: 1,
             tracks: filteredRecommendationTracks,
           },
           86400000
         );
         logger.log(
-          `[getRecommendation] Created new recommendation track list with ${filteredRecommendationTracks.length} tracks. (ref. userId: ${user.id})`
+          `[getRecommendation] Created new recommendation track list with ${filteredRecommendationTracks.length} tracks. (${data.tracks.length} before filtering) (ref. userId: ${user.id})`
+        );
+        logger.log(
+          '[getRecommendation] Returning first track from recommendation track list.'
         );
 
         return filteredRecommendationTracks[0];
       })
       .catch((error: Spotify.Error) => {
+        // TODO: FF error if radioplus error type
         logger.error(
           `[getRecommendation] Fetching recommendation failed:`,
           error.message
@@ -228,6 +243,7 @@ export class AlgoService {
    * Adds a new track to the queue of the user.
    * The track is based on a recommendation query, which uses dedicated parameters and the origin track as base.
    * @param originTrackId {string} The id of the origin track id, that is used as base for the current lifetime cycle of the running alogorithm.
+   * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param deviceId {string} The id of the current device (radio plus instance)
    * @param accessToken {string} The access token of the user to authenticate the request.
@@ -235,16 +251,19 @@ export class AlgoService {
    */
   async updateQueue(
     originTrackId: string,
+    freshTracks: boolean,
     user: RadioPlus.User,
     deviceId: string,
     accessToken: string
   ): Promise<string> {
     const recommendedTrackId = await this.getRecommendation(
       originTrackId,
+      freshTracks,
       user,
       accessToken
     )
       .then((recommendation) => {
+        console.log(recommendation);
         if (recommendation) {
           return recommendation;
         } else {

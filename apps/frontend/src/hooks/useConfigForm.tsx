@@ -41,7 +41,7 @@ function useConfigForm() {
   }, [inputChangeTracker, config.data]);
 
   /**
-   * Compares two config objects on thei similiarity.
+   * Compares two config objects on their similiarity.
    * This doesn't compare key differences.
    * @param newInput {RadioPlus.Config} The new config object.
    * @param currentInput {RadioPlus.Config} The current config object.
@@ -107,7 +107,7 @@ function useConfigForm() {
       return false;
     }
 
-    // Create local copies of data and error objects.a
+    // Create local copies of data and error objects.
     const localConfig: RadioPlus.Config = { ...config.data };
     const localErrors: RadioPlus.ConfigFormErrors = {
       radioOriginTrackUrl: null,
@@ -118,6 +118,9 @@ function useConfigForm() {
     const songOriginInputValue = formData.get(
       'radio-plus-radio-origin-input'
     ) as string | null;
+    const freshTracksBool = formData.get('radio-plus-fresh-track-checkbox') as
+      | string
+      | null;
 
     // Run through each dedicated evaluator for each existing input in the config form.
     try {
@@ -126,6 +129,9 @@ function useConfigForm() {
     } catch (err) {
       localErrors.radioOriginTrackUrl = (err as { message: string }).message;
     }
+
+    // Checkboxes in form data are either 'on' if true or non existant if false.
+    localConfig.freshTracks = freshTracksBool === 'on' ?? false;
 
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {

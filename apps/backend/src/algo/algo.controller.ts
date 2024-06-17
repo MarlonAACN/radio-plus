@@ -46,6 +46,7 @@ export class AlgoController {
     return this.algoService
       .updateQueue(
         dto.originTrackId,
+        dto.freshTracks,
         dto.user,
         dto.deviceId,
         request.accessToken

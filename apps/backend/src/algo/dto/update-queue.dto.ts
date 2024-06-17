@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsObject, IsString, ValidateNested } from 'class-validator';
+import { IsBoolean, IsObject, IsString, ValidateNested } from 'class-validator';
 
 import { UserDto } from '@/algo/dto/user.dto';
 
@@ -9,6 +9,9 @@ class UpdateQueueDto {
 
   @IsString()
   originTrackId: string;
+
+  @IsBoolean()
+  freshTracks: boolean;
 
   @IsObject()
   @ValidateNested()

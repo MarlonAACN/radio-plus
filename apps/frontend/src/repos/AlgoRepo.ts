@@ -42,6 +42,7 @@ class AlgoRepo {
   updateQueue(
     deviceId: string,
     originTrackId: string,
+    freshTracks: boolean,
     user: RadioPlus.User
   ): Promise<{ trackId: string }> {
     return fetch(
@@ -57,6 +58,7 @@ class AlgoRepo {
         body: JSON.stringify({
           deviceId: deviceId,
           originTrackId: originTrackId,
+          freshTracks: freshTracks,
           user: user,
         }),
       }

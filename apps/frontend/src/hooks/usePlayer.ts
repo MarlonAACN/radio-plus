@@ -198,7 +198,7 @@ function usePlayer(): RadioPlus.PlayerHook {
       return Promise.resolve(false);
     }
 
-    console.log('[SpotifyPlayer] seeking pos');
+    logger.log('[SpotifyPlayer] seeking pos');
     setEventIsLoading(true);
     return playerRepo
       .seekPosition(positionMs, deviceId.current)

@@ -82,6 +82,7 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     updateTrackQueue(
       player.deviceId,
       config.radioOriginTrack.information.id,
+      config.data.freshTracks,
       user.data
     );
   }, [player.activeTrackId]);
@@ -136,22 +137,24 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       return;
     }
 
-    setOriginTrack(trackId, player.deviceId, user.data);
+    setOriginTrack(trackId, config.freshTracks, player.deviceId, user.data);
   }
 
   /**
    * Finds a recommendation based on the origin track id and adds it to the users track queue.
    * @param deviceId {string} The device id of the Radio plus instance.
    * @param originTrackId {string} The id of the origin track, that is used to fetch recommendations.
+   * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
    * @param user {RadioPlus.User} Data of the user, that is relevant for the algorithm.
    */
   function updateTrackQueue(
     deviceId: string,
     originTrackId: string,
+    freshTracks: boolean,
     user: RadioPlus.User
   ) {
     return algoRepo
-      .updateQueue(deviceId, originTrackId, user)
+      .updateQueue(deviceId, originTrackId, freshTracks, user)
       .then((res) => {
         logger.log(
           `[updateTrackQueue] Track with id: ${res.trackId} was successfully added to the queue.`
@@ -171,12 +174,14 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
    * Changes the currently played song to the track with the given id.
    * This marks the start of the running algorithm.
    * @param trackId {string} The id of the origin track
+   * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
    * @param deviceId {string} The id of the current device (radio plus instance)
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @returns {boolean} A boolean indicating the outcome of the operation.
    */
   function setOriginTrack(
     trackId: string,
+    freshTracks: boolean,
     deviceId: string,
     user: RadioPlus.User
   ): Promise<boolean> {
@@ -193,7 +198,7 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
         );
 
         // manually trigger 'update track queue', since hook would not be called, if the set origin track matches the already active one.
-        updateTrackQueue(deviceId, trackId, user);
+        updateTrackQueue(deviceId, trackId, freshTracks, user);
         return true;
       })
       .catch((err: RadioPlus.Error) => {

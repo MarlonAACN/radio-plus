@@ -26,6 +26,16 @@ class LocalStorageManager {
     return lsRadioOriginTrackUrl;
   }
 
+  private static getFreshTracksBoolFromLs(): boolean {
+    const lsFreshTracks = localStorage.getItem(LocalStorageKeys.freshTracks);
+
+    if (!lsFreshTracks) {
+      return false;
+    }
+
+    return lsFreshTracks === 'true';
+  }
+
   /**
    * Returns the config object, built upon the data fetched from the clients local storage.
    * @returns {RadioPlus.Config} The config built upon the data from the clients local storage.
@@ -33,6 +43,7 @@ class LocalStorageManager {
   public static getConfig(): RadioPlus.Config {
     return {
       radioOriginTrackUrl: this.getRadioTrackUrlFromLs(),
+      freshTracks: this.getFreshTracksBoolFromLs(),
     };
   }
 

@@ -31,12 +31,14 @@ type ConfigProps = {
 const configDefaultValues: ConfigContextProps = {
   data: {
     radioOriginTrackUrl: null,
+    freshTracks: false,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
   },
   errors: {
     radioOriginTrackUrl: null,
+    freshTracks: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -55,12 +57,15 @@ function ConfigProvider({ children }: ConfigProps) {
    * */
   const [cachedData, setCachedData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
+    freshTracks: false,
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
+    freshTracks: false,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
+    freshTracks: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -82,7 +87,9 @@ function ConfigProvider({ children }: ConfigProps) {
   }, [data]);
 
   useEffect(() => {
-    setHasErrors(errors.radioOriginTrackUrl !== null);
+    setHasErrors(
+      errors.radioOriginTrackUrl !== null || errors.freshTracks !== null
+    );
   }, [errors]);
 
   /**
@@ -121,6 +128,17 @@ function ConfigProvider({ children }: ConfigProps) {
           updateErrors.radioOriginTrackUrl = err;
           newCache.radioOriginTrackUrl = null;
         });
+    }
+
+    // 2. Fresh tracks
+    if (_cache.freshTracks !== _data.freshTracks) {
+      updateErrors.freshTracks = null;
+
+      newCache.freshTracks = _data.freshTracks;
+      LocalStorageManager.updateConfigValue(
+        LocalStorageKeys.freshTracks,
+        _data.freshTracks.toString()
+      );
     }
 
     // Update global error object, update global cache.

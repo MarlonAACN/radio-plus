@@ -11,6 +11,7 @@ import {
 import { Error } from '@/types/RadioPlus/Error';
 import { PlayerHook } from '@/types/RadioPlus/PlayerHook';
 import { ErrorResponse } from '@/types/RadioPlus/RadioPlusErrorResponse';
+import { TrackMood } from '@/types/RadioPlus/TrackMoods';
 import { User, UserData } from '@/types/RadioPlus/UserData';
 import { UserHook } from '@/types/RadioPlus/UserHook';
 
@@ -31,4 +32,4 @@ declare namespace RadioPlus {
   };
 }
 
-export { RadioPlus };
+export { RadioPlus, TrackMood };

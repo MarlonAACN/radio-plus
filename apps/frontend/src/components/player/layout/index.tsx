@@ -1,5 +1,6 @@
 import { ErrorOverlayView } from '@/components/player/views/ErrorOverlay';
 import { LoadingOverviewView } from '@/components/player/views/LoadingOverlay';
+import { PlaylistUrlBtn } from '@/components/player/views/PlaylistUrlBtn';
 import { ProgressBarWidget } from '@/components/player/views/ProgressBar';
 import { ReconnectBtnView } from '@/components/player/views/ReconnectBtn';
 import { ButtonHubWidget } from '@/components/player/widgets/ButtonHub';
@@ -9,9 +10,14 @@ import { RadioPlus } from '@/types/RadioPlus';
 type PlayerLayoutProps = {
   player: RadioPlus.PlayerHook;
   algoIsLoading: boolean;
+  playlistUrl: string | null;
 };
 
-function PlayerLayout({ player, algoIsLoading }: PlayerLayoutProps) {
+function PlayerLayout({
+  player,
+  algoIsLoading,
+  playlistUrl,
+}: PlayerLayoutProps) {
   function getTrackBackgroundCSS(track: Spotify.Track | null): string {
     if (!track || (!track.album.images[0].url && !track.album.images[2].url)) {
       return '#242424';
@@ -74,7 +80,7 @@ function PlayerLayout({ player, algoIsLoading }: PlayerLayoutProps) {
           reconnectHandler={player.reconnectPlayer}
         />
       </div>
-      <p>{player.isActive ? 'active' : 'inactive'}</p>
+      <PlaylistUrlBtn url={playlistUrl} />
     </>
   );
 }

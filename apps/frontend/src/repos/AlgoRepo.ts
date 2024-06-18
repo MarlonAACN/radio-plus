@@ -14,7 +14,7 @@ class AlgoRepo {
     originTrackId: string,
     user: RadioPlus.User,
     freshTracks: boolean
-  ): Promise<void> {
+  ): Promise<RadioPlus.PlaylistUrl> {
     return fetch(
       this.router.get('runAlgorithm').build({
         v: 'v1',
@@ -34,10 +34,10 @@ class AlgoRepo {
       }
     )
       .then((response: Response) => {
-        return HttpHandler.response<void>(response);
+        return HttpHandler.response<RadioPlus.PlaylistUrl>(response);
       })
       .catch((errResponse) => {
-        return HttpHandler.error<void>(errResponse);
+        return HttpHandler.error<RadioPlus.PlaylistUrl>(errResponse);
       });
   }
 }

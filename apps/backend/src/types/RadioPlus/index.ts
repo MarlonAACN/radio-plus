@@ -1,3 +1,4 @@
+import { AlgorithmResponse } from '@/types/RadioPlus/AlgorithmResponse';
 import {
   TrackAudioFeatures,
   DetailedTrack,
@@ -10,6 +11,7 @@ import { UserData, User } from '@/types/RadioPlus/UserData';
 
 declare namespace RadioPlus {
   export {
+    AlgorithmResponse,
     DetailedTrack,
     Error,
     FilterOptions,

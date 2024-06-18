@@ -49,7 +49,11 @@ function Base() {
           userFetched={algorithm.userFetched}
           algorithmError={algorithm.error}
         />
-        <PlayerLayout player={player} algoIsLoading={algorithm.isLoading} />
+        <PlayerLayout
+          player={player}
+          algoIsLoading={algorithm.isLoading}
+          playlistUrl={algorithm.playlistUrl}
+        />
       </main>
     </>
   );

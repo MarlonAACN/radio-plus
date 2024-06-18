@@ -94,6 +94,9 @@ function ConfigLayout({
             formHoldsNewData={configForm.formHoldsNewData}
             playerWasTransferred={playerWasTransferred}
             userFetched={userFetched}
+            radioOriginTrackinputValue={
+              configForm.inputChangeTracker.radioOriginTrackUrl
+            }
           />
           <ConfigMenuToggleBarWidget
             isOpen={isOpen}

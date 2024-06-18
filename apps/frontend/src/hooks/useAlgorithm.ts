@@ -15,8 +15,8 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
   const config = useConfig();
   const user = useUser();
 
-  const [algoIsActive, setAlgoIsActive] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   const [algoError, setAlgoError] = useState<string | null>(null);
   const blockQueueUpdate = useRef<boolean>(false);
 
@@ -41,8 +41,6 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
    */
   function handleConfigChange(_config: RadioPlus.Config) {
     if (!_config.radioOriginTrackUrl) {
-      setAlgoIsActive(false);
-
       return;
     }
 
@@ -68,26 +66,30 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       originTrackId = TrackFormatter.parseTrackUrl(_config.radioOriginTrackUrl);
     } catch (err) {
       logger.error('[useAlgorithm] Track url is malformed.');
-      setAlgoIsActive(false);
       setAlgoError('Origin track url is malformed');
 
       return;
     }
 
     if (!originTrackId) {
-      setAlgoIsActive(false);
-
       return;
     }
 
     setAlgoError(null);
+    player.pause();
 
     runAlgorithm(
       player.deviceId,
       originTrackId,
       user.data,
       _config.freshTracks
-    );
+    ).then((res) => {
+      if (res === null) {
+        setPlaylistUrl(null);
+      } else {
+        setPlaylistUrl(res.playlistUrl);
+      }
+    });
   }
 
   function runAlgorithm(
@@ -95,13 +97,14 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     originTrackId: string,
     user: RadioPlus.User,
     freshTracks: boolean
-  ): Promise<void> {
+  ): Promise<RadioPlus.PlaylistUrl | null> {
     setIsLoading(true);
 
     return algoRepo
       .runAlgorithm(deviceId, originTrackId, user, freshTracks)
-      .then(() => {
+      .then((data) => {
         logger.log(`[runAlgorithm] Algorithm ran successfully.`);
+        return data;
       })
       .catch((err: RadioPlus.Error) => {
         logger.error('[runAlgorithm] Running algorithm failed:', err);
@@ -114,7 +117,7 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
           radioOriginTrackUrl: null,
         });
 
-        return;
+        return null;
       })
       .finally(() => {
         blockQueueUpdate.current = false;
@@ -126,6 +129,7 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     error: algoError,
     userFetched: user.fetchCompleted,
     isLoading: isLoading,
+    playlistUrl: playlistUrl,
   };
 }
 

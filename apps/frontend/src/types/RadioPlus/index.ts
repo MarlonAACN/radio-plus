@@ -10,6 +10,7 @@ import {
 } from '@/types/RadioPlus/DetailedTrack';
 import { Error } from '@/types/RadioPlus/Error';
 import { PlayerHook } from '@/types/RadioPlus/PlayerHook';
+import { PlaylistUrl } from '@/types/RadioPlus/PlaylistUrl';
 import { ErrorResponse } from '@/types/RadioPlus/RadioPlusErrorResponse';
 import { TrackMood } from '@/types/RadioPlus/TrackMoods';
 import { User, UserData } from '@/types/RadioPlus/UserData';
@@ -25,6 +26,7 @@ declare namespace RadioPlus {
     ConfigErrors,
     DetailedTrack,
     PlayerHook,
+    PlaylistUrl,
     TrackAudioFeatures,
     User,
     UserData,

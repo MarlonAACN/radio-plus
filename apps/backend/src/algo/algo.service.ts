@@ -8,6 +8,7 @@ import { TrackService } from '@/track/track.service';
 import { RadioPlus } from '@/types/RadioPlus';
 import { RadioPlusError } from '@/types/RadioPlus/Error';
 import { UserService } from '@/user/user.service';
+import { delay } from '@/util/delay';
 import { RequestError } from '@/util/Error';
 import { SpotifyURI, SpotiyUriType } from '@/util/formatter/SpotifyURI';
 import { HttpHeader } from '@/util/HttpHeader';
@@ -32,6 +33,7 @@ export class AlgoService {
    * @param deviceId {string} The id of the current device (radio plus instance)
    * @param response {Response} The response object to be able to append the set-cookie header.
    * @param freshTracks {boolean} Filter option that determines if known tracks should be excluded.
+   * @returns {RadioPlus.AlgorithmResponse} The url to the playlist in the spotify webapp.
    */
   async runAlgorithm(
     originTrackId: string,
@@ -41,7 +43,7 @@ export class AlgoService {
     deviceId: string,
     response: Response,
     freshTracks: boolean
-  ): Promise<void> {
+  ): Promise<RadioPlus.AlgorithmResponse> {
     // 1. Check if a dedicated radio plus session playlist already exists.
     if (playlistId) {
       // 1a. Playlist ref exists -> try fetching it.
@@ -179,40 +181,66 @@ export class AlgoService {
       }),
     };
 
-    return fetch(
-      SpotifyEndpointURLs.player.StartResumePlayback(urlParams),
-      requestParams
-    )
-      .then((response) => {
-        return response.text();
-      })
-      .then((raw) => {
-        const data = raw ? JSON.parse(raw) : {};
+    let retries = 0;
 
-        throwIfDataIsSpotifyError(data);
+    function startPlayback(): Promise<RadioPlus.AlgorithmResponse> {
+      return fetch(
+        SpotifyEndpointURLs.player.StartResumePlayback(urlParams),
+        requestParams
+      )
+        .then((response) => {
+          return response.text();
+        })
+        .then((raw) => {
+          const data = raw ? JSON.parse(raw) : {};
 
-        response.cookie(SupportedCookies.sessionPlaylistId, newPlaylist.id, {
-          sameSite: 'lax',
-          path: '/',
-          httpOnly: false,
-          expires: new Date(Date.now() + 21600000), // Six hours from now
+          throwIfDataIsSpotifyError(data);
+
+          response.cookie(SupportedCookies.sessionPlaylistId, newPlaylist.id, {
+            sameSite: 'lax',
+            path: '/',
+            httpOnly: false,
+            expires: new Date(Date.now() + 21600000), // Six hours from now
+          });
+
+          logger.log(
+            `[runAlgorithm] Successfully started playback on ${retries} try.`
+          );
+
+          return {
+            playlistUrl: newPlaylist.external_urls.spotify,
+          };
+        })
+        .catch(async (error: Spotify.Error) => {
+          logger.error(
+            `[runAlgorithm] Failed starting playback for session playlist with id ${
+              newPlaylist.id
+            } try (${retries + 1}/3).`,
+            error.message
+          );
+
+          if (retries < 3) {
+            retries += 1;
+
+            logger.log(
+              '[runAlgorithm] Retrying to launch playback in 5 seconds...'
+            );
+
+            await delay(5000);
+            return startPlayback();
+          } else {
+            logger.warn(
+              `[runAlgorithm] Failed starting playback for session playlist with id ${newPlaylist.id}`
+            );
+
+            return {
+              playlistUrl: newPlaylist.external_urls.spotify,
+            };
+          }
         });
+    }
 
-        return;
-      })
-      .catch((error: Spotify.Error) => {
-        logger.error(
-          `[runAlgorithm] Failed starting playback for session playlist with id ${newPlaylist.id}.`,
-          error.message
-        );
-
-        return Promise.reject(
-          new RequestError(
-            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            `Failed starting playback for session playlist.`
-          )
-        );
-      });
+    return startPlayback();
   }
 
   /**

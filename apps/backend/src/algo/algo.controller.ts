@@ -12,6 +12,7 @@ import { AlgoService } from '@/algo/algo.service';
 import { RunAlgorithmDto } from '@/algo/dto';
 import { SupportedCookies } from '@/constants/SupportedCookies';
 import { AuthRequest } from '@/types/misc/AuthRequest';
+import { RadioPlus } from '@/types/RadioPlus';
 import { RequestError } from '@/util/Error';
 
 @Controller({
@@ -26,7 +27,7 @@ export class AlgoController {
     @Body() dto: RunAlgorithmDto,
     @Req() request: AuthRequest,
     @Res({ passthrough: true }) response: Response
-  ): Promise<void> {
+  ): Promise<RadioPlus.AlgorithmResponse> {
     const playlistIdCookie =
       request.cookies[SupportedCookies.sessionPlaylistId];
 
@@ -40,8 +41,8 @@ export class AlgoController {
         response,
         dto.freshTracks
       )
-      .then(() => {
-        return;
+      .then((playlistUrl) => {
+        return playlistUrl;
       })
       .catch((err: RequestError) => {
         throw new HttpException(

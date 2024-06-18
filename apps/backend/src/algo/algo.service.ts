@@ -158,7 +158,14 @@ export class AlgoService {
         );
       });
 
-    // 5. Launch playback of playlist
+    // 4. Try to set playlist image cover.
+    await this.playlistService
+      .addRadioPlusPlaylistCoverImage(newPlaylist.id, accessToken)
+      .catch((_error: RadioPlus.Error) => {
+        logger.warn('[runAlgorithm] Failed to set playlist image cover.');
+      });
+
+    // 6. Launch playback of playlist
     const urlParams = new URLSearchParams({
       device_id: deviceId,
     });

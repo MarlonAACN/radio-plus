@@ -31,6 +31,8 @@ export const SpotifyEndpointURLs = {
       `https://api.spotify.com/v1/playlists/${playlistId}`,
     addTracks: (playlistId: string) =>
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+    addCustomPlayCoverImage: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}/images`,
   },
   GetRecommendations: (urlParams: URLSearchParams) =>
     `https://api.spotify.com/v1/recommendations?${urlParams}`,

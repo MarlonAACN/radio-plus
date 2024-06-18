@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
+import { RADIO_PLUS_COVER_BASE64_JPEG } from '@/constants';
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
 import { RadioPlus } from '@/types/RadioPlus';
 import { RequestError } from '@/util/Error';
@@ -259,6 +260,56 @@ export class PlaylistService {
           new RequestError(
             error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
             `Failed to dump playlist with id ${playlistId}.`
+          )
+        );
+      });
+  }
+
+  /**
+   * Sets the cover image of the given playlist to a radio plus cover image.
+   * @param playlistId {string} The id of the playlist for which the cover should be set.
+   * @param accessToken {string} The access token of the user to authenticate the request.
+   */
+  public addRadioPlusPlaylistCoverImage(
+    playlistId: string,
+    accessToken: string
+  ): Promise<void> {
+    const requestParams = {
+      method: 'PUT',
+      headers: {
+        'Authorization': HttpHeader.getSpotifyBearerAuthorization(accessToken),
+        'Content-Type': 'application/json',
+      },
+      body: RADIO_PLUS_COVER_BASE64_JPEG,
+    };
+
+    return fetch(
+      SpotifyEndpointURLs.playlist.addCustomPlayCoverImage(playlistId),
+      requestParams
+    )
+      .then((response) => {
+        return response.text();
+      })
+      .then((raw) => {
+        const data = raw ? JSON.parse(raw) : {};
+
+        throwIfDataIsSpotifyError(data);
+        logger.log(
+          `[addRadioPlusPlaylistCoverImage] Playlist image cover set successfully.`
+        );
+
+        return;
+      })
+      .catch((error: Spotify.Error) => {
+        logger.error(
+          `[addRadioPlusPlaylistCoverImage] Failed to set playlist imager cover.`,
+          error.message
+        );
+
+        return Promise.reject(
+          new RequestError(
+            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+            `Failed to set playlist imager cover.`
           )
         );
       });

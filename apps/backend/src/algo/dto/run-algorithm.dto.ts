@@ -3,20 +3,20 @@ import { IsBoolean, IsObject, IsString, ValidateNested } from 'class-validator';
 
 import { UserDto } from '@/algo/dto/user.dto';
 
-class UpdateQueueDto {
+class RunAlgorithmDto {
   @IsString()
   deviceId: string;
 
   @IsString()
   originTrackId: string;
 
-  @IsBoolean()
-  freshTracks: boolean;
-
   @IsObject()
   @ValidateNested()
   @Type(() => UserDto)
   user: UserDto;
+
+  @IsBoolean()
+  freshTracks: boolean;
 }
 
-export { UpdateQueueDto };
+export { RunAlgorithmDto };

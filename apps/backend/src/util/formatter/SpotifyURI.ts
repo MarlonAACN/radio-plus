@@ -1,5 +1,6 @@
 enum SpotiyUriType {
   track = 'spotify:track',
+  playlist = 'spotify:playlist',
   album = 'spotify:album',
   artist = 'spotify:artist',
 }

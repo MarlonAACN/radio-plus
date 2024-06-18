@@ -110,7 +110,7 @@ function usePlayer(): RadioPlus.PlayerHook {
         !state ? setActive(false) : setActive(true);
       });
 
-      logger.log('DEBUG: [SpotifyPlayer] Player state changed.');
+      //logger.log('DEBUG: [SpotifyPlayer] Player state changed.');
     });
 
     player.addListener('ready', ({ device_id }) => {

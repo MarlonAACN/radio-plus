@@ -1,13 +1,14 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { Response } from 'express';
 
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
+import { SupportedCookies } from '@/constants/SupportedCookies';
+import { PlaylistService } from '@/playlist/playlist.service';
+import { TrackService } from '@/track/track.service';
 import { RadioPlus } from '@/types/RadioPlus';
 import { RadioPlusError } from '@/types/RadioPlus/Error';
 import { UserService } from '@/user/user.service';
 import { RequestError } from '@/util/Error';
-import { CacheObject, CacheObjectType } from '@/util/formatter/CacheObject';
 import { SpotifyURI, SpotiyUriType } from '@/util/formatter/SpotifyURI';
 import { HttpHeader } from '@/util/HttpHeader';
 import { logger } from '@/util/Logger';
@@ -17,57 +18,145 @@ import { TrackFilter } from '@/util/TrackFilter';
 @Injectable()
 export class AlgoService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private userService: UserService
+    private userService: UserService,
+    private playlistService: PlaylistService,
+    private trackService: TrackService
   ) {}
 
   /**
-   * Fetch user data based on the given access token and add to cache.
-   * If a cached object already exists, overwrite it.
-   * @param accessToken {string} The access token of the user to authenticate the request.
-   * @param userId {string} The id of the user, used as key for the cache object.
-   */
-  private async cacheUserData(
-    accessToken: string,
-    userId: string
-  ): Promise<void> {
-    // 13-15 kb on average
-    const userData: RadioPlus.UserData =
-      await this.userService.getUserData(accessToken);
-
-    await this.cacheManager.set(
-      CacheObject.constructKey(userId, CacheObjectType.UserData),
-      userData,
-      86400000
-    ); // One day from now
-    await this.cacheManager.set('foo', 'bar', 86400000);
-
-    // Delete potentially existing recommendation data
-    await this.cacheManager.del(
-      CacheObject.constructKey(userId, CacheObjectType.Recommendations)
-    );
-
-    logger.log('[cacheUserData] Cache data set successfully.');
-
-    return Promise.resolve();
-  }
-
-  /**
-   * Marks the start of a running algorithm.
-   * This sets based on the given origin track id the track as currently played.
-   * This also toggles the playback to play.
-   * This also fetches userData and sets said data as cachable object. When a new init is triggered, this data gets replaced.
+   *
    * @param originTrackId {string} The origin track id, that is used in the current lifetime cycle of the running algorithm.
-   * @param user {RadioPlus.user} The user data required to set the cachable object.
-   * @param deviceId {string} The id of the current device (radio plus instance)
+   * @param playlistId {string | null} A potentially already existing session playlist from the current session.
+   * @param user {RadioPlus.user} The user data required for proper result filtering.
    * @param accessToken {string} The access token of the user to authenticate the request.
+   * @param deviceId {string} The id of the current device (radio plus instance)
+   * @param response {Response} The response object to be able to append the set-cookie header.
+   * @param freshTracks {boolean} Filter option that determines if known tracks should be excluded.
    */
-  async initAlgorithm(
+  async runAlgorithm(
     originTrackId: string,
+    playlistId: string | null,
     user: RadioPlus.User,
+    accessToken: string,
     deviceId: string,
-    accessToken: string
+    response: Response,
+    freshTracks: boolean
   ): Promise<void> {
+    // 1. Check if a dedicated radio plus session playlist already exists.
+    if (playlistId) {
+      // 1a. Playlist ref exists -> try fetching it.
+      const playlist: Spotify.SinglePlaylistResponse | null =
+        await this.playlistService
+          .getPlaylist(playlistId, accessToken)
+          .then((_playlist: Spotify.SinglePlaylistResponse) => {
+            logger.log('[runAlgorithm] Found existing playlist.');
+
+            return _playlist;
+          })
+          .catch((_error: RadioPlus.Error) => {
+            logger.warn(
+              '[runAlgorithm] Failed fetching playlist. Playlist reference is invalid.'
+            );
+
+            return null;
+          });
+
+      // 1b. If playlist actually exists, dump it.
+      if (playlist !== null) {
+        await this.playlistService.dumpPlaylist(playlistId, accessToken);
+      }
+    }
+
+    // 2a. Get origin track data.
+    const originTrack: Spotify.Track = await this.trackService
+      .getTrackData(originTrackId, accessToken)
+      .then((track) => {
+        return track;
+      })
+      .catch((error: RadioPlus.Error) => {
+        logger.error('[runAlgorithm] Failed fetching origin track data.');
+
+        return Promise.reject(
+          new RequestError(
+            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+            'Failed fetching origin track data.'
+          )
+        );
+      });
+
+    // 2b. Create new playlist for current recommendation list.
+    const dateString = new Date().toLocaleDateString('de');
+    const newPlaylist = await this.playlistService
+      .createPlaylist(user.id, accessToken, {
+        name: `Radio⁺ | ${originTrack.name}`,
+        description: `Radio⁺ session playlist (${dateString}). Origin track: ${originTrack.name}, fresh tracks: ${freshTracks}`,
+      })
+      .then((playlist) => {
+        logger.log(
+          `[runAlgorithm] Radio⁺ session playlist with id ${playlist.id} successfully created.`
+        );
+        return playlist;
+      })
+      .catch((error: RadioPlus.Error) => {
+        logger.error(
+          '[runAlgorithm] Failed creating session playlist.',
+          error.message
+        );
+
+        return Promise.reject(
+          new RequestError(
+            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+            'Failed creating session playlist.'
+          )
+        );
+      });
+
+    // 3. Get recommendation track list.
+    const recommendationTrackIds = await this.getRecommendations(
+      originTrackId,
+      freshTracks,
+      user,
+      accessToken
+    )
+      .then((recommendations) => {
+        return recommendations;
+      })
+      .catch((error: RadioPlus.Error) => {
+        logger.error(
+          '[runAlgorithm] Failed fetching recommendations.',
+          error.message
+        );
+
+        return Promise.reject(
+          new RequestError(
+            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+            'Failed finding proper recommendations.'
+          )
+        );
+      });
+
+    // 4. Add recommendations to playlist.
+    await this.playlistService
+      .addTracksToPlaylist(newPlaylist.id, recommendationTrackIds, accessToken)
+      .then(() => {
+        logger.log(
+          `[runAlgorithm] ${recommendationTrackIds.length} tracks successfully added to session playlist.`
+        );
+      })
+      .catch((error: RadioPlus.Error) => {
+        logger.error(
+          '[runAlgorithm] Failed adding tracks to session playlist.'
+        );
+
+        return Promise.reject(
+          new RequestError(
+            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+            'Failed adding tracks to session playlist.'
+          )
+        );
+      });
+
+    // 5. Launch playback of playlist
     const urlParams = new URLSearchParams({
       device_id: deviceId,
     });
@@ -79,11 +168,16 @@ export class AlgoService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        uris: [SpotifyURI.construct(originTrackId, SpotiyUriType.track)],
+        context_uri: SpotifyURI.construct(
+          newPlaylist.id,
+          SpotiyUriType.playlist
+        ),
+        offset: {
+          position: 0,
+        },
+        position_ms: 0,
       }),
     };
-
-    await this.cacheUserData(accessToken, user.id);
 
     return fetch(
       SpotifyEndpointURLs.player.StartResumePlayback(urlParams),
@@ -97,73 +191,44 @@ export class AlgoService {
 
         throwIfDataIsSpotifyError(data);
 
+        response.cookie(SupportedCookies.sessionPlaylistId, newPlaylist.id, {
+          sameSite: 'lax',
+          path: '/',
+          httpOnly: false,
+          expires: new Date(Date.now() + 21600000), // Six hours from now
+        });
+
         return;
       })
       .catch((error: Spotify.Error) => {
         logger.error(
-          `[startAlgorithm] Starting algorithm with setting track origin as current track failed:`,
+          `[runAlgorithm] Failed starting playback for session playlist with id ${newPlaylist.id}.`,
           error.message
         );
 
         return Promise.reject(
           new RequestError(
             error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            'Starting algorithm with setting track origin as current track failed.'
+            `Failed starting playback for session playlist.`
           )
         );
       });
   }
 
   /**
-   * Get a recommendation track based on the given trackId.
+   * Get a recommendation track list based on the given trackId.
    * @param trackId {string} The trackId of the track that should be used as base for the recommendation.
    * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param accessToken {string} The access token of the user to authenticate the request.
-   * @returns {string | null} The recommendation track or null if no eligible recommendation track could be found.
+   * @returns {Array<string>} The recommendation track list.
    */
-  private async getRecommendation(
+  private async getRecommendations(
     trackId: string,
     freshTracks: boolean,
     user: RadioPlus.User,
     accessToken: string
-  ): Promise<string | null> {
-    // Check if cached recommendation track list exists.
-    const recommendations: RadioPlus.Recommendations | undefined =
-      await this.cacheManager.get<RadioPlus.Recommendations>(
-        CacheObject.constructKey(user.id, CacheObjectType.Recommendations)
-      );
-
-    console.log('rec obj.', recommendations?.position);
-
-    // Check if object exists and user is not at the end of it.
-    if (
-      recommendations &&
-      recommendations.position < recommendations.tracks.length - 1
-    ) {
-      // Update cache objects position
-      await this.cacheManager.set(
-        CacheObject.constructKey(user.id, CacheObjectType.Recommendations),
-        {
-          position: recommendations.position + 1,
-          tracks: recommendations.tracks,
-        },
-        86400000
-      );
-
-      logger.log(
-        `[getRecommendation] Return position ${recommendations.position}/${recommendations.tracks.length} in recommendation track list. (ref. userId: ${user.id})`
-      );
-
-      return recommendations.tracks[recommendations.position];
-    }
-
-    // No recommendations cached or at the end of array -> generate new set.
-    const userData: RadioPlus.UserData | undefined =
-      await this.cacheManager.get<RadioPlus.UserData>(
-        CacheObject.constructKey(user.id, CacheObjectType.UserData)
-      );
-
+  ): Promise<Array<string>> {
     const urlParams = new URLSearchParams({
       limit: '100',
       seed_tracks: trackId,
@@ -191,7 +256,7 @@ export class AlgoService {
 
         if (data.tracks.length === 0) {
           logger.error(
-            '[getRecommendation] Array of recommendations is empty.'
+            '[getRecommendations] Array of recommendations is empty.'
           );
           throw new RadioPlusError(
             HttpStatus.NOT_FOUND,
@@ -199,133 +264,37 @@ export class AlgoService {
           );
         }
 
+        // Fetch user data (recent tracks, top artists & tracks etc.)
+        const userData = await this.userService.getUserData(accessToken);
+
+        // Filter recommendation track list based on filers.
         const filteredRecommendationTracks = TrackFilter.filterRecommendations(
           data.tracks,
           userData,
           { freshTracks: freshTracks }
         );
 
-        // Add object to cache
-        await this.cacheManager.set(
-          CacheObject.constructKey(user.id, CacheObjectType.Recommendations),
-          {
-            position: 1,
-            tracks: filteredRecommendationTracks,
-          },
-          86400000
-        );
         logger.log(
-          `[getRecommendation] Created new recommendation track list with ${filteredRecommendationTracks.length} tracks. (${data.tracks.length} before filtering) (ref. userId: ${user.id})`
-        );
-        logger.log(
-          '[getRecommendation] Returning first track from recommendation track list.'
+          `[getRecommendations] Created new recommendation track list with ${filteredRecommendationTracks.length} tracks. (${data.tracks.length} before filtering) (ref. userId: ${user.id})`
         );
 
-        return filteredRecommendationTracks[0];
+        return filteredRecommendationTracks;
       })
-      .catch((error: Spotify.Error) => {
-        // TODO: FF error if radioplus error type
-        logger.error(
-          `[getRecommendation] Fetching recommendation failed:`,
-          error.message
-        );
-
-        return Promise.reject(
-          new RequestError(
-            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            'Fetching recommendation failed.'
-          )
-        );
-      });
-  }
-
-  /**
-   * Adds a new track to the queue of the user.
-   * The track is based on a recommendation query, which uses dedicated parameters and the origin track as base.
-   * @param originTrackId {string} The id of the origin track id, that is used as base for the current lifetime cycle of the running alogorithm.
-   * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
-   * @param user {RadioPlus.User} The user data, relevant to the algorithm.
-   * @param deviceId {string} The id of the current device (radio plus instance)
-   * @param accessToken {string} The access token of the user to authenticate the request.
-   * @returns {string} The id of track that was added to the queue.
-   */
-  async updateQueue(
-    originTrackId: string,
-    freshTracks: boolean,
-    user: RadioPlus.User,
-    deviceId: string,
-    accessToken: string
-  ): Promise<string> {
-    const recommendedTrackId = await this.getRecommendation(
-      originTrackId,
-      freshTracks,
-      user,
-      accessToken
-    )
-      .then((recommendation) => {
-        console.log(recommendation);
-        if (recommendation) {
-          return recommendation;
-        } else {
-          return Promise.reject(
-            new RequestError(
-              HttpStatus.BAD_REQUEST,
-              "Couldn't finde a valid recommendation."
-            )
-          );
+      .catch((error: Spotify.Error | RadioPlusError) => {
+        // Fast-forward if radio plus error.
+        if (error instanceof RadioPlusError) {
+          throw error;
         }
-      })
-      .catch((error: Spotify.Error) => {
+
         logger.error(
-          `[updateQueue] Finding a recommendation failed:`,
+          `[getRecommendations] Fetching recommendations failed:`,
           error.message
         );
 
         return Promise.reject(
           new RequestError(
             error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            'Failed finding a recommendation.'
-          )
-        );
-      });
-
-    const urlParams = new URLSearchParams({
-      uri: SpotifyURI.construct(recommendedTrackId, SpotiyUriType.track),
-      device_id: deviceId,
-    });
-
-    const requestParams = {
-      method: 'POST',
-      headers: {
-        Authorization: HttpHeader.getSpotifyBearerAuthorization(accessToken),
-      },
-    };
-
-    return fetch(
-      SpotifyEndpointURLs.player.AddToQueue(urlParams),
-      requestParams
-    )
-      .then((response) => {
-        return response.text();
-      })
-      .then((raw) => {
-        const data = raw ? JSON.parse(raw) : {};
-
-        throwIfDataIsSpotifyError(data);
-
-        // Return id of track that was just added to the queue.
-        return recommendedTrackId;
-      })
-      .catch((error: Spotify.Error) => {
-        logger.error(
-          `[updateQueue] Updating track queue failed:`,
-          error.message
-        );
-
-        return Promise.reject(
-          new RequestError(
-            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            'Updating track queue failed.'
+            'Fetching recommendations failed.'
           )
         );
       });

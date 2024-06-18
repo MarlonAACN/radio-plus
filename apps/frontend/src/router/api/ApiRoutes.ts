@@ -23,13 +23,8 @@ export const ApiRoutes = {
     vars: { v: 'v1', trackId: '' },
     query: {},
   },
-  initAlgorithm: {
+  runAlgorithm: {
     path: '/{v}/algorithm',
-    vars: { v: 'v1' },
-    query: {},
-  },
-  updateQueue: {
-    path: '/{v}/algorithm/queue',
     vars: { v: 'v1' },
     query: {},
   },

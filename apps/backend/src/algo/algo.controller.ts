@@ -1,7 +1,16 @@
-import { Body, Controller, HttpException, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpException,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
 
 import { AlgoService } from '@/algo/algo.service';
-import { InitAlgorithmDto, UpdateQueueDto } from '@/algo/dto';
+import { RunAlgorithmDto } from '@/algo/dto';
+import { SupportedCookies } from '@/constants/SupportedCookies';
 import { AuthRequest } from '@/types/misc/AuthRequest';
 import { RequestError } from '@/util/Error';
 
@@ -13,46 +22,26 @@ export class AlgoController {
   constructor(private algoService: AlgoService) {}
 
   @Post()
-  initAlgorithm(
-    @Body() dto: InitAlgorithmDto,
-    @Req() request: AuthRequest
+  runAlgorithm(
+    @Body() dto: RunAlgorithmDto,
+    @Req() request: AuthRequest,
+    @Res({ passthrough: true }) response: Response
   ): Promise<void> {
+    const playlistIdCookie =
+      request.cookies[SupportedCookies.sessionPlaylistId];
+
     return this.algoService
-      .initAlgorithm(
+      .runAlgorithm(
         dto.originTrackId,
+        playlistIdCookie ?? null,
         dto.user,
+        request.accessToken,
         dto.deviceId,
-        request.accessToken
+        response,
+        dto.freshTracks
       )
       .then(() => {
         return;
-      })
-      .catch((err: RequestError) => {
-        throw new HttpException(
-          {
-            status: err.status,
-            message: err.message,
-          },
-          err.status
-        );
-      });
-  }
-
-  @Post('queue')
-  updateQueue(
-    @Body() dto: UpdateQueueDto,
-    @Req() request: AuthRequest
-  ): Promise<{ trackId: string }> {
-    return this.algoService
-      .updateQueue(
-        dto.originTrackId,
-        dto.freshTracks,
-        dto.user,
-        dto.deviceId,
-        request.accessToken
-      )
-      .then((trackId) => {
-        return { trackId: trackId };
       })
       .catch((err: RequestError) => {
         throw new HttpException(

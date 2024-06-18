@@ -9,13 +9,14 @@ class AlgoRepo {
     this.router = new ApiRouter(apiBase);
   }
 
-  initAlgorithm(
+  runAlgorithm(
+    deviceId: string,
     originTrackId: string,
     user: RadioPlus.User,
-    deviceId: string
+    freshTracks: boolean
   ): Promise<void> {
     return fetch(
-      this.router.get('initAlgorithm').build({
+      this.router.get('runAlgorithm').build({
         v: 'v1',
       }),
       {
@@ -28,6 +29,7 @@ class AlgoRepo {
           deviceId: deviceId,
           originTrackId: originTrackId,
           user: user,
+          freshTracks: freshTracks,
         }),
       }
     )
@@ -36,38 +38,6 @@ class AlgoRepo {
       })
       .catch((errResponse) => {
         return HttpHandler.error<void>(errResponse);
-      });
-  }
-
-  updateQueue(
-    deviceId: string,
-    originTrackId: string,
-    freshTracks: boolean,
-    user: RadioPlus.User
-  ): Promise<{ trackId: string }> {
-    return fetch(
-      this.router.get('updateQueue').build({
-        v: 'v1',
-      }),
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          deviceId: deviceId,
-          originTrackId: originTrackId,
-          freshTracks: freshTracks,
-          user: user,
-        }),
-      }
-    )
-      .then((response: Response) => {
-        return HttpHandler.response<{ trackId: string }>(response);
-      })
-      .catch((errResponse) => {
-        return HttpHandler.error<{ trackId: string }>(errResponse);
       });
   }
 }

@@ -34,69 +34,13 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     }
   }, [user.error]);
 
-  /** Update queue if new track comes up.
-   * This can be blocked if the blockQueueUpdate is set to true. For example when the starting track is set, this hook should not fire.
-   * With this hook there is always one track in the queue of the user, as a new track is added to the queue, once a new track comes up.
-   * This hook won't fire if the same track comes up right after the same track. (This should never happen).
-   * */
-  useEffect(() => {
-    logger.log('[UpdateQueueTracker] New track detected.');
-
-    if (blockQueueUpdate.current) {
-      logger.log(
-        '[UpdateQueueTracker] Updating track queue by hook is currently disabled.'
-      );
-      return;
-    }
-
-    if (!player.deviceId) {
-      logger.log(
-        "[UpdateQueueTracker] Can't update queue before player is connected with RadioPlus"
-      );
-
-      return;
-    }
-
-    if (!config.radioOriginTrack?.information.id) {
-      logger.log(
-        '[UpdateQueueTracker] Not updating queue, as no orign track has been set yet.'
-      );
-      return;
-    }
-
-    if (!algoIsActive) {
-      logger.log(
-        '[UpdateQueueTracker] Smart queue is disabled, not updating queue.'
-      );
-      return;
-    }
-
-    // user.fetchCompleted would usually be enough, but let's satisfy the compiler here.
-    if (!user.fetchCompleted || !user.data) {
-      logger.log(
-        '[UpdateQueueTracker] Tried to update queue, before user data fetch was completed.'
-      );
-      return;
-    }
-
-    updateTrackQueue(
-      player.deviceId,
-      config.radioOriginTrack.information.id,
-      config.data.freshTracks,
-      user.data
-    );
-  }, [player.activeTrackId]);
-
   /**
    * Update the algorithm with the latest data from the config.
    * If no origin track is set, disable algorithm to prevent new track being added to the queue.
-   * @param config {RadioPlus.Config} The current config object.
+   * @param _config {RadioPlus.Config} The current config object.
    */
-  function handleConfigChange(config: RadioPlus.Config) {
-    // Reset errors
-    setAlgoError(null);
-
-    if (!config.radioOriginTrackUrl) {
+  function handleConfigChange(_config: RadioPlus.Config) {
+    if (!_config.radioOriginTrackUrl) {
       setAlgoIsActive(false);
 
       return;
@@ -119,9 +63,9 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       return;
     }
 
-    let trackId;
+    let originTrackId;
     try {
-      trackId = TrackFormatter.parseTrackUrl(config.radioOriginTrackUrl);
+      originTrackId = TrackFormatter.parseTrackUrl(_config.radioOriginTrackUrl);
     } catch (err) {
       logger.error('[useAlgorithm] Track url is malformed.');
       setAlgoIsActive(false);
@@ -130,88 +74,50 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       return;
     }
 
-    if (!trackId) {
+    if (!originTrackId) {
       setAlgoIsActive(false);
-      //player.pause();
 
       return;
     }
 
-    setOriginTrack(trackId, config.freshTracks, player.deviceId, user.data);
+    setAlgoError(null);
+
+    runAlgorithm(
+      player.deviceId,
+      originTrackId,
+      user.data,
+      _config.freshTracks
+    );
   }
 
-  /**
-   * Finds a recommendation based on the origin track id and adds it to the users track queue.
-   * @param deviceId {string} The device id of the Radio plus instance.
-   * @param originTrackId {string} The id of the origin track, that is used to fetch recommendations.
-   * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
-   * @param user {RadioPlus.User} Data of the user, that is relevant for the algorithm.
-   */
-  function updateTrackQueue(
+  function runAlgorithm(
     deviceId: string,
     originTrackId: string,
-    freshTracks: boolean,
-    user: RadioPlus.User
-  ) {
+    user: RadioPlus.User,
+    freshTracks: boolean
+  ): Promise<void> {
+    setIsLoading(true);
+
     return algoRepo
-      .updateQueue(deviceId, originTrackId, freshTracks, user)
-      .then((res) => {
-        logger.log(
-          `[updateTrackQueue] Track with id: ${res.trackId} was successfully added to the queue.`
-        );
+      .runAlgorithm(deviceId, originTrackId, user, freshTracks)
+      .then(() => {
+        logger.log(`[runAlgorithm] Algorithm ran successfully.`);
       })
       .catch((err: RadioPlus.Error) => {
-        logger.error('[updateTrackQueue] Failed to update track queue:', err);
+        logger.error('[runAlgorithm] Running algorithm failed:', err);
 
         setAlgoError(err.message);
 
-        return false;
-      })
-      .finally(() => (blockQueueUpdate.current = false));
-  }
+        // reset origin track input
+        config.setData({
+          ...config.data,
+          radioOriginTrackUrl: null,
+        });
 
-  /**
-   * Changes the currently played song to the track with the given id.
-   * This marks the start of the running algorithm.
-   * @param trackId {string} The id of the origin track
-   * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
-   * @param deviceId {string} The id of the current device (radio plus instance)
-   * @param user {RadioPlus.User} The user data, relevant to the algorithm.
-   * @returns {boolean} A boolean indicating the outcome of the operation.
-   */
-  function setOriginTrack(
-    trackId: string,
-    freshTracks: boolean,
-    deviceId: string,
-    user: RadioPlus.User
-  ): Promise<boolean> {
-    setIsLoading(true);
-    // Prevent track change hook from adding a track to the queue.
-    blockQueueUpdate.current = true;
-
-    return algoRepo
-      .initAlgorithm(trackId, user, deviceId)
-      .then(() => {
-        setAlgoIsActive(true);
-        logger.log(
-          '[setOriginTrack] Origin track has been set and algorithm has been started.'
-        );
-
-        // manually trigger 'update track queue', since hook would not be called, if the set origin track matches the already active one.
-        updateTrackQueue(deviceId, trackId, freshTracks, user);
-        return true;
-      })
-      .catch((err: RadioPlus.Error) => {
-        logger.error(
-          '[setOriginTrack] Failed setting new track and start algorithm:',
-          err
-        );
-
-        setAlgoError('Launching smart queue failed');
-        blockQueueUpdate.current = false;
-        return false;
+        return;
       })
       .finally(() => {
+        blockQueueUpdate.current = false;
         setIsLoading(false);
       });
   }

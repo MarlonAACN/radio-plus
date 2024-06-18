@@ -41,7 +41,7 @@ function ConfigFormSubmitBtnView({
       {isLoading || !playerWasTransferred || !userFetched ? (
         <Spinner className="w-6 h-6 py-0.5" />
       ) : (
-        'Start'
+        'Generate'
       )}
     </button>
   );

@@ -20,6 +20,18 @@ export const SpotifyEndpointURLs = {
     SaveTrack: (urlParams: URLSearchParams) =>
       `https://api.spotify.com/v1/me/tracks?${urlParams}`,
   },
+  playlist: {
+    create: (userId: string) =>
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
+    get: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}`,
+    delete: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}/followers`,
+    updateDetails: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}`,
+    addTracks: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+  },
   GetRecommendations: (urlParams: URLSearchParams) =>
     `https://api.spotify.com/v1/recommendations?${urlParams}`,
   GetUserProfile: 'https://api.spotify.com/v1/me',

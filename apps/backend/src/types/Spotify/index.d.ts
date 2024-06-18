@@ -498,4 +498,110 @@ declare namespace Spotify {
    * https://developer.spotify.com/web-api/get-users-top-artists-and-tracks/
    */
   type UsersTopTracksResponse = PagingObject<TrackObjectFull>;
+
+  /**
+   * Followers Object
+   * [](https://developer.spotify.com/web-api/object-model/)
+   */
+  interface FollowersObject {
+    /**
+     * A link to the Web API endpoint providing full details of the followers; `null` if not available.
+     * Please note that this will always be set to `null`, as the Web API does not support it at the moment.
+     */
+    href: null;
+    /**
+     * The total number of followers.
+     */
+    total: number;
+  }
+
+  /**
+   * The Track Object in Playlists
+   * [](https://developer.spotify.com/web-api/object-model/)
+   */
+  interface PlaylistTrackObject {
+    added_at: string;
+    added_by: UserObjectPublic;
+    is_local: boolean;
+    track: TrackObjectFull | null;
+  }
+
+  /**
+   * Base Playlist Object. Does not in itself exist in Spotify Web Api,
+   * but needs to be made since the tracks types vary in the Full and Simplified versions.
+   */
+  interface PlaylistBaseObject extends ContextObject {
+    /**
+     * Returns `true` if context is not search and the owner allows other users to modify the playlist.
+     * Otherwise, returns `false`.
+     */
+    collaborative: boolean;
+    /**
+     * The playlist description. Only returned for modified, verified playlists, otherwise null.
+     */
+    description: string | null;
+    /**
+     * The [Spotify ID](https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids) for the playlist.
+     */
+    id: string;
+    /**
+     * Images for the playlist. The array may be empty or contain up to three images.
+     * The images are returned by size in descending order.
+     * See [Working with Playlists](https://developer.spotify.com/documentation/general/guides/working-with-playlists/).
+     * Note: If returned, the source URL for the image (`url`) is temporary and will expire in less than a day.
+     */
+    images: ImageObject[];
+    /**
+     * The name of the playlist.
+     */
+    name: string;
+    /**
+     * The user who owns the playlist.
+     */
+    owner: UserObjectPublic;
+    /**
+     * The playlist’s public/private status:
+     * `true` the playlist is public,
+     * `false` the playlist is private,
+     * or `null` the playlist status is not relevant.
+     */
+    public: boolean | null;
+    /**
+     * The version identifier for the current playlist. Can be supplied in other requests to target a specific playlist version:
+     * see [Remove tracks from a playlist](https://developer.spotify.com/documentation/web-api/reference/playlists/remove-tracks-playlist/).
+     */
+    snapshot_id: string;
+    type: 'playlist';
+  }
+
+  /**
+   * Playlist Object Full
+   * [](https://developer.spotify.com/web-api/object-model/#playlist-object-full)
+   */
+  interface PlaylistObjectFull extends PlaylistBaseObject {
+    /**
+     * Information about the followers of the playlist.
+     */
+    followers: FollowersObject;
+    /**
+     * Information about the tracks of the playlist.
+     */
+    tracks: PagingObject<PlaylistTrackObject>;
+  }
+
+  /**
+   * Create a Playlist
+   *
+   * POST /v1/users/{user_id}/playlists
+   * https://developer.spotify.com/web-api/create-playlist/
+   */
+  type CreatePlaylistResponse = PlaylistObjectFull;
+
+  /**
+   * Get a playlist
+   *
+   * GET /v1/users/{user_id}/playlists/{playlist_id}
+   * https://developer.spotify.com/web-api/get-playlist/
+   */
+  type SinglePlaylistResponse = PlaylistObjectFull;
 }

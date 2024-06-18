@@ -9,6 +9,7 @@ import { UserController } from '@/user/user.controller';
 import { AlgoModule } from './algo/algo.module';
 import { AuthModule } from './auth/auth.module';
 import { PlayerModule } from './player/player.module';
+import { PlaylistModule } from './playlist/playlist.module';
 import { TrackController } from './track/track.controller';
 import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
@@ -23,6 +24,7 @@ import { UserModule } from './user/user.module';
     TrackModule,
     AlgoModule,
     UserModule,
+    PlaylistModule,
   ],
 })
 @Module({

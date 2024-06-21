@@ -77,7 +77,7 @@ class TrackFilter {
     userData: RadioPlus.UserData | undefined,
     options: RadioPlus.FilterOptions
   ): Array<string> {
-    const filteredTracks = this.removeUnplayableTracks(tracks);
+    let filteredTracks = this.removeUnplayableTracks(tracks);
 
     if (options.freshTracks) {
       if (!userData) {
@@ -86,6 +86,11 @@ class TrackFilter {
           'Failed fetching user listening preferences.'
         );
       }
+
+      filteredTracks = this.removeTracksKnownToTheUser(
+        filteredTracks,
+        userData
+      );
     }
 
     return this.trackListToTrackIdList(filteredTracks);

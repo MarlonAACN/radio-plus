@@ -11,4 +11,8 @@ declare namespace Spotify {
     /** The refresh token if any to refresh the current token */
     refresh_token: string;
   };
+
+  type Genres = {
+    genres: Array<string>;
+  };
 }

@@ -43,7 +43,7 @@ function FreshTracksCheckboxView({
       >
         Fresh tracks
       </label>
-      <div className="absolute top-0 left-full h-full flex flex-col justify-center items-center pl-3">
+      <div className="absolute top-0 left-full h-full flex flex-col justify-center items-center pl-1">
         <FreshTrackTooltipView />
       </div>
     </div>

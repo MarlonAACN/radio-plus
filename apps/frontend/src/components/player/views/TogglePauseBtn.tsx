@@ -35,6 +35,7 @@ function TogglePauseBtn({
       {...firefoxProps}
       disabled={disabled}
       onClick={() => toggleHandlerMiddleware()}
+      aria-label="Toggle the playstate of the player."
       className="radio-plus-pause-player-btn group p-3 bg-primary-500 rounded-full transition-colors hover:enabled:bg-primary-400 disabled:bg-base-700"
     >
       {isPaused ? (

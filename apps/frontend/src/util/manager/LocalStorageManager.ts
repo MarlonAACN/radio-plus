@@ -36,6 +36,18 @@ class LocalStorageManager {
     return lsFreshTracks === 'true';
   }
 
+  private static getSelectedGenresFromLs(): Array<string> {
+    const lsSelectedGenres = localStorage.getItem(
+      LocalStorageKeys.selectedGenres
+    );
+
+    if (!lsSelectedGenres || lsSelectedGenres === '') {
+      return [];
+    }
+
+    return lsSelectedGenres.split(',');
+  }
+
   /**
    * Returns the config object, built upon the data fetched from the clients local storage.
    * @returns {RadioPlus.Config} The config built upon the data from the clients local storage.
@@ -44,6 +56,7 @@ class LocalStorageManager {
     return {
       radioOriginTrackUrl: this.getRadioTrackUrlFromLs(),
       freshTracks: this.getFreshTracksBoolFromLs(),
+      selectedGenres: this.getSelectedGenresFromLs(),
     };
   }
 

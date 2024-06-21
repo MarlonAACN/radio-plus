@@ -11,6 +11,7 @@ import { TrackRepo } from '@/repos/TrackRepo';
 import { RadioPlus } from '@/types/RadioPlus';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { logger } from '@/util/Logger';
+import { ArrayManager } from '@/util/manager/ArrayManager';
 import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 type ConfigContextProps = {
@@ -32,6 +33,7 @@ const configDefaultValues: ConfigContextProps = {
   data: {
     radioOriginTrackUrl: null,
     freshTracks: false,
+    selectedGenres: ['placeholder'],
   },
   setData: (_data: RadioPlus.Config) => {
     return;
@@ -39,6 +41,7 @@ const configDefaultValues: ConfigContextProps = {
   errors: {
     radioOriginTrackUrl: null,
     freshTracks: null,
+    selectedGenres: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -58,14 +61,19 @@ function ConfigProvider({ children }: ConfigProps) {
   const [cachedData, setCachedData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
     freshTracks: false,
+    // If on load at least one genre is fetched from cache, the user then removes that genre and submits, the if block is skipped and the ls would not be cleared.
+    // That's why there is a placeholder item is in place, that will automatically be removed on first submit.
+    selectedGenres: ['placeholder'],
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
     freshTracks: false,
+    selectedGenres: ['placeholder'],
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
     freshTracks: null,
+    selectedGenres: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -139,6 +147,24 @@ function ConfigProvider({ children }: ConfigProps) {
         LocalStorageKeys.freshTracks,
         _data.freshTracks.toString()
       );
+    }
+
+    // 3. Selected genres
+    if (!ArrayManager.isEqual(_cache.selectedGenres, _data.selectedGenres)) {
+      updateErrors.selectedGenres = null;
+
+      newCache.selectedGenres = _data.selectedGenres;
+
+      if (_data.selectedGenres.length > 0) {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.selectedGenres,
+          _data.selectedGenres.join(',')
+        );
+      } else {
+        LocalStorageManager.removeFromLocalStorage(
+          LocalStorageKeys.selectedGenres
+        );
+      }
     }
 
     // Update global error object, update global cache.

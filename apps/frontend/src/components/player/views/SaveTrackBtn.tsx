@@ -100,6 +100,8 @@ function SaveTrackBtn({ activeTrackId }: SaveTrackBtnProps) {
         }
       )}
       onClick={saveTrackHandler}
+      title="Save current track"
+      aria-label="Save current track in spotify saved tracks playlist"
     >
       {isLoading ? (
         <Spinner className="w-6 h-6 py-0.5" />

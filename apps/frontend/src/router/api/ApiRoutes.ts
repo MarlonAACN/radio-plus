@@ -33,4 +33,9 @@ export const ApiRoutes = {
     vars: { v: 'v1' },
     query: {},
   },
+  getAvailableGenres: {
+    path: '/{v}/genre',
+    vars: { v: 'v1' },
+    query: {},
+  },
 };

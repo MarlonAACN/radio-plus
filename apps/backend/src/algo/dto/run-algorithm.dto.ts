@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsObject, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsObject,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 import { UserDto } from '@/algo/dto/user.dto';
 
@@ -17,6 +23,10 @@ class RunAlgorithmDto {
 
   @IsBoolean()
   freshTracks: boolean;
+
+  @IsArray()
+  @IsString({ each: true })
+  selectedGenres: Array<string>;
 }
 
 export { RunAlgorithmDto };

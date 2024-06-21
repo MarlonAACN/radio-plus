@@ -45,4 +45,6 @@ export const SpotifyEndpointURLs = {
     `https://api.spotify.com/v1/me/top/artists?${urlParams}`,
   GetUsersTopTracks: (urlParams: URLSearchParams) =>
     `https://api.spotify.com/v1/me/top/tracks?${urlParams}`,
+  GetAvailableGenres:
+    'https://api.spotify.com/v1/recommendations/available-genre-seeds',
 };

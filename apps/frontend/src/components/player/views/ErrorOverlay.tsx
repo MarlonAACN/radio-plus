@@ -13,6 +13,10 @@ function ErrorOverlayView({ showError, isLoading }: ErrorOverlayProps) {
     <AnimatePresence>
       {showError && !isLoading && (
         <m.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ ease: 'easeIn', duration: 0.1 }}
           role="alert"
           className="radio-plus-error-overlay z-50 absolute inset-0 flex flex-col justify-center items-center bg-base-700/90"
         >

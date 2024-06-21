@@ -6,6 +6,7 @@ import { ConfigFormSubmitBtnView } from '@/components/config/views/ConfigFormSub
 import { FreshTracksCheckboxView } from '@/components/config/views/FreshTracksCheckbox';
 import { ConfigHeaderWidget } from '@/components/config/widgets/ConfigHeader';
 import { ConfigMenuToggleBarWidget } from '@/components/config/widgets/ConfigMenuToggleBar';
+import { GenreSelectWidget } from '@/components/config/widgets/GenreSelect';
 import { RadioOriginInputWidget } from '@/components/config/widgets/RadioOriginInput';
 import { useConfig } from '@/context/ConfigContext';
 import { useConfigForm } from '@/hooks/useConfigForm';
@@ -74,7 +75,7 @@ function ConfigLayout({
           className="radio-plus-filter-container absolute bottom-0 w-full h-fit flex flex-col justify-between items-start px-5 pt-5 overflow-hidden bg-base-800 rounded-b-xl sm:w-[calc(100%-3rem)] sm:px-6 md:w-4/5 max-w-4xl"
         >
           <ConfigHeaderWidget logout={logout} />
-          <div className="w-full flex flex-col flex-nowrap justify-start items-start gap-y-4">
+          <div className="w-full flex flex-col flex-nowrap justify-start items-start gap-y-5">
             <RadioOriginInputWidget
               formErrors={configForm.formErrors}
               setFormErrors={configForm.setFormErrors}
@@ -83,6 +84,11 @@ function ConfigLayout({
               updateInputChangeTracker={configForm.setInputChangeTracker}
             />
             <FreshTracksCheckboxView
+              isLoading={config.isLoading}
+              inputChangeTracker={configForm.inputChangeTracker}
+              updateInputChangeTracker={configForm.setInputChangeTracker}
+            />
+            <GenreSelectWidget
               isLoading={config.isLoading}
               inputChangeTracker={configForm.inputChangeTracker}
               updateInputChangeTracker={configForm.setInputChangeTracker}

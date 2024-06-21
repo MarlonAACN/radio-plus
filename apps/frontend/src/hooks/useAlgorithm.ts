@@ -82,7 +82,8 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       player.deviceId,
       originTrackId,
       user.data,
-      _config.freshTracks
+      _config.freshTracks,
+      _config.selectedGenres
     ).then((res) => {
       if (res === null) {
         setPlaylistUrl(null);
@@ -96,12 +97,13 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     deviceId: string,
     originTrackId: string,
     user: RadioPlus.User,
-    freshTracks: boolean
+    freshTracks: boolean,
+    selectedGenres: Array<string>
   ): Promise<RadioPlus.PlaylistUrl | null> {
     setIsLoading(true);
 
     return algoRepo
-      .runAlgorithm(deviceId, originTrackId, user, freshTracks)
+      .runAlgorithm(deviceId, originTrackId, user, freshTracks, selectedGenres)
       .then((data) => {
         logger.log(`[runAlgorithm] Algorithm ran successfully.`);
         return data;

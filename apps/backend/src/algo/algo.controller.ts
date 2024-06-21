@@ -39,7 +39,8 @@ export class AlgoController {
         request.accessToken,
         dto.deviceId,
         response,
-        dto.freshTracks
+        dto.freshTracks,
+        dto.selectedGenres
       )
       .then((playlistUrl) => {
         return playlistUrl;

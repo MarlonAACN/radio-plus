@@ -4,6 +4,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { RadioPlus } from '@/types/RadioPlus';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { isWhitespaceString } from '@/util/is-whitespace-string';
+import { ArrayManager } from '@/util/manager/ArrayManager';
 import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 function useConfigForm() {
@@ -55,7 +56,16 @@ function useConfigForm() {
 
     // Compare values for each key
     for (const key of keys) {
-      if (currentInput[key] !== newInput[key]) {
+      const newValue = newInput[key];
+      const currentValue = currentInput[key];
+
+      if (Array.isArray(currentValue) && Array.isArray(newValue)) {
+        const arraysAreSame = ArrayManager.isEqual(currentValue, newValue);
+
+        if (!arraysAreSame) {
+          return true;
+        }
+      } else if (currentValue !== newValue) {
         return true;
       }
     }
@@ -96,7 +106,7 @@ function useConfigForm() {
   }
 
   /**
-   * Expandable form submit handler to check all config options for if there are any errors.
+   * Expandable form submit handler to check all config options on if there are any errors.
    * @param e {FormEvent<HTMLFormElement>} The form event wrapping all filter inputs.
    * @returns {boolean} If the data was evaluated and saved in the config succesfully return true. Also returns false if config status is currently loading.
    */
@@ -123,6 +133,7 @@ function useConfigForm() {
       | null;
 
     // Run through each dedicated evaluator for each existing input in the config form.
+    // 1. Radio origin track url
     try {
       localConfig.radioOriginTrackUrl =
         radioOriginInputEvaluator(songOriginInputValue);
@@ -130,8 +141,13 @@ function useConfigForm() {
       localErrors.radioOriginTrackUrl = (err as { message: string }).message;
     }
 
+    // 2. Fresh tracks
     // Checkboxes in form data are either 'on' if true or non existant if false.
     localConfig.freshTracks = freshTracksBool === 'on' ?? false;
+
+    // 3. Selected genres
+    // Selected tracks are not stored in a defalt form item, hence it's fetched from the config form directly.
+    localConfig.selectedGenres = inputChangeTracker.selectedGenres;
 
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {

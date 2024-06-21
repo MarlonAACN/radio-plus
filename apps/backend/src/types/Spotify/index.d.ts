@@ -604,4 +604,8 @@ declare namespace Spotify {
    * https://developer.spotify.com/web-api/get-playlist/
    */
   type SinglePlaylistResponse = PlaylistObjectFull;
+
+  type Genres = {
+    genres: Array<string>;
+  };
 }

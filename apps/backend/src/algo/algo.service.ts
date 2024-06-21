@@ -8,6 +8,7 @@ import { TrackService } from '@/track/track.service';
 import { RadioPlus } from '@/types/RadioPlus';
 import { RadioPlusError } from '@/types/RadioPlus/Error';
 import { UserService } from '@/user/user.service';
+import { createPlaylistDescription } from '@/util/createPlaylistDescription';
 import { delay } from '@/util/delay';
 import { RequestError } from '@/util/Error';
 import { SpotifyURI, SpotiyUriType } from '@/util/formatter/SpotifyURI';
@@ -33,6 +34,7 @@ export class AlgoService {
    * @param deviceId {string} The id of the current device (radio plus instance)
    * @param response {Response} The response object to be able to append the set-cookie header.
    * @param freshTracks {boolean} Filter option that determines if known tracks should be excluded.
+   * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
    * @returns {RadioPlus.AlgorithmResponse} The url to the playlist in the spotify webapp.
    */
   async runAlgorithm(
@@ -42,7 +44,8 @@ export class AlgoService {
     accessToken: string,
     deviceId: string,
     response: Response,
-    freshTracks: boolean
+    freshTracks: boolean,
+    selectedGenres: Array<string>
   ): Promise<RadioPlus.AlgorithmResponse> {
     // 1. Check if a dedicated radio plus session playlist already exists.
     if (playlistId) {
@@ -87,11 +90,14 @@ export class AlgoService {
       });
 
     // 2b. Create new playlist for current recommendation list.
-    const dateString = new Date().toLocaleDateString('de');
     const newPlaylist = await this.playlistService
       .createPlaylist(user.id, accessToken, {
         name: `Radio⁺ | ${originTrack.name}`,
-        description: `Radio⁺ session playlist (${dateString}). Origin track: ${originTrack.name}, fresh tracks: ${freshTracks}`,
+        description: createPlaylistDescription(
+          originTrack.name,
+          freshTracks,
+          selectedGenres
+        ),
       })
       .then((playlist) => {
         logger.log(
@@ -117,6 +123,7 @@ export class AlgoService {
     const recommendationTrackIds = await this.getRecommendations(
       originTrackId,
       freshTracks,
+      selectedGenres,
       user,
       accessToken
     )
@@ -254,6 +261,7 @@ export class AlgoService {
    * Get a recommendation track list based on the given trackId.
    * @param trackId {string} The trackId of the track that should be used as base for the recommendation.
    * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
+   * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param accessToken {string} The access token of the user to authenticate the request.
    * @returns {Array<string>} The recommendation track list.
@@ -261,6 +269,7 @@ export class AlgoService {
   private async getRecommendations(
     trackId: string,
     freshTracks: boolean,
+    selectedGenres: Array<string>,
     user: RadioPlus.User,
     accessToken: string
   ): Promise<Array<string>> {
@@ -269,6 +278,10 @@ export class AlgoService {
       seed_tracks: trackId,
       market: user.market,
     });
+
+    if (selectedGenres.length > 0) {
+      urlParams.append('seed_genres', selectedGenres.join(','));
+    }
 
     const requestParams = {
       method: 'GET',

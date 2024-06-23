@@ -2,7 +2,9 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsNumber,
   IsObject,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -27,6 +29,10 @@ class RunAlgorithmDto {
   @IsArray()
   @IsString({ each: true })
   selectedGenres: Array<string>;
+
+  @IsNumber()
+  @IsOptional()
+  bpm: number | null;
 }
 
 export { RunAlgorithmDto };

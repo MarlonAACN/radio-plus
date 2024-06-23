@@ -146,8 +146,11 @@ function useConfigForm() {
     localConfig.freshTracks = freshTracksBool === 'on' ?? false;
 
     // 3. Selected genres
-    // Selected tracks are not stored in a defalt form item, hence it's fetched from the config form directly.
+    // Selected tracks are not stored in a default form item, hence it's fetched from the config form directly.
     localConfig.selectedGenres = inputChangeTracker.selectedGenres;
+
+    // 4. BPM
+    localConfig.bpm = inputChangeTracker.bpm;
 
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {

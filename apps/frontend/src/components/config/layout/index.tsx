@@ -4,6 +4,7 @@ import { m } from 'framer-motion';
 
 import { ConfigFormSubmitBtnView } from '@/components/config/views/ConfigFormSubmitBtn';
 import { FreshTracksCheckboxView } from '@/components/config/views/FreshTracksCheckbox';
+import { BpmSliderWidget } from '@/components/config/widgets/BpmSlider';
 import { ConfigHeaderWidget } from '@/components/config/widgets/ConfigHeader';
 import { ConfigMenuToggleBarWidget } from '@/components/config/widgets/ConfigMenuToggleBar';
 import { GenreSelectWidget } from '@/components/config/widgets/GenreSelect';
@@ -89,6 +90,11 @@ function ConfigLayout({
               updateInputChangeTracker={configForm.setInputChangeTracker}
             />
             <GenreSelectWidget
+              isLoading={config.isLoading}
+              inputChangeTracker={configForm.inputChangeTracker}
+              updateInputChangeTracker={configForm.setInputChangeTracker}
+            />
+            <BpmSliderWidget
               isLoading={config.isLoading}
               inputChangeTracker={configForm.inputChangeTracker}
               updateInputChangeTracker={configForm.setInputChangeTracker}

@@ -35,6 +35,7 @@ export class AlgoService {
    * @param response {Response} The response object to be able to append the set-cookie header.
    * @param freshTracks {boolean} Filter option that determines if known tracks should be excluded.
    * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
+   * @param bpm {number | null} Filter option that determines the desired BPM for the recommended tracks. If null, it's disabled.
    * @returns {RadioPlus.AlgorithmResponse} The url to the playlist in the spotify webapp.
    */
   async runAlgorithm(
@@ -45,7 +46,8 @@ export class AlgoService {
     deviceId: string,
     response: Response,
     freshTracks: boolean,
-    selectedGenres: Array<string>
+    selectedGenres: Array<string>,
+    bpm: number | null
   ): Promise<RadioPlus.AlgorithmResponse> {
     // 1. Check if a dedicated radio plus session playlist already exists.
     if (playlistId) {
@@ -124,6 +126,7 @@ export class AlgoService {
       originTrackId,
       freshTracks,
       selectedGenres,
+      bpm,
       user,
       accessToken
     )
@@ -262,6 +265,7 @@ export class AlgoService {
    * @param trackId {string} The trackId of the track that should be used as base for the recommendation.
    * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
    * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
+   * @param bpm {number | null} Filter option that determines the desired BPM for the recommended tracks. If null, it's disabled.
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param accessToken {string} The access token of the user to authenticate the request.
    * @returns {Array<string>} The recommendation track list.
@@ -270,6 +274,7 @@ export class AlgoService {
     trackId: string,
     freshTracks: boolean,
     selectedGenres: Array<string>,
+    bpm: number | null,
     user: RadioPlus.User,
     accessToken: string
   ): Promise<Array<string>> {
@@ -281,6 +286,10 @@ export class AlgoService {
 
     if (selectedGenres.length > 0) {
       urlParams.append('seed_genres', selectedGenres.join(','));
+    }
+
+    if (bpm !== null) {
+      urlParams.append('target_tempo', bpm.toString());
     }
 
     const requestParams = {

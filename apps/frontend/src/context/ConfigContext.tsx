@@ -34,6 +34,7 @@ const configDefaultValues: ConfigContextProps = {
     radioOriginTrackUrl: null,
     freshTracks: false,
     selectedGenres: ['placeholder'],
+    bpm: null,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
@@ -42,6 +43,7 @@ const configDefaultValues: ConfigContextProps = {
     radioOriginTrackUrl: null,
     freshTracks: null,
     selectedGenres: null,
+    bpm: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -64,16 +66,20 @@ function ConfigProvider({ children }: ConfigProps) {
     // If on load at least one genre is fetched from cache, the user then removes that genre and submits, the if block is skipped and the ls would not be cleared.
     // That's why there is a placeholder item is in place, that will automatically be removed on first submit.
     selectedGenres: ['placeholder'],
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    bpm: undefined,
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
     freshTracks: false,
     selectedGenres: ['placeholder'],
+    bpm: undefined,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
     freshTracks: null,
     selectedGenres: null,
+    bpm: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -163,6 +169,28 @@ function ConfigProvider({ children }: ConfigProps) {
       } else {
         LocalStorageManager.removeFromLocalStorage(
           LocalStorageKeys.selectedGenres
+        );
+      }
+    }
+
+    // 4. BPM
+    if (_cache.bpm !== _data.bpm) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.bpm === undefined) {
+        return;
+      }
+
+      updateErrors.bpm = null;
+
+      newCache.bpm = _data.bpm;
+
+      /** Using bpm was disabled, hence its null. */
+      if (_data.bpm === null) {
+        LocalStorageManager.removeFromLocalStorage(LocalStorageKeys.bpm);
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.bpm,
+          _data.bpm.toString()
         );
       }
     }

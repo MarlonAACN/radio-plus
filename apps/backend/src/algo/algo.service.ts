@@ -98,7 +98,8 @@ export class AlgoService {
         description: createPlaylistDescription(
           originTrack.name,
           freshTracks,
-          selectedGenres
+          selectedGenres,
+          bpm
         ),
       })
       .then((playlist) => {

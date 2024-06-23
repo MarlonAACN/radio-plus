@@ -81,6 +81,7 @@ function BpmSliderWidget({
         <Switch
           checked={isEnabled}
           onChange={setIsEnabled}
+          aria-label="Sets the amount of desired BMP for the recommneded tracks."
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span

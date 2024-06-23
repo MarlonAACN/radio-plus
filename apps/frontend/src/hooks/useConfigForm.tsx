@@ -128,9 +128,6 @@ function useConfigForm() {
     const songOriginInputValue = formData.get(
       'radio-plus-radio-origin-input'
     ) as string | null;
-    const freshTracksBool = formData.get('radio-plus-fresh-track-checkbox') as
-      | string
-      | null;
 
     // Run through each dedicated evaluator for each existing input in the config form.
     // 1. Radio origin track url
@@ -142,8 +139,7 @@ function useConfigForm() {
     }
 
     // 2. Fresh tracks
-    // Checkboxes in form data are either 'on' if true or non existant if false.
-    localConfig.freshTracks = freshTracksBool === 'on' ?? false;
+    localConfig.freshTracks = inputChangeTracker.freshTracks;
 
     // 3. Selected genres
     // Selected tracks are not stored in a default form item, hence it's fetched from the config form directly.

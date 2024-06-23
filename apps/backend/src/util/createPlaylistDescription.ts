@@ -1,7 +1,8 @@
 function createPlaylistDescription(
   originTrackName: string,
   freshTracks: boolean,
-  selectedGenres: Array<string>
+  selectedGenres: Array<string>,
+  bpm: number | null
 ) {
   const dateString = new Date().toLocaleDateString('de');
 
@@ -14,6 +15,10 @@ function createPlaylistDescription(
   if (selectedGenres.length > 0) {
     const genres = selectedGenres.join(', ');
     description += `, selected genres: ${genres}`;
+  }
+
+  if (bpm !== null) {
+    description += `, BPM: ${bpm}`;
   }
 
   return description;

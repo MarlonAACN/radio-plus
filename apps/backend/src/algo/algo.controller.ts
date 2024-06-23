@@ -31,6 +31,11 @@ export class AlgoController {
     const playlistIdCookie =
       request.cookies[SupportedCookies.sessionPlaylistId];
 
+    console.log(dto);
+    return Promise.resolve({
+      playlistUrl: 'http://www.google.com',
+    });
+
     return this.algoService
       .runAlgorithm(
         dto.originTrackId,

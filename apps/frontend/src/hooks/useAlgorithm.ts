@@ -84,7 +84,8 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       user.data,
       _config.freshTracks,
       _config.selectedGenres,
-      _config.bpm
+      _config.bpm,
+      _config.danceability
     ).then((res) => {
       if (res === null) {
         setPlaylistUrl(null);
@@ -100,7 +101,8 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     user: RadioPlus.User,
     freshTracks: boolean,
     selectedGenres: Array<string>,
-    bpm: number | null | undefined
+    bpm: number | null | undefined,
+    danceability: number | null | undefined
   ): Promise<RadioPlus.PlaylistUrl | null> {
     setIsLoading(true);
 
@@ -111,7 +113,8 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
         user,
         freshTracks,
         selectedGenres,
-        bpm ?? null
+        bpm ?? null,
+        danceability ?? null
       )
       .then((data) => {
         logger.log(`[runAlgorithm] Algorithm ran successfully.`);

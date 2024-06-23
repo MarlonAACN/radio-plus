@@ -33,7 +33,7 @@ function BpmSliderWidget({
   };
 
   /** When the local storage data is set for the input change tracker, update cache value if value exists.
-   * Also toggle the bpm selector active if ls data was found.
+   * Also toggle the bpm selector to active if ls data was found.
    * */
   useEffect(() => {
     if (cachedBpmValue.current === undefined && inputChangeTracker.bpm) {
@@ -81,7 +81,7 @@ function BpmSliderWidget({
         <Switch
           checked={isEnabled}
           onChange={setIsEnabled}
-          aria-label="Sets the amount of desired BMP for the recommneded tracks."
+          aria-label="Sets the amount of desired BMP for the recommended tracks."
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span

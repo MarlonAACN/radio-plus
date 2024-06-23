@@ -148,6 +148,9 @@ function useConfigForm() {
     // 4. BPM
     localConfig.bpm = inputChangeTracker.bpm;
 
+    // 5. Danceability
+    localConfig.danceability = inputChangeTracker.danceability;
+
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {
       setFormErrors(localErrors);

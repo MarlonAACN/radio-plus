@@ -36,6 +36,7 @@ export class AlgoService {
    * @param freshTracks {boolean} Filter option that determines if known tracks should be excluded.
    * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
    * @param bpm {number | null} Filter option that determines the desired BPM for the recommended tracks. If null, it's disabled.
+   * @param danceability {number | null} Filter option that determines the danceability score for the recommended tracks. If null, it's disabled. Ranged between 0 - 1.
    * @returns {RadioPlus.AlgorithmResponse} The url to the playlist in the spotify webapp.
    */
   async runAlgorithm(
@@ -47,7 +48,8 @@ export class AlgoService {
     response: Response,
     freshTracks: boolean,
     selectedGenres: Array<string>,
-    bpm: number | null
+    bpm: number | null,
+    danceability: number | null
   ): Promise<RadioPlus.AlgorithmResponse> {
     // 1. Check if a dedicated radio plus session playlist already exists.
     if (playlistId) {
@@ -99,7 +101,8 @@ export class AlgoService {
           originTrack.name,
           freshTracks,
           selectedGenres,
-          bpm
+          bpm,
+          danceability
         ),
       })
       .then((playlist) => {
@@ -128,6 +131,7 @@ export class AlgoService {
       freshTracks,
       selectedGenres,
       bpm,
+      danceability,
       user,
       accessToken
     )
@@ -267,6 +271,7 @@ export class AlgoService {
    * @param freshTracks {boolean} Determine if only tracks unkown to the user should be recommended.
    * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
    * @param bpm {number | null} Filter option that determines the desired BPM for the recommended tracks. If null, it's disabled.
+   * @param danceability {number | null} Filter option that determines the danceability score for the recommended tracks. If null, it's disabled. Ranged between 0 - 1.
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param accessToken {string} The access token of the user to authenticate the request.
    * @returns {Array<string>} The recommendation track list.
@@ -276,6 +281,7 @@ export class AlgoService {
     freshTracks: boolean,
     selectedGenres: Array<string>,
     bpm: number | null,
+    danceability: number | null,
     user: RadioPlus.User,
     accessToken: string
   ): Promise<Array<string>> {
@@ -291,6 +297,10 @@ export class AlgoService {
 
     if (bpm !== null) {
       urlParams.append('target_tempo', bpm.toString());
+    }
+
+    if (danceability !== null) {
+      urlParams.append('target_danceability', danceability.toString());
     }
 
     const requestParams = {

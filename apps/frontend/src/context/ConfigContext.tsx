@@ -34,7 +34,8 @@ const configDefaultValues: ConfigContextProps = {
     radioOriginTrackUrl: null,
     freshTracks: false,
     selectedGenres: ['placeholder'],
-    bpm: null,
+    bpm: undefined,
+    danceability: undefined,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
@@ -44,6 +45,7 @@ const configDefaultValues: ConfigContextProps = {
     freshTracks: null,
     selectedGenres: null,
     bpm: null,
+    danceability: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -68,18 +70,22 @@ function ConfigProvider({ children }: ConfigProps) {
     selectedGenres: ['placeholder'],
     // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
     bpm: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    danceability: undefined,
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
     freshTracks: false,
     selectedGenres: ['placeholder'],
     bpm: undefined,
+    danceability: undefined,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
     freshTracks: null,
     selectedGenres: null,
     bpm: null,
+    danceability: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -191,6 +197,30 @@ function ConfigProvider({ children }: ConfigProps) {
         LocalStorageManager.updateConfigValue(
           LocalStorageKeys.bpm,
           _data.bpm.toString()
+        );
+      }
+    }
+
+    // 5. Danceability
+    if (_cache.danceability !== _data.danceability) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.danceability === undefined) {
+        return;
+      }
+
+      updateErrors.danceability = null;
+
+      newCache.danceability = _data.danceability;
+
+      /** Using danceability was disabled, hence its null. */
+      if (_data.danceability === null) {
+        LocalStorageManager.removeFromLocalStorage(
+          LocalStorageKeys.danceability
+        );
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.danceability,
+          _data.danceability.toString()
         );
       }
     }

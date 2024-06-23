@@ -2,7 +2,10 @@ type Config = {
   radioOriginTrackUrl: string | null;
   freshTracks: boolean;
   selectedGenres: Array<string>;
+  /** undefined if untouched on load, null if disabled or not set, number if set. */
   bpm: number | null | undefined;
+  /** undefined if untouched on load, null if disabled or not set, number if set in range of 0-1. */
+  danceability: number | null | undefined;
 };
 
 /**
@@ -13,6 +16,7 @@ type ConfigErrors = {
   freshTracks: string | null;
   selectedGenres: string | null;
   bpm: string | null;
+  danceability: string | null;
 };
 
 /**

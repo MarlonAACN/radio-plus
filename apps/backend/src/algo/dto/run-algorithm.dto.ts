@@ -33,6 +33,10 @@ class RunAlgorithmDto {
   @IsNumber()
   @IsOptional()
   bpm: number | null;
+
+  @IsNumber()
+  @IsOptional()
+  danceability: number | null;
 }
 
 export { RunAlgorithmDto };

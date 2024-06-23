@@ -1,8 +1,11 @@
+import { generateDanceabilityScoreText } from '@/util/generateDanceabilityScoreText';
+
 function createPlaylistDescription(
   originTrackName: string,
   freshTracks: boolean,
   selectedGenres: Array<string>,
-  bpm: number | null
+  bpm: number | null,
+  danceability: number | null
 ) {
   const dateString = new Date().toLocaleDateString('de');
 
@@ -19,6 +22,12 @@ function createPlaylistDescription(
 
   if (bpm !== null) {
     description += `, BPM: ${bpm}`;
+  }
+
+  if (danceability !== null) {
+    description += `, danceability: ${generateDanceabilityScoreText(
+      danceability
+    )}`;
   }
 
   return description;

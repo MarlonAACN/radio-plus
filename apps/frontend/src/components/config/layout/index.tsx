@@ -7,6 +7,7 @@ import { FreshTracksCheckboxView } from '@/components/config/views/FreshTracksCh
 import { BpmSliderWidget } from '@/components/config/widgets/BpmSlider';
 import { ConfigHeaderWidget } from '@/components/config/widgets/ConfigHeader';
 import { ConfigMenuToggleBarWidget } from '@/components/config/widgets/ConfigMenuToggleBar';
+import { DanceabilitySliderWidget } from '@/components/config/widgets/DanceabilitySlider';
 import { GenreSelectWidget } from '@/components/config/widgets/GenreSelect';
 import { RadioOriginInputWidget } from '@/components/config/widgets/RadioOriginInput';
 import { useConfig } from '@/context/ConfigContext';
@@ -95,6 +96,11 @@ function ConfigLayout({
               updateInputChangeTracker={configForm.setInputChangeTracker}
             />
             <BpmSliderWidget
+              isLoading={config.isLoading}
+              inputChangeTracker={configForm.inputChangeTracker}
+              updateInputChangeTracker={configForm.setInputChangeTracker}
+            />
+            <DanceabilitySliderWidget
               isLoading={config.isLoading}
               inputChangeTracker={configForm.inputChangeTracker}
               updateInputChangeTracker={configForm.setInputChangeTracker}

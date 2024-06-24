@@ -47,7 +47,8 @@ export class AlgoController {
         dto.freshTracks,
         dto.selectedGenres,
         dto.bpm,
-        dto.danceability
+        dto.danceability,
+        dto.popularity
       )
       .then((playlistUrl) => {
         return playlistUrl;

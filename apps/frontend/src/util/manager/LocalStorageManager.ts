@@ -68,6 +68,16 @@ class LocalStorageManager {
     return Number(lsDanceability);
   }
 
+  private static getPopularityFromLs(): number | null {
+    const lsPopularity = localStorage.getItem(LocalStorageKeys.popularity);
+
+    if (!lsPopularity || isNaN(Number(lsPopularity))) {
+      return null;
+    }
+
+    return Number(lsPopularity);
+  }
+
   /**
    * Returns the config object, built upon the data fetched from the clients local storage.
    * @returns {RadioPlus.Config} The config built upon the data from the clients local storage.
@@ -79,6 +89,7 @@ class LocalStorageManager {
       selectedGenres: this.getSelectedGenresFromLs(),
       bpm: this.getBpmFromLs(),
       danceability: this.getDanceabilityFromLs(),
+      popularity: this.getPopularityFromLs(),
     };
   }
 

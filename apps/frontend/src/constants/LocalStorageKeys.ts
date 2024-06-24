@@ -4,4 +4,5 @@ export enum LocalStorageKeys {
   selectedGenres = 'radio-plus-selected-genres',
   bpm = 'radio-plus-bpm',
   danceability = 'radio-plus-danceability',
+  popularity = 'radio-plus-popularity',
 }

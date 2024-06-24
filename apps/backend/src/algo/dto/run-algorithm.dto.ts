@@ -37,6 +37,10 @@ class RunAlgorithmDto {
   @IsNumber()
   @IsOptional()
   danceability: number | null;
+
+  @IsNumber()
+  @IsOptional()
+  popularity: number | null;
 }
 
 export { RunAlgorithmDto };

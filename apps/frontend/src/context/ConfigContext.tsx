@@ -36,6 +36,7 @@ const configDefaultValues: ConfigContextProps = {
     selectedGenres: ['placeholder'],
     bpm: undefined,
     danceability: undefined,
+    popularity: undefined,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
@@ -46,6 +47,7 @@ const configDefaultValues: ConfigContextProps = {
     selectedGenres: null,
     bpm: null,
     danceability: null,
+    popularity: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -72,6 +74,8 @@ function ConfigProvider({ children }: ConfigProps) {
     bpm: undefined,
     // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
     danceability: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    popularity: undefined,
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
@@ -79,6 +83,7 @@ function ConfigProvider({ children }: ConfigProps) {
     selectedGenres: ['placeholder'],
     bpm: undefined,
     danceability: undefined,
+    popularity: undefined,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
@@ -86,6 +91,7 @@ function ConfigProvider({ children }: ConfigProps) {
     selectedGenres: null,
     bpm: null,
     danceability: null,
+    popularity: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -221,6 +227,28 @@ function ConfigProvider({ children }: ConfigProps) {
         LocalStorageManager.updateConfigValue(
           LocalStorageKeys.danceability,
           _data.danceability.toString()
+        );
+      }
+    }
+
+    // 6. Popularity
+    if (_cache.popularity !== _data.popularity) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.popularity === undefined) {
+        return;
+      }
+
+      updateErrors.popularity = null;
+
+      newCache.popularity = _data.popularity;
+
+      /** Using popularity was disabled, hence its null. */
+      if (_data.popularity === null) {
+        LocalStorageManager.removeFromLocalStorage(LocalStorageKeys.popularity);
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.popularity,
+          _data.popularity.toString()
         );
       }
     }

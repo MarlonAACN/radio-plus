@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
 import { Switch } from '@headlessui/react';
 
@@ -16,19 +16,6 @@ function FreshTracksCheckboxView({
   inputChangeTracker,
   updateInputChangeTracker,
 }: FreshTracksCheckboxProps) {
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
-
-  /**
-   * Updates the input tracker on change.
-   * @param e {ChangeEvent<HTMLInputElement>} The event object emitted from the input.
-   */
-  function inputChangeHandler(e: ChangeEvent<HTMLInputElement>) {
-    updateInputChangeTracker({
-      ...inputChangeTracker,
-      freshTracks: e.target.checked,
-    });
-  }
-
   /**
    * Updates the input tracker on change.
    * @param state {boolean} The boolean state of the switch.
@@ -58,9 +45,7 @@ function FreshTracksCheckboxView({
       <p className="peer-disabled:cursor-default cursor-pointer">
         Fresh tracks
       </p>
-      <div className="absolute top-0 left-full h-full flex flex-col justify-center items-center pl-1">
-        <FreshTrackTooltipView />
-      </div>
+      <FreshTrackTooltipView />
     </div>
   );
 }

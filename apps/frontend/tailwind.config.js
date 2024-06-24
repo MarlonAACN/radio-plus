@@ -15,6 +15,7 @@ module.exports = {
       screens: {
         mini: '350px',
         xs: '450px',
+        md2: '850px',
       },
       fontFamily: {
         dmsans: ['DMSans', 'sans-serif'],

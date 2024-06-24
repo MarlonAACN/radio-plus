@@ -8,8 +8,9 @@ function BpmTooltipView() {
         to be around the given BPM value.
       </p>
       <p>
-        The BPM of the tracks will not match the given value exactly, but use it
-        as point of orientation, so all tracks should be around that value.
+        Tracks with a BPM value nearest to the target values will be preferred,
+        meaning that the BPM value of the tracks will not necessary match the
+        desired value exactly.
       </p>
     </Tooltip>
   );

@@ -2,7 +2,14 @@ import { Tooltip } from '@/components/util/Tooltip';
 
 function TrackGenresTooltipView() {
   return (
-    <Tooltip options={{ iconBackground: false, origin: 'left', width: 'w-96' }}>
+    <Tooltip
+      options={{
+        iconBackground: false,
+        origin: 'left',
+        width: 'w-96',
+        yAxisPos: 'top-10',
+      }}
+    >
       <p className="pb-2">
         Up to 5 music genres can be selected, which the algorithm then takes
         into consideration.

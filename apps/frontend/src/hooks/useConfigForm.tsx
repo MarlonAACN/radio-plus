@@ -151,6 +151,9 @@ function useConfigForm() {
     // 5. Danceability
     localConfig.danceability = inputChangeTracker.danceability;
 
+    // 6. Popularity
+    localConfig.popularity = inputChangeTracker.popularity;
+
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {
       setFormErrors(localErrors);

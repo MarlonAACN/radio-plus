@@ -9,6 +9,7 @@ import { ConfigHeaderWidget } from '@/components/config/widgets/ConfigHeader';
 import { ConfigMenuToggleBarWidget } from '@/components/config/widgets/ConfigMenuToggleBar';
 import { DanceabilitySliderWidget } from '@/components/config/widgets/DanceabilitySlider';
 import { GenreSelectWidget } from '@/components/config/widgets/GenreSelect';
+import { PopularitySliderWidget } from '@/components/config/widgets/PopularitySlider';
 import { RadioOriginInputWidget } from '@/components/config/widgets/RadioOriginInput';
 import { useConfig } from '@/context/ConfigContext';
 import { useConfigForm } from '@/hooks/useConfigForm';
@@ -101,6 +102,11 @@ function ConfigLayout({
               updateInputChangeTracker={configForm.setInputChangeTracker}
             />
             <DanceabilitySliderWidget
+              isLoading={config.isLoading}
+              inputChangeTracker={configForm.inputChangeTracker}
+              updateInputChangeTracker={configForm.setInputChangeTracker}
+            />
+            <PopularitySliderWidget
               isLoading={config.isLoading}
               inputChangeTracker={configForm.inputChangeTracker}
               updateInputChangeTracker={configForm.setInputChangeTracker}

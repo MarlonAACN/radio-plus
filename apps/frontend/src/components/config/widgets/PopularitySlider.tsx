@@ -10,23 +10,22 @@ import {
 import { Switch } from '@headlessui/react';
 import { m, AnimatePresence } from 'framer-motion';
 
-import { DanceabilityTooltipView } from '@/components/config/views/DanceabilityTooltip';
+import { PopularityTooltipView } from '@/components/config/views/PopularityTooltip';
 import { RadioPlus } from '@/types/RadioPlus';
-import { SliderFilterFormatter } from '@/util/formatter/SliderFilterFormatter';
 
-type DanceabilitySliderProps = {
+type PopularitySliderProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
 };
-function DanceabilitySliderWidget({
+function PopularitySliderWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
-}: DanceabilitySliderProps) {
+}: PopularitySliderProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  /** number: set (0-1), null: disabled, undefined: untouched yet. */
-  const cachedDanceabilityValue = useRef<number | null | undefined>(undefined);
+  /** number: set (0-100), null: disabled, undefined: untouched yet. */
+  const cachedPopularityValue = useRef<number | null | undefined>(undefined);
 
   // https://github.com/vercel/next.js/issues/35558
   const firefoxProps = {
@@ -34,41 +33,41 @@ function DanceabilitySliderWidget({
   };
 
   /** When the local storage data is set for the input change tracker, update cache value if value exists.
-   * Also toggle the danceability selector to active if ls data was found.
+   * Also toggle the popularity selector to active if ls data was found.
    * */
   useEffect(() => {
     if (
-      cachedDanceabilityValue.current === undefined &&
-      inputChangeTracker.danceability
+      cachedPopularityValue.current === undefined &&
+      inputChangeTracker.popularity
     ) {
-      cachedDanceabilityValue.current = inputChangeTracker.danceability;
+      cachedPopularityValue.current = inputChangeTracker.popularity;
 
       setIsEnabled(true);
     }
   }, [inputChangeTracker]);
 
-  /** Remove danceability value from algoritm payload if disabled. If enabled check for cached value to set as danceability value. */
+  /** Remove popularity value from algoritm payload if disabled. If enabled check for cached value to set as popularity value. */
   useEffect(() => {
-    if (cachedDanceabilityValue.current === undefined) {
+    if (cachedPopularityValue.current === undefined) {
       return;
     }
 
     if (!isEnabled) {
       updateInputChangeTracker({
         ...inputChangeTracker,
-        danceability: null,
+        popularity: null,
       });
     } else {
-      if (cachedDanceabilityValue.current !== null) {
+      if (cachedPopularityValue.current !== null) {
         updateInputChangeTracker({
           ...inputChangeTracker,
-          danceability: cachedDanceabilityValue.current,
+          popularity: cachedPopularityValue.current,
         });
       }
     }
   }, [isEnabled]);
 
-  function generateDanceabilityScoreText(
+  function generatePopularityScoreText(
     value: number | null | undefined
   ): string {
     if (value === undefined || value === null) {
@@ -76,31 +75,31 @@ function DanceabilitySliderWidget({
     }
 
     if (value === 0) {
-      return 'minimal';
+      return 'unknown';
     }
 
-    if (value < 0.2) {
+    if (value < 20) {
+      return 'very low';
+    }
+
+    if (value < 40) {
       return 'low';
     }
 
-    if (value < 0.4) {
-      return 'barely';
-    }
-
-    if (value < 0.6) {
+    if (value < 60) {
       return 'moderate';
     }
 
-    if (value < 0.8) {
+    if (value < 80) {
       return 'high';
     }
 
-    if (value < 1) {
-      return 'groovy';
+    if (value < 100) {
+      return 'very high';
     }
 
-    if (value === 1) {
-      return 'exceptional';
+    if (value === 100) {
+      return 'maximum';
     }
 
     return '--';
@@ -111,24 +110,19 @@ function DanceabilitySliderWidget({
 
     updateInputChangeTracker({
       ...inputChangeTracker,
-      danceability: SliderFilterFormatter.toConfigValueFromSliderValue(
-        Number(eventProgressValue)
-      ),
+      popularity: Number(eventProgressValue),
     });
 
-    cachedDanceabilityValue.current =
-      SliderFilterFormatter.toConfigValueFromSliderValue(
-        Number(eventProgressValue)
-      );
+    cachedPopularityValue.current = Number(eventProgressValue);
   }
 
   return (
-    <div className="radio-plus-danceability-slider-container relative w-full">
+    <div className="radio-plus-popularity-slider-container relative w-full">
       <div className="relative w-fit flex flex-row justify-start items-center gap-x-4">
         <Switch
           checked={isEnabled}
           onChange={setIsEnabled}
-          aria-label="Sets the danceability level for the recommended tracks."
+          aria-label="Sets the popularity level for the recommended tracks."
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span
@@ -137,8 +131,8 @@ function DanceabilitySliderWidget({
           />
         </Switch>
         <div className="flex flex-row flex-nowrap justify-start items-center">
-          <p className="block pr-1">Danceability</p>
-          <DanceabilityTooltipView />
+          <p className="block pr-1">Popularity</p>
+          <PopularityTooltipView />
         </div>
       </div>
       <AnimatePresence>
@@ -152,14 +146,12 @@ function DanceabilitySliderWidget({
               ease: 'easeOut',
               height: { duration: 0.2, ease: 'easeOut' },
             }}
-            className="radio-plus-danceability-slider flex flex-row flex-nowrap justify-start items-center pr-6"
+            className="radio-plus-popularity-slider flex flex-row flex-nowrap justify-start items-center pr-6"
           >
-            <div className="radio-plus-danceability-position-container w-20">
+            <div className="radio-plus-popularity-position-container w-20">
               <span className="flex justify-start items-center m-auto text-sm text-font-400">
-                {isEnabled && inputChangeTracker.danceability !== null
-                  ? generateDanceabilityScoreText(
-                      inputChangeTracker.danceability
-                    )
+                {isEnabled && inputChangeTracker.popularity !== null
+                  ? generatePopularityScoreText(inputChangeTracker.popularity)
                   : '--'}
               </span>
             </div>
@@ -169,19 +161,13 @@ function DanceabilitySliderWidget({
               min={0}
               max={100}
               onChange={(e) => changeHandler(e)}
-              value={
-                inputChangeTracker.danceability
-                  ? SliderFilterFormatter.toSliderValueFromConfigValue(
-                      inputChangeTracker.danceability
-                    )
-                  : 0
-              }
-              aria-label="Desired danceability value"
+              value={inputChangeTracker.popularity ?? 0}
+              aria-label="Desired popularity value"
               aria-valuemin={0}
               aria-valuemax={100}
               role="slider"
               disabled={isLoading || !isEnabled}
-              id="radio-plus-danceability-slider"
+              id="radio-plus-popularity-slider"
               className="range-slider flex-1"
             />
           </m.div>
@@ -191,4 +177,4 @@ function DanceabilitySliderWidget({
   );
 }
 
-export { DanceabilitySliderWidget };
+export { PopularitySliderWidget };

@@ -97,7 +97,7 @@ function GenreSelectWidget({
   }
 
   return (
-    <div className="radio-plus-select-genre-container w-full">
+    <div className="radio-plus-select-genre-container relative w-full">
       <div className="flex flex-row flex-wrap justify-between items-center gap-x-4 pr-3 pb-2 pl-3">
         <div className="flex flex-row flex-nowrap justify-start items-center">
           <p className="block pr-1">Track genres</p>

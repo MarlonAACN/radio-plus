@@ -6,6 +6,8 @@ type Config = {
   bpm: number | null | undefined;
   /** undefined if untouched on load, null if disabled or not set, number if set in range of 0-1. */
   danceability: number | null | undefined;
+  /** undefined if untouched on load, null if disabled or not set, number if set in range of 0-100. */
+  popularity: number | null | undefined;
 };
 
 /**
@@ -17,6 +19,7 @@ type ConfigErrors = {
   selectedGenres: string | null;
   bpm: string | null;
   danceability: string | null;
+  popularity: string | null;
 };
 
 /**

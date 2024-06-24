@@ -16,7 +16,8 @@ class AlgoRepo {
     freshTracks: boolean,
     selectedGenres: Array<string>,
     bpm: number | null,
-    danceability: number | null
+    danceability: number | null,
+    popularity: number | null
   ): Promise<RadioPlus.PlaylistUrl> {
     return fetch(
       this.router.get('runAlgorithm').build({
@@ -36,6 +37,7 @@ class AlgoRepo {
           selectedGenres: selectedGenres,
           bpm: bpm,
           danceability: danceability,
+          popularity: popularity,
         }),
       }
     )

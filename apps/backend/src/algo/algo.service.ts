@@ -37,6 +37,7 @@ export class AlgoService {
    * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
    * @param bpm {number | null} Filter option that determines the desired BPM for the recommended tracks. If null, it's disabled.
    * @param danceability {number | null} Filter option that determines the danceability score for the recommended tracks. If null, it's disabled. Ranged between 0 - 1.
+   * @param popularity {number | null} Filter option that determines the popularity score for the recommended tracks. If null, it's disabled. Ranged between 0 - 100.
    * @returns {RadioPlus.AlgorithmResponse} The url to the playlist in the spotify webapp.
    */
   async runAlgorithm(
@@ -49,7 +50,8 @@ export class AlgoService {
     freshTracks: boolean,
     selectedGenres: Array<string>,
     bpm: number | null,
-    danceability: number | null
+    danceability: number | null,
+    popularity: number | null
   ): Promise<RadioPlus.AlgorithmResponse> {
     // 1. Check if a dedicated radio plus session playlist already exists.
     if (playlistId) {
@@ -102,7 +104,8 @@ export class AlgoService {
           freshTracks,
           selectedGenres,
           bpm,
-          danceability
+          danceability,
+          popularity
         ),
       })
       .then((playlist) => {
@@ -132,6 +135,7 @@ export class AlgoService {
       selectedGenres,
       bpm,
       danceability,
+      popularity,
       user,
       accessToken
     )
@@ -272,6 +276,7 @@ export class AlgoService {
    * @param selectedGenres {Array<string>} Filter option that determines the type of genres the recommended tracks should belong to.
    * @param bpm {number | null} Filter option that determines the desired BPM for the recommended tracks. If null, it's disabled.
    * @param danceability {number | null} Filter option that determines the danceability score for the recommended tracks. If null, it's disabled. Ranged between 0 - 1.
+   * @param popularity {number | null} Filter option that determines the popularity score for the recommended tracks. If null, it's disabled. Ranged between 0 - 100.
    * @param user {RadioPlus.User} The user data, relevant to the algorithm.
    * @param accessToken {string} The access token of the user to authenticate the request.
    * @returns {Array<string>} The recommendation track list.
@@ -282,6 +287,7 @@ export class AlgoService {
     selectedGenres: Array<string>,
     bpm: number | null,
     danceability: number | null,
+    popularity: number | null,
     user: RadioPlus.User,
     accessToken: string
   ): Promise<Array<string>> {
@@ -301,6 +307,10 @@ export class AlgoService {
 
     if (danceability !== null) {
       urlParams.append('target_danceability', danceability.toString());
+    }
+
+    if (popularity !== null) {
+      urlParams.append('target_popularity', popularity.toString());
     }
 
     const requestParams = {

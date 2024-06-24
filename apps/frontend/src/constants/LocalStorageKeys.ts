@@ -5,4 +5,5 @@ export enum LocalStorageKeys {
   bpm = 'radio-plus-bpm',
   danceability = 'radio-plus-danceability',
   popularity = 'radio-plus-popularity',
+  valence = 'radio-plus-valence',
 }

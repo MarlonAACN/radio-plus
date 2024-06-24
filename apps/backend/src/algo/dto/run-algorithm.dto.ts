@@ -41,6 +41,10 @@ class RunAlgorithmDto {
   @IsNumber()
   @IsOptional()
   popularity: number | null;
+
+  @IsNumber()
+  @IsOptional()
+  valence: number | null;
 }
 
 export { RunAlgorithmDto };

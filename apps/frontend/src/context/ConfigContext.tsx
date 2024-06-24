@@ -37,6 +37,7 @@ const configDefaultValues: ConfigContextProps = {
     bpm: undefined,
     danceability: undefined,
     popularity: undefined,
+    valence: undefined,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
@@ -48,6 +49,7 @@ const configDefaultValues: ConfigContextProps = {
     bpm: null,
     danceability: null,
     popularity: null,
+    valence: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -76,6 +78,8 @@ function ConfigProvider({ children }: ConfigProps) {
     danceability: undefined,
     // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
     popularity: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    valence: undefined,
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
@@ -84,6 +88,7 @@ function ConfigProvider({ children }: ConfigProps) {
     bpm: undefined,
     danceability: undefined,
     popularity: undefined,
+    valence: undefined,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
@@ -92,6 +97,7 @@ function ConfigProvider({ children }: ConfigProps) {
     bpm: null,
     danceability: null,
     popularity: null,
+    valence: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -249,6 +255,28 @@ function ConfigProvider({ children }: ConfigProps) {
         LocalStorageManager.updateConfigValue(
           LocalStorageKeys.popularity,
           _data.popularity.toString()
+        );
+      }
+    }
+
+    // 7. Valence
+    if (_cache.valence !== _data.valence) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.valence === undefined) {
+        return;
+      }
+
+      updateErrors.valence = null;
+
+      newCache.valence = _data.valence;
+
+      /** Using valence was disabled, hence its null. */
+      if (_data.valence === null) {
+        LocalStorageManager.removeFromLocalStorage(LocalStorageKeys.valence);
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.valence,
+          _data.valence.toString()
         );
       }
     }

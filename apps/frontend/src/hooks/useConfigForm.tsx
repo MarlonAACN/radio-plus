@@ -154,6 +154,9 @@ function useConfigForm() {
     // 6. Popularity
     localConfig.popularity = inputChangeTracker.popularity;
 
+    // 7. Valence
+    localConfig.valence = inputChangeTracker.valence;
+
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {
       setFormErrors(localErrors);

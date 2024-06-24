@@ -157,6 +157,9 @@ function useConfigForm() {
     // 7. Valence
     localConfig.valence = inputChangeTracker.valence;
 
+    // 8. Instrumentalness
+    localConfig.instrumentalness = inputChangeTracker.instrumentalness;
+
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {
       setFormErrors(localErrors);

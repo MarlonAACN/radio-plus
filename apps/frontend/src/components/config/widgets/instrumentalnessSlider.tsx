@@ -10,23 +10,25 @@ import {
 import { Switch } from '@headlessui/react';
 import { m, AnimatePresence } from 'framer-motion';
 
-import { ValenceTooltipView } from '@/components/config/views/ValenceTooltip';
+import { InstrumentalnessTooltipView } from '@/components/config/views/InstrumentalnessTooltip';
 import { RadioPlus } from '@/types/RadioPlus';
 import { SliderFilterFormatter } from '@/util/formatter/SliderFilterFormatter';
 
-type ValenceSliderProps = {
+type InstrumentalnessSliderProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
 };
-function ValenceSliderWidget({
+function InstrumentalnessSliderWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
-}: ValenceSliderProps) {
+}: InstrumentalnessSliderProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  /** number: set, null: disabled, undefined: untouched yet. */
-  const cachedValenceValue = useRef<number | null | undefined>(undefined);
+  /** number: set (0-1), null: disabled, undefined: untouched yet. */
+  const cachedInstrumentalnessValue = useRef<number | null | undefined>(
+    undefined
+  );
 
   // https://github.com/vercel/next.js/issues/35558
   const firefoxProps = {
@@ -34,71 +36,73 @@ function ValenceSliderWidget({
   };
 
   /** When the local storage data is set for the input change tracker, update cache value if value exists.
-   * Also toggle the valence selector to active if ls data was found.
+   * Also toggle the instrumentalness selector to active if ls data was found.
    * */
   useEffect(() => {
     if (
-      cachedValenceValue.current === undefined &&
-      inputChangeTracker.valence
+      cachedInstrumentalnessValue.current === undefined &&
+      inputChangeTracker.instrumentalness
     ) {
-      cachedValenceValue.current = inputChangeTracker.valence;
+      cachedInstrumentalnessValue.current = inputChangeTracker.instrumentalness;
 
       setIsEnabled(true);
     }
   }, [inputChangeTracker]);
 
-  /** Remove valence value from algoritm payload if disabled. If enabled check for cached value to set as valence value. */
+  /** Remove instrumentalness value from algoritm payload if disabled. If enabled check for cached value to set as instrumentalness value. */
   useEffect(() => {
-    if (cachedValenceValue.current === undefined) {
+    if (cachedInstrumentalnessValue.current === undefined) {
       return;
     }
 
     if (!isEnabled) {
       updateInputChangeTracker({
         ...inputChangeTracker,
-        valence: null,
+        instrumentalness: null,
       });
     } else {
-      if (cachedValenceValue.current !== null) {
+      if (cachedInstrumentalnessValue.current !== null) {
         updateInputChangeTracker({
           ...inputChangeTracker,
-          valence: cachedValenceValue.current,
+          instrumentalness: cachedInstrumentalnessValue.current,
         });
       }
     }
   }, [isEnabled]);
 
-  function generateMoodScoreText(value: number | null | undefined): string {
+  function generateInstrumentalnessScoreText(
+    value: number | null | undefined
+  ): string {
     if (value === undefined || value === null) {
       return '--';
     }
 
     if (value === 0) {
-      return 'depressed';
+      return 'completely vocal';
     }
 
     if (value < 0.2) {
-      return 'gloomy';
+      return 'predominantly vocal';
     }
 
     if (value < 0.4) {
-      return 'melancholic';
+      return 'some vocals';
     }
 
     if (value < 0.6) {
-      return 'neutral';
+      return 'balanced';
     }
 
     if (value < 0.8) {
-      return 'cheerful';
+      return 'mostly instrumental';
     }
 
     if (value < 1) {
-      return 'happy';
+      return 'predominantly instrumental';
     }
 
     if (value === 1) {
-      return 'euphoric';
+      return 'purely instrumental';
     }
 
     return '--';
@@ -109,24 +113,24 @@ function ValenceSliderWidget({
 
     updateInputChangeTracker({
       ...inputChangeTracker,
-      valence: SliderFilterFormatter.toConfigValueFromSliderValue(
+      instrumentalness: SliderFilterFormatter.toConfigValueFromSliderValue(
         Number(eventProgressValue)
       ),
     });
 
-    cachedValenceValue.current =
+    cachedInstrumentalnessValue.current =
       SliderFilterFormatter.toConfigValueFromSliderValue(
         Number(eventProgressValue)
       );
   }
 
   return (
-    <div className="radio-plus-valence-slider-container relative w-full">
+    <div className="radio-plus-instrumentalness-slider-container relative w-full">
       <div className="relative w-fit flex flex-row justify-start items-center gap-x-4">
         <Switch
           checked={isEnabled}
           onChange={setIsEnabled}
-          aria-label="Sets mood of the recommended tracks."
+          aria-label="Sets the instrumentalness level for the recommended tracks."
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span
@@ -135,8 +139,8 @@ function ValenceSliderWidget({
           />
         </Switch>
         <div className="flex flex-row flex-nowrap justify-start items-center">
-          <p className="block pr-1">Mood</p>
-          <ValenceTooltipView />
+          <p className="block pr-1">Instrumentalness</p>
+          <InstrumentalnessTooltipView />
         </div>
       </div>
       <AnimatePresence>
@@ -150,12 +154,14 @@ function ValenceSliderWidget({
               ease: 'easeOut',
               height: { duration: 0.2, ease: 'easeOut' },
             }}
-            className="radio-plus-valence-slider flex flex-row flex-nowrap justify-start items-center pr-6"
+            className="radio-plus-instrumentalness-slider flex flex-row flex-nowrap justify-start items-center pr-6"
           >
-            <div className="radio-plus-valence-position-container w-24">
-              <span className="flex justify-start items-center m-auto text-sm text-font-400">
-                {isEnabled && inputChangeTracker.valence !== null
-                  ? generateMoodScoreText(inputChangeTracker.valence)
+            <div className="radio-plus-instrumentalness-position-container w-28">
+              <span className="flex justify-start items-center pr-2 m-auto text-sm text-font-400">
+                {isEnabled && inputChangeTracker.instrumentalness !== null
+                  ? generateInstrumentalnessScoreText(
+                      inputChangeTracker.instrumentalness
+                    )
                   : '--'}
               </span>
             </div>
@@ -166,18 +172,18 @@ function ValenceSliderWidget({
               max={100}
               onChange={(e) => changeHandler(e)}
               value={
-                inputChangeTracker.valence
+                inputChangeTracker.instrumentalness
                   ? SliderFilterFormatter.toSliderValueFromConfigValue(
-                      inputChangeTracker.valence
+                      inputChangeTracker.instrumentalness
                     )
                   : 0
               }
-              aria-label="Desired track mood"
+              aria-label="Desired instrumentalness value"
               aria-valuemin={0}
               aria-valuemax={100}
               role="slider"
               disabled={isLoading || !isEnabled}
-              id="radio-plus-valence-slider"
+              id="radio-plus-instrumentalness-slider"
               className="range-slider flex-1"
             />
           </m.div>
@@ -187,4 +193,4 @@ function ValenceSliderWidget({
   );
 }
 
-export { ValenceSliderWidget };
+export { InstrumentalnessSliderWidget };

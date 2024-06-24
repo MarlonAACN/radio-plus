@@ -88,6 +88,18 @@ class LocalStorageManager {
     return Number(lsValence);
   }
 
+  private static getInstrumentalnessFromLs(): number | null {
+    const lsInstrumentalness = localStorage.getItem(
+      LocalStorageKeys.instrumentalness
+    );
+
+    if (!lsInstrumentalness || isNaN(Number(lsInstrumentalness))) {
+      return null;
+    }
+
+    return Number(lsInstrumentalness);
+  }
+
   /**
    * Returns the config object, built upon the data fetched from the clients local storage.
    * @returns {RadioPlus.Config} The config built upon the data from the clients local storage.
@@ -101,6 +113,7 @@ class LocalStorageManager {
       danceability: this.getDanceabilityFromLs(),
       popularity: this.getPopularityFromLs(),
       valence: this.getValenceFromLs(),
+      instrumentalness: this.getInstrumentalnessFromLs(),
     };
   }
 

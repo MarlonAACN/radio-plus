@@ -38,6 +38,7 @@ const configDefaultValues: ConfigContextProps = {
     danceability: undefined,
     popularity: undefined,
     valence: undefined,
+    instrumentalness: undefined,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
@@ -50,6 +51,7 @@ const configDefaultValues: ConfigContextProps = {
     danceability: null,
     popularity: null,
     valence: null,
+    instrumentalness: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -80,6 +82,8 @@ function ConfigProvider({ children }: ConfigProps) {
     popularity: undefined,
     // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
     valence: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    instrumentalness: undefined,
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
@@ -89,6 +93,7 @@ function ConfigProvider({ children }: ConfigProps) {
     danceability: undefined,
     popularity: undefined,
     valence: undefined,
+    instrumentalness: undefined,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
@@ -98,6 +103,7 @@ function ConfigProvider({ children }: ConfigProps) {
     danceability: null,
     popularity: null,
     valence: null,
+    instrumentalness: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -277,6 +283,30 @@ function ConfigProvider({ children }: ConfigProps) {
         LocalStorageManager.updateConfigValue(
           LocalStorageKeys.valence,
           _data.valence.toString()
+        );
+      }
+    }
+
+    // 7. Instrumentalness
+    if (_cache.instrumentalness !== _data.instrumentalness) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.instrumentalness === undefined) {
+        return;
+      }
+
+      updateErrors.instrumentalness = null;
+
+      newCache.instrumentalness = _data.instrumentalness;
+
+      /** Using instrumentalness was disabled, hence its null. */
+      if (_data.instrumentalness === null) {
+        LocalStorageManager.removeFromLocalStorage(
+          LocalStorageKeys.instrumentalness
+        );
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.instrumentalness,
+          _data.instrumentalness.toString()
         );
       }
     }

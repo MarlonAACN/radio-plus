@@ -10,6 +10,8 @@ type Config = {
   popularity: number | null | undefined;
   /** undefined if untouched on load, null if disabled or not set, number if set. */
   valence: number | null | undefined;
+  /** undefined if untouched on load, null if disabled or not set, number if set. */
+  instrumentalness: number | null | undefined;
 };
 
 /**
@@ -23,6 +25,7 @@ type ConfigErrors = {
   danceability: string | null;
   popularity: string | null;
   valence: string | null;
+  instrumentalness: string | null;
 };
 
 /**

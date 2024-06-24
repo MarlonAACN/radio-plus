@@ -9,6 +9,7 @@ import { ConfigHeaderWidget } from '@/components/config/widgets/ConfigHeader';
 import { ConfigMenuToggleBarWidget } from '@/components/config/widgets/ConfigMenuToggleBar';
 import { DanceabilitySliderWidget } from '@/components/config/widgets/DanceabilitySlider';
 import { GenreSelectWidget } from '@/components/config/widgets/GenreSelect';
+import { InstrumentalnessSliderWidget } from '@/components/config/widgets/instrumentalnessSlider';
 import { PopularitySliderWidget } from '@/components/config/widgets/PopularitySlider';
 import { RadioOriginInputWidget } from '@/components/config/widgets/RadioOriginInput';
 import { ValenceSliderWidget } from '@/components/config/widgets/ValenceSlider';
@@ -113,6 +114,11 @@ function ConfigLayout({
               updateInputChangeTracker={configForm.setInputChangeTracker}
             />
             <ValenceSliderWidget
+              isLoading={config.isLoading}
+              inputChangeTracker={configForm.inputChangeTracker}
+              updateInputChangeTracker={configForm.setInputChangeTracker}
+            />
+            <InstrumentalnessSliderWidget
               isLoading={config.isLoading}
               inputChangeTracker={configForm.inputChangeTracker}
               updateInputChangeTracker={configForm.setInputChangeTracker}

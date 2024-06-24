@@ -1,4 +1,5 @@
 import { generateDanceabilityScoreText } from '@/util/generateDanceabilityScoreText';
+import { generateInstrumentalnessScoreText } from '@/util/generateInstrumentalnessScoreText';
 import { generatePopularityScoreText } from '@/util/generatePopularityScoreText';
 import { generateValenceScoreText } from '@/util/generateValenceScoreText';
 
@@ -9,7 +10,8 @@ function createPlaylistDescription(
   bpm: number | null,
   danceability: number | null,
   popularity: number | null,
-  valence: number | null
+  valence: number | null,
+  instrumentalness: number | null
 ) {
   const dateString = new Date().toLocaleDateString('de');
 
@@ -40,6 +42,12 @@ function createPlaylistDescription(
 
   if (valence !== null) {
     description += `, mood: ${generateValenceScoreText(valence)}`;
+  }
+
+  if (instrumentalness !== null) {
+    description += `, instrumentalness: ${generateInstrumentalnessScoreText(
+      instrumentalness
+    )}`;
   }
 
   return description;

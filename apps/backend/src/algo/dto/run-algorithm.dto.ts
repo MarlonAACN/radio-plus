@@ -45,6 +45,10 @@ class RunAlgorithmDto {
   @IsNumber()
   @IsOptional()
   valence: number | null;
+
+  @IsNumber()
+  @IsOptional()
+  instrumentalness: number | null;
 }
 
 export { RunAlgorithmDto };

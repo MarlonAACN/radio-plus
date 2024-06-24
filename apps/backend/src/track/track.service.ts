@@ -235,7 +235,7 @@ export class TrackService {
         return Promise.reject(
           new RequestError(
             error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            `[saveTrack] Failed to save track id ${trackId}.`
+            `Failed to save track id ${trackId}.`
           )
         );
       });
@@ -281,7 +281,7 @@ export class TrackService {
         return Promise.reject(
           new RequestError(
             error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            `[saveTrack] Failed to remove saved track with id ${trackId}.`
+            `Failed to remove saved track with id ${trackId}.`
           )
         );
       });

@@ -15,8 +15,8 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
   const config = useConfig();
   const user = useUser();
 
-  const [algoIsActive, setAlgoIsActive] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   const [algoError, setAlgoError] = useState<string | null>(null);
   const blockQueueUpdate = useRef<boolean>(false);
 
@@ -34,70 +34,13 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     }
   }, [user.error]);
 
-  /** Update queue if new track comes up.
-   * This can be blocked if the blockQueueUpdate is set to true. For example when the starting track is set, this hook should not fire.
-   * With this hook there is always one track in the queue of the user, as a new track is added to the queue, once a new track comes up.
-   * This hook won't fire if the same track comes up right after the same track. (This should never happen).
-   * */
-  useEffect(() => {
-    logger.log('[UpdateQueueTracker] New track detected.');
-
-    if (blockQueueUpdate.current) {
-      logger.log(
-        '[UpdateQueueTracker] Updating track queue by hook is currently disabled.'
-      );
-      return;
-    }
-
-    if (!player.deviceId) {
-      logger.log(
-        "[UpdateQueueTracker] Can't update queue before player is connected with RadioPlus"
-      );
-
-      return;
-    }
-
-    if (!config.radioOriginTrack?.information.id) {
-      logger.log(
-        '[UpdateQueueTracker] Not updating queue, as no orign track has been set yet.'
-      );
-      return;
-    }
-
-    if (!algoIsActive) {
-      logger.log(
-        '[UpdateQueueTracker] Smart queue is disabled, not updating queue.'
-      );
-      return;
-    }
-
-    // user.fetchCompleted would usually be enough, but let's satisfy the compiler here.
-    if (!user.fetchCompleted || !user.data) {
-      logger.log(
-        '[UpdateQueueTracker] Tried to update queue, before user data fetch was completed.'
-      );
-      return;
-    }
-
-    updateTrackQueue(
-      player.deviceId,
-      config.radioOriginTrack.information.id,
-      user.data
-    );
-  }, [player.activeTrackId]);
-
   /**
    * Update the algorithm with the latest data from the config.
    * If no origin track is set, disable algorithm to prevent new track being added to the queue.
-   * @param config {RadioPlus.Config} The current config object.
+   * @param _config {RadioPlus.Config} The current config object.
    */
-  function handleConfigChange(config: RadioPlus.Config) {
-    // Reset errors
-    setAlgoError(null);
-
-    if (!config.radioOriginTrackUrl) {
-      setAlgoIsActive(false);
-
+  function handleConfigChange(_config: RadioPlus.Config) {
+    if (!_config.radioOriginTrackUrl) {
       return;
     }
 
@@ -118,95 +61,89 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
       return;
     }
 
-    let trackId;
+    let originTrackId;
     try {
-      trackId = TrackFormatter.parseTrackUrl(config.radioOriginTrackUrl);
+      originTrackId = TrackFormatter.parseTrackUrl(_config.radioOriginTrackUrl);
     } catch (err) {
       logger.error('[useAlgorithm] Track url is malformed.');
-      setAlgoIsActive(false);
       setAlgoError('Origin track url is malformed');
 
       return;
     }
 
-    if (!trackId) {
-      setAlgoIsActive(false);
-      //player.pause();
-
+    if (!originTrackId) {
       return;
     }
 
-    setOriginTrack(trackId, player.deviceId, user.data);
+    setAlgoError(null);
+    player.pause();
+
+    runAlgorithm(
+      player.deviceId,
+      originTrackId,
+      user.data,
+      _config.freshTracks,
+      _config.selectedGenres,
+      _config.bpm,
+      _config.danceability,
+      _config.popularity,
+      _config.valence,
+      _config.instrumentalness
+    ).then((res) => {
+      if (res === null) {
+        setPlaylistUrl(null);
+      } else {
+        setPlaylistUrl(res.playlistUrl);
+      }
+    });
   }
 
-  /**
-   * Finds a recommendation based on the origin track id and adds it to the users track queue.
-   * @param deviceId {string} The device id of the Radio plus instance.
-   * @param originTrackId {string} The id of the origin track, that is used to fetch recommendations.
-   * @param user {RadioPlus.User} Data of the user, that is relevant for the algorithm.
-   */
-  function updateTrackQueue(
+  function runAlgorithm(
     deviceId: string,
     originTrackId: string,
-    user: RadioPlus.User
-  ) {
+    user: RadioPlus.User,
+    freshTracks: boolean,
+    selectedGenres: Array<string>,
+    bpm: number | null | undefined,
+    danceability: number | null | undefined,
+    popularity: number | null | undefined,
+    valence: number | null | undefined,
+    instrumentalness: number | null | undefined
+  ): Promise<RadioPlus.PlaylistUrl | null> {
+    setIsLoading(true);
+
     return algoRepo
-      .updateQueue(deviceId, originTrackId, user)
-      .then((res) => {
-        logger.log(
-          `[updateTrackQueue] Track with id: ${res.trackId} was successfully added to the queue.`
-        );
+      .runAlgorithm(
+        deviceId,
+        originTrackId,
+        user,
+        freshTracks,
+        selectedGenres,
+        bpm ?? null,
+        danceability ?? null,
+        popularity ?? null,
+        valence ?? null,
+        instrumentalness ?? null
+      )
+      .then((data) => {
+        logger.log(`[runAlgorithm] Algorithm ran successfully.`);
+        return data;
       })
       .catch((err: RadioPlus.Error) => {
-        logger.error('[updateTrackQueue] Failed to update track queue:', err);
+        logger.error('[runAlgorithm] Running algorithm failed:', err);
 
         setAlgoError(err.message);
 
-        return false;
-      })
-      .finally(() => (blockQueueUpdate.current = false));
-  }
+        // reset origin track input
+        config.setData({
+          ...config.data,
+          radioOriginTrackUrl: null,
+        });
 
-  /**
-   * Changes the currently played song to the track with the given id.
-   * This marks the start of the running algorithm.
-   * @param trackId {string} The id of the origin track
-   * @param deviceId {string} The id of the current device (radio plus instance)
-   * @param user {RadioPlus.User} The user data, relevant to the algorithm.
-   * @returns {boolean} A boolean indicating the outcome of the operation.
-   */
-  function setOriginTrack(
-    trackId: string,
-    deviceId: string,
-    user: RadioPlus.User
-  ): Promise<boolean> {
-    setIsLoading(true);
-    // Prevent track change hook from adding a track to the queue.
-    blockQueueUpdate.current = true;
-
-    return algoRepo
-      .initAlgorithm(trackId, user, deviceId)
-      .then(() => {
-        setAlgoIsActive(true);
-        logger.log(
-          '[setOriginTrack] Origin track has been set and algorithm has been started.'
-        );
-
-        // manually trigger 'update track queue', since hook would not be called, if the set origin track matches the already active one.
-        updateTrackQueue(deviceId, trackId, user);
-        return true;
-      })
-      .catch((err: RadioPlus.Error) => {
-        logger.error(
-          '[setOriginTrack] Failed setting new track and start algorithm:',
-          err
-        );
-
-        setAlgoError('Launching smart queue failed');
-        blockQueueUpdate.current = false;
-        return false;
+        return null;
       })
       .finally(() => {
+        blockQueueUpdate.current = false;
         setIsLoading(false);
       });
   }
@@ -215,6 +152,7 @@ function useAlgorithm({ player }: AlgorithmProps): RadioPlus.AlgorithmHook {
     error: algoError,
     userFetched: user.fetchCompleted,
     isLoading: isLoading,
+    playlistUrl: playlistUrl,
   };
 }
 

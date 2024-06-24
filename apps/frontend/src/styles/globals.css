@@ -132,7 +132,7 @@
 }
 
 @layer components {
-    .radio-plus-track-progress-slider {
+    .radio-plus-track-progress-slider, .range-slider {
         -webkit-appearance: none;
         appearance: none;
         width: 100%;
@@ -143,7 +143,7 @@
         border-radius: 15px;
     }
 
-    .radio-plus-track-progress-slider:disabled {
+    .radio-plus-track-progress-slider:disabled, .range-slider:disabled {
         cursor: default;
     }
 
@@ -151,7 +151,7 @@
         outline: none;
     }
 
-    .radio-plus-track-progress-slider::-ms-track {
+    .radio-plus-track-progress-slider::-ms-track, .range-slider::-ms-track {
         width: 100%;
         cursor: pointer;
         background: transparent;
@@ -160,7 +160,7 @@
     }
 
     /* Thumb: webkit */
-    .radio-plus-track-progress-slider::-webkit-slider-thumb {
+    .radio-plus-track-progress-slider::-webkit-slider-thumb, .range-slider::-webkit-slider-thumb {
         opacity: 0;
         transition: all .1s ease-out;
         box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;
@@ -173,9 +173,12 @@
         border-radius: 50px;
         border: none;
     }
+    .range-slider::-webkit-slider-thumb {
+        opacity: 1;
+    }
 
     /* Thumb: Firefox */
-    .radio-plus-track-progress-slider::-moz-range-thumb {
+    .radio-plus-track-progress-slider::-moz-range-thumb, .range-slider::-moz-range-thumb {
         opacity: 0;
         transition: opacity .1s ease-out;
         box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;
@@ -185,9 +188,12 @@
         border-radius: 50px;
         border: none;
     }
+    .range-slider::-moz-range-thumb {
+        opacity: 1;
+    }
 
     /* Thumb: IE */
-    .radio-plus-track-progress-slider::-ms-thumb {
+    .radio-plus-track-progress-slider::-ms-thumb. .range-slider::-ms-thumb {
         opacity: 0;
         transition: opacity .1s ease-out;
         box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;
@@ -197,6 +203,9 @@
         border-radius: 50px;
         background: #F70062;
         cursor: pointer;
+    }
+    .range-slider::-ms-thumb {
+        opacity: 1;
     }
 
     /* Hover, active & focus Thumb: Webkit */
@@ -213,15 +222,15 @@
     }
 
     /** Add styling to the range track */
-    .radio-plus-track-progress-slider::-webkit-slider-runnable-track {
+    .radio-plus-track-progress-slider::-webkit-slider-runnable-track, .range-slider::-webkit-slider-runnable-track {
         cursor: default;
     }
 
-    .radio-plus-track-progress-slider::-moz-range-track {
+    .radio-plus-track-progress-slider::-moz-range-track, .range-slider::-moz-range-track {
         cursor: default;
     }
 
-    .radio-plus-track-progress-slider::-ms-track {
+    .radio-plus-track-progress-slider::-ms-track, .range-slider::-ms-track {
         cursor: default;
     }
 }

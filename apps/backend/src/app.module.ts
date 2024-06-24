@@ -2,13 +2,16 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AlgoController } from '@/algo/algo.controller';
+import { GenreController } from '@/genre/genre.controller';
 import { AuthMiddleware } from '@/middleware/auth.middleware';
 import { PlayerController } from '@/player/player.controller';
 import { UserController } from '@/user/user.controller';
 
 import { AlgoModule } from './algo/algo.module';
 import { AuthModule } from './auth/auth.module';
+import { GenreModule } from './genre/genre.module';
 import { PlayerModule } from './player/player.module';
+import { PlaylistModule } from './playlist/playlist.module';
 import { TrackController } from './track/track.controller';
 import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
@@ -23,6 +26,8 @@ import { UserModule } from './user/user.module';
     TrackModule,
     AlgoModule,
     UserModule,
+    PlaylistModule,
+    GenreModule,
   ],
 })
 @Module({
@@ -36,7 +41,8 @@ export class AppModule implements NestModule {
         PlayerController,
         TrackController,
         AlgoController,
-        UserController
+        UserController,
+        GenreController
       );
   }
 }

@@ -11,6 +11,7 @@ import { TrackRepo } from '@/repos/TrackRepo';
 import { RadioPlus } from '@/types/RadioPlus';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { logger } from '@/util/Logger';
+import { ArrayManager } from '@/util/manager/ArrayManager';
 import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 type ConfigContextProps = {
@@ -31,12 +32,26 @@ type ConfigProps = {
 const configDefaultValues: ConfigContextProps = {
   data: {
     radioOriginTrackUrl: null,
+    freshTracks: false,
+    selectedGenres: ['placeholder'],
+    bpm: undefined,
+    danceability: undefined,
+    popularity: undefined,
+    valence: undefined,
+    instrumentalness: undefined,
   },
   setData: (_data: RadioPlus.Config) => {
     return;
   },
   errors: {
     radioOriginTrackUrl: null,
+    freshTracks: null,
+    selectedGenres: null,
+    bpm: null,
+    danceability: null,
+    popularity: null,
+    valence: null,
+    instrumentalness: null,
   },
   hasErrors: false,
   radioOriginTrack: null,
@@ -55,12 +70,40 @@ function ConfigProvider({ children }: ConfigProps) {
    * */
   const [cachedData, setCachedData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
+    freshTracks: false,
+    // If on load at least one genre is fetched from cache, the user then removes that genre and submits, the if block is skipped and the ls would not be cleared.
+    // That's why there is a placeholder item is in place, that will automatically be removed on first submit.
+    selectedGenres: ['placeholder'],
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    bpm: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    danceability: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    popularity: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    valence: undefined,
+    // Only on load undefined. Will either be turned into number if set or null if not set in local storage.
+    instrumentalness: undefined,
   });
   const [data, setData] = useState<RadioPlus.Config>({
     radioOriginTrackUrl: null,
+    freshTracks: false,
+    selectedGenres: ['placeholder'],
+    bpm: undefined,
+    danceability: undefined,
+    popularity: undefined,
+    valence: undefined,
+    instrumentalness: undefined,
   });
   const [errors, setErrors] = useState<RadioPlus.ConfigErrors>({
     radioOriginTrackUrl: null,
+    freshTracks: null,
+    selectedGenres: null,
+    bpm: null,
+    danceability: null,
+    popularity: null,
+    valence: null,
+    instrumentalness: null,
   });
   const [hasErrors, setHasErrors] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -82,7 +125,9 @@ function ConfigProvider({ children }: ConfigProps) {
   }, [data]);
 
   useEffect(() => {
-    setHasErrors(errors.radioOriginTrackUrl !== null);
+    setHasErrors(
+      errors.radioOriginTrackUrl !== null || errors.freshTracks !== null
+    );
   }, [errors]);
 
   /**
@@ -121,6 +166,149 @@ function ConfigProvider({ children }: ConfigProps) {
           updateErrors.radioOriginTrackUrl = err;
           newCache.radioOriginTrackUrl = null;
         });
+    }
+
+    // 2. Fresh tracks
+    if (_cache.freshTracks !== _data.freshTracks) {
+      updateErrors.freshTracks = null;
+
+      newCache.freshTracks = _data.freshTracks;
+      LocalStorageManager.updateConfigValue(
+        LocalStorageKeys.freshTracks,
+        _data.freshTracks.toString()
+      );
+    }
+
+    // 3. Selected genres
+    if (!ArrayManager.isEqual(_cache.selectedGenres, _data.selectedGenres)) {
+      updateErrors.selectedGenres = null;
+
+      newCache.selectedGenres = _data.selectedGenres;
+
+      if (_data.selectedGenres.length > 0) {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.selectedGenres,
+          _data.selectedGenres.join(',')
+        );
+      } else {
+        LocalStorageManager.removeFromLocalStorage(
+          LocalStorageKeys.selectedGenres
+        );
+      }
+    }
+
+    // 4. BPM
+    if (_cache.bpm !== _data.bpm) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.bpm === undefined) {
+        return;
+      }
+
+      updateErrors.bpm = null;
+
+      newCache.bpm = _data.bpm;
+
+      /** Using bpm was disabled, hence its null. */
+      if (_data.bpm === null) {
+        LocalStorageManager.removeFromLocalStorage(LocalStorageKeys.bpm);
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.bpm,
+          _data.bpm.toString()
+        );
+      }
+    }
+
+    // 5. Danceability
+    if (_cache.danceability !== _data.danceability) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.danceability === undefined) {
+        return;
+      }
+
+      updateErrors.danceability = null;
+
+      newCache.danceability = _data.danceability;
+
+      /** Using danceability was disabled, hence its null. */
+      if (_data.danceability === null) {
+        LocalStorageManager.removeFromLocalStorage(
+          LocalStorageKeys.danceability
+        );
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.danceability,
+          _data.danceability.toString()
+        );
+      }
+    }
+
+    // 6. Popularity
+    if (_cache.popularity !== _data.popularity) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.popularity === undefined) {
+        return;
+      }
+
+      updateErrors.popularity = null;
+
+      newCache.popularity = _data.popularity;
+
+      /** Using popularity was disabled, hence its null. */
+      if (_data.popularity === null) {
+        LocalStorageManager.removeFromLocalStorage(LocalStorageKeys.popularity);
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.popularity,
+          _data.popularity.toString()
+        );
+      }
+    }
+
+    // 7. Valence
+    if (_cache.valence !== _data.valence) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.valence === undefined) {
+        return;
+      }
+
+      updateErrors.valence = null;
+
+      newCache.valence = _data.valence;
+
+      /** Using valence was disabled, hence its null. */
+      if (_data.valence === null) {
+        LocalStorageManager.removeFromLocalStorage(LocalStorageKeys.valence);
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.valence,
+          _data.valence.toString()
+        );
+      }
+    }
+
+    // 7. Instrumentalness
+    if (_cache.instrumentalness !== _data.instrumentalness) {
+      /** data is in untouched state if undefined, return. */
+      if (_data.instrumentalness === undefined) {
+        return;
+      }
+
+      updateErrors.instrumentalness = null;
+
+      newCache.instrumentalness = _data.instrumentalness;
+
+      /** Using instrumentalness was disabled, hence its null. */
+      if (_data.instrumentalness === null) {
+        LocalStorageManager.removeFromLocalStorage(
+          LocalStorageKeys.instrumentalness
+        );
+      } else {
+        LocalStorageManager.updateConfigValue(
+          LocalStorageKeys.instrumentalness,
+          _data.instrumentalness.toString()
+        );
+      }
     }
 
     // Update global error object, update global cache.

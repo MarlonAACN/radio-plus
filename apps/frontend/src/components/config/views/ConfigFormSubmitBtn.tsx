@@ -11,6 +11,8 @@ type FilterFormSubmitBtnProps = {
   playerWasTransferred: boolean;
   /** Don't allow config submits, before user fetch is completed. */
   userFetched: boolean;
+  /** Don't allow config submits, if no track origin value is set. */
+  radioOriginTrackinputValue: string | null;
 };
 
 function ConfigFormSubmitBtnView({
@@ -19,6 +21,7 @@ function ConfigFormSubmitBtnView({
   formHasErrors,
   playerWasTransferred,
   userFetched,
+  radioOriginTrackinputValue,
 }: FilterFormSubmitBtnProps) {
   // https://github.com/vercel/next.js/issues/35558
   const extraFirefoxProps = {
@@ -34,14 +37,15 @@ function ConfigFormSubmitBtnView({
         !formHoldsNewData ||
         formHasErrors ||
         !playerWasTransferred ||
-        !userFetched
+        !userFetched ||
+        !radioOriginTrackinputValue
       }
       type="submit"
     >
       {isLoading || !playerWasTransferred || !userFetched ? (
         <Spinner className="w-6 h-6 py-0.5" />
       ) : (
-        'Start'
+        'Generate'
       )}
     </button>
   );

@@ -2,7 +2,7 @@ import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 import clsx from 'clsx';
 
-import { RadioOriginInputInfoView } from '@/components/config/views/RadioOriginInputInfo';
+import { RadioOriginInputTooltipView } from '@/components/config/views/RadioOriginInputInfo';
 import { RadioPlus } from '@/types/RadioPlus';
 
 type RadioOriginInputProps = {
@@ -76,7 +76,7 @@ function RadioOriginInputWidget({
           )}
         ></input>
         <div className="absolute top-0 right-2 h-full flex flex-col justify-center items-center">
-          <RadioOriginInputInfoView />
+          <RadioOriginInputTooltipView />
         </div>
       </div>
       {formErrors.radioOriginTrackUrl ? (

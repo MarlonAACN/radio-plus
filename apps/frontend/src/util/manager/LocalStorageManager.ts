@@ -26,6 +26,80 @@ class LocalStorageManager {
     return lsRadioOriginTrackUrl;
   }
 
+  private static getFreshTracksBoolFromLs(): boolean {
+    const lsFreshTracks = localStorage.getItem(LocalStorageKeys.freshTracks);
+
+    if (!lsFreshTracks) {
+      return false;
+    }
+
+    return lsFreshTracks === 'true';
+  }
+
+  private static getSelectedGenresFromLs(): Array<string> {
+    const lsSelectedGenres = localStorage.getItem(
+      LocalStorageKeys.selectedGenres
+    );
+
+    if (!lsSelectedGenres || lsSelectedGenres === '') {
+      return [];
+    }
+
+    return lsSelectedGenres.split(',');
+  }
+
+  private static getBpmFromLs(): number | null {
+    const lsBpm = localStorage.getItem(LocalStorageKeys.bpm);
+
+    if (!lsBpm || isNaN(Number(lsBpm))) {
+      return null;
+    }
+
+    return Number(lsBpm);
+  }
+
+  private static getDanceabilityFromLs(): number | null {
+    const lsDanceability = localStorage.getItem(LocalStorageKeys.danceability);
+
+    if (!lsDanceability || isNaN(Number(lsDanceability))) {
+      return null;
+    }
+
+    return Number(lsDanceability);
+  }
+
+  private static getPopularityFromLs(): number | null {
+    const lsPopularity = localStorage.getItem(LocalStorageKeys.popularity);
+
+    if (!lsPopularity || isNaN(Number(lsPopularity))) {
+      return null;
+    }
+
+    return Number(lsPopularity);
+  }
+
+  private static getValenceFromLs(): number | null {
+    const lsValence = localStorage.getItem(LocalStorageKeys.valence);
+
+    if (!lsValence || isNaN(Number(lsValence))) {
+      return null;
+    }
+
+    return Number(lsValence);
+  }
+
+  private static getInstrumentalnessFromLs(): number | null {
+    const lsInstrumentalness = localStorage.getItem(
+      LocalStorageKeys.instrumentalness
+    );
+
+    if (!lsInstrumentalness || isNaN(Number(lsInstrumentalness))) {
+      return null;
+    }
+
+    return Number(lsInstrumentalness);
+  }
+
   /**
    * Returns the config object, built upon the data fetched from the clients local storage.
    * @returns {RadioPlus.Config} The config built upon the data from the clients local storage.
@@ -33,6 +107,13 @@ class LocalStorageManager {
   public static getConfig(): RadioPlus.Config {
     return {
       radioOriginTrackUrl: this.getRadioTrackUrlFromLs(),
+      freshTracks: this.getFreshTracksBoolFromLs(),
+      selectedGenres: this.getSelectedGenresFromLs(),
+      bpm: this.getBpmFromLs(),
+      danceability: this.getDanceabilityFromLs(),
+      popularity: this.getPopularityFromLs(),
+      valence: this.getValenceFromLs(),
+      instrumentalness: this.getInstrumentalnessFromLs(),
     };
   }
 

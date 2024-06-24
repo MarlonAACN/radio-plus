@@ -201,6 +201,11 @@ function ProgressBarWidget({
         onMouseDown={mouseDownEventHandler}
         onMouseUp={(e) => mouseUpEventHandler(e)}
         disabled={!initPlaybackWasTransferred}
+        aria-label="Current track position progress in seconds"
+        aria-valuemin={0}
+        aria-valuemax={msToSeconds(trackLength)}
+        aria-valuenow={Number(progressBarValue)}
+        role="slider"
         id="radio-plus-track-progress-slider"
         className="radio-plus-track-progress-slider flex-1"
       />

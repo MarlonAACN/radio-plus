@@ -20,6 +20,20 @@ export const SpotifyEndpointURLs = {
     SaveTrack: (urlParams: URLSearchParams) =>
       `https://api.spotify.com/v1/me/tracks?${urlParams}`,
   },
+  playlist: {
+    create: (userId: string) =>
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
+    get: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}`,
+    delete: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}/followers`,
+    updateDetails: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}`,
+    addTracks: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+    addCustomPlayCoverImage: (playlistId: string) =>
+      `https://api.spotify.com/v1/playlists/${playlistId}/images`,
+  },
   GetRecommendations: (urlParams: URLSearchParams) =>
     `https://api.spotify.com/v1/recommendations?${urlParams}`,
   GetUserProfile: 'https://api.spotify.com/v1/me',
@@ -31,4 +45,6 @@ export const SpotifyEndpointURLs = {
     `https://api.spotify.com/v1/me/top/artists?${urlParams}`,
   GetUsersTopTracks: (urlParams: URLSearchParams) =>
     `https://api.spotify.com/v1/me/top/tracks?${urlParams}`,
+  GetAvailableGenres:
+    'https://api.spotify.com/v1/recommendations/available-genre-seeds',
 };

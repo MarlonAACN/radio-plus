@@ -78,7 +78,7 @@ function RadioOriginTrackPreview({
               <DisconnectedIcon className="w-full h-auto fill-white" />
             </div>
             <div className="h-full flex flex-col justify-center items-start">
-              <p className="text-sm text-secondary-700">
+              <p className="text-sm text-secondary-400">
                 Smart queue is disabled
               </p>
             </div>

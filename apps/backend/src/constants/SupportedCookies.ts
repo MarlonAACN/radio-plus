@@ -3,4 +3,5 @@ export enum SupportedCookies {
   refreshToken = 'x-radio-plus-refresh-token',
   userMarket = 'x-radio-user-market',
   userId = 'x-radio-user-id',
+  sessionPlaylistId = 'x-radio-session-playlist-id',
 }

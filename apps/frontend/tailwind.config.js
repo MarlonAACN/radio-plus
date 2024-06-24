@@ -15,6 +15,7 @@ module.exports = {
       screens: {
         mini: '350px',
         xs: '450px',
+        md2: '850px',
       },
       fontFamily: {
         dmsans: ['DMSans', 'sans-serif'],
@@ -29,6 +30,8 @@ module.exports = {
           800: '#595396',
         },
         secondary: {
+          400: '#447eca',
+          600: '#3b649a',
           700: '#31517b',
           800: '#31517b',
         },

@@ -110,7 +110,7 @@ function usePlayer(): RadioPlus.PlayerHook {
         !state ? setActive(false) : setActive(true);
       });
 
-      logger.log('DEBUG: [SpotifyPlayer] Player state changed.');
+      //logger.log('DEBUG: [SpotifyPlayer] Player state changed.');
     });
 
     player.addListener('ready', ({ device_id }) => {
@@ -198,7 +198,7 @@ function usePlayer(): RadioPlus.PlayerHook {
       return Promise.resolve(false);
     }
 
-    console.log('[SpotifyPlayer] seeking pos');
+    logger.log('[SpotifyPlayer] seeking pos');
     setEventIsLoading(true);
     return playerRepo
       .seekPosition(positionMs, deviceId.current)

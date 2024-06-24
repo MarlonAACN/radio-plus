@@ -4,6 +4,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { RadioPlus } from '@/types/RadioPlus';
 import { TrackFormatter } from '@/util/formatter/TrackFormatter';
 import { isWhitespaceString } from '@/util/is-whitespace-string';
+import { ArrayManager } from '@/util/manager/ArrayManager';
 import { LocalStorageManager } from '@/util/manager/LocalStorageManager';
 
 function useConfigForm() {
@@ -41,7 +42,7 @@ function useConfigForm() {
   }, [inputChangeTracker, config.data]);
 
   /**
-   * Compares two config objects on thei similiarity.
+   * Compares two config objects on their similiarity.
    * This doesn't compare key differences.
    * @param newInput {RadioPlus.Config} The new config object.
    * @param currentInput {RadioPlus.Config} The current config object.
@@ -55,7 +56,16 @@ function useConfigForm() {
 
     // Compare values for each key
     for (const key of keys) {
-      if (currentInput[key] !== newInput[key]) {
+      const newValue = newInput[key];
+      const currentValue = currentInput[key];
+
+      if (Array.isArray(currentValue) && Array.isArray(newValue)) {
+        const arraysAreSame = ArrayManager.isEqual(currentValue, newValue);
+
+        if (!arraysAreSame) {
+          return true;
+        }
+      } else if (currentValue !== newValue) {
         return true;
       }
     }
@@ -96,7 +106,7 @@ function useConfigForm() {
   }
 
   /**
-   * Expandable form submit handler to check all config options for if there are any errors.
+   * Expandable form submit handler to check all config options on if there are any errors.
    * @param e {FormEvent<HTMLFormElement>} The form event wrapping all filter inputs.
    * @returns {boolean} If the data was evaluated and saved in the config succesfully return true. Also returns false if config status is currently loading.
    */
@@ -107,7 +117,7 @@ function useConfigForm() {
       return false;
     }
 
-    // Create local copies of data and error objects.a
+    // Create local copies of data and error objects.
     const localConfig: RadioPlus.Config = { ...config.data };
     const localErrors: RadioPlus.ConfigFormErrors = {
       radioOriginTrackUrl: null,
@@ -120,12 +130,35 @@ function useConfigForm() {
     ) as string | null;
 
     // Run through each dedicated evaluator for each existing input in the config form.
+    // 1. Radio origin track url
     try {
       localConfig.radioOriginTrackUrl =
         radioOriginInputEvaluator(songOriginInputValue);
     } catch (err) {
       localErrors.radioOriginTrackUrl = (err as { message: string }).message;
     }
+
+    // 2. Fresh tracks
+    localConfig.freshTracks = inputChangeTracker.freshTracks;
+
+    // 3. Selected genres
+    // Selected tracks are not stored in a default form item, hence it's fetched from the config form directly.
+    localConfig.selectedGenres = inputChangeTracker.selectedGenres;
+
+    // 4. BPM
+    localConfig.bpm = inputChangeTracker.bpm;
+
+    // 5. Danceability
+    localConfig.danceability = inputChangeTracker.danceability;
+
+    // 6. Popularity
+    localConfig.popularity = inputChangeTracker.popularity;
+
+    // 7. Valence
+    localConfig.valence = inputChangeTracker.valence;
+
+    // 8. Instrumentalness
+    localConfig.instrumentalness = inputChangeTracker.instrumentalness;
 
     // If there is atleast one error, update the error variable and return.
     if (Object.values(localErrors).some((value) => value !== null)) {

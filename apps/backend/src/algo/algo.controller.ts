@@ -1,8 +1,18 @@
-import { Body, Controller, HttpException, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpException,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
 
 import { AlgoService } from '@/algo/algo.service';
-import { InitAlgorithmDto, UpdateQueueDto } from '@/algo/dto';
+import { RunAlgorithmDto } from '@/algo/dto';
+import { SupportedCookies } from '@/constants/SupportedCookies';
 import { AuthRequest } from '@/types/misc/AuthRequest';
+import { RadioPlus } from '@/types/RadioPlus';
 import { RequestError } from '@/util/Error';
 
 @Controller({
@@ -13,45 +23,32 @@ export class AlgoController {
   constructor(private algoService: AlgoService) {}
 
   @Post()
-  initAlgorithm(
-    @Body() dto: InitAlgorithmDto,
-    @Req() request: AuthRequest
-  ): Promise<void> {
-    return this.algoService
-      .initAlgorithm(
-        dto.originTrackId,
-        dto.user,
-        dto.deviceId,
-        request.accessToken
-      )
-      .then(() => {
-        return;
-      })
-      .catch((err: RequestError) => {
-        throw new HttpException(
-          {
-            status: err.status,
-            message: err.message,
-          },
-          err.status
-        );
-      });
-  }
+  runAlgorithm(
+    @Body() dto: RunAlgorithmDto,
+    @Req() request: AuthRequest,
+    @Res({ passthrough: true }) response: Response
+  ): Promise<RadioPlus.AlgorithmResponse> {
+    const playlistIdCookie =
+      request.cookies[SupportedCookies.sessionPlaylistId];
 
-  @Post('queue')
-  updateQueue(
-    @Body() dto: UpdateQueueDto,
-    @Req() request: AuthRequest
-  ): Promise<{ trackId: string }> {
     return this.algoService
-      .updateQueue(
+      .runAlgorithm(
         dto.originTrackId,
+        playlistIdCookie ?? null,
         dto.user,
+        request.accessToken,
         dto.deviceId,
-        request.accessToken
+        response,
+        dto.freshTracks,
+        dto.selectedGenres,
+        dto.bpm,
+        dto.danceability,
+        dto.popularity,
+        dto.valence,
+        dto.instrumentalness
       )
-      .then((trackId) => {
-        return { trackId: trackId };
+      .then((playlistUrl) => {
+        return playlistUrl;
       })
       .catch((err: RequestError) => {
         throw new HttpException(

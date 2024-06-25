@@ -3,6 +3,9 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { composePlugins, withNx } = require('@nx/next');
 
+console.log('Using Node:', process.version);
+console.log('Building ENV:', process.env.NODE_ENV);
+
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
  **/

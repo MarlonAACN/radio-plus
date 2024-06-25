@@ -3,7 +3,9 @@
   "description": "Less search, more discovery.",
   "version": "2.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build:frontend": "nx build frontend"
+  },
   "private": true,
   "dependencies": {
     "@headlessui/react": "^2.0.4",

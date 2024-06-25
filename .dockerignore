@@ -1,0 +1,45 @@
+# Node modules
+node_modules/**
+
+# Local development directories
+.idea
+.vscode
+
+# Logs
+*.log
+
+# Build artifacts
+*.tsbuildinfo
+*.next
+*.out
+
+# Dependency directories and files generated during development
+npm-debug.log
+
+# ESLint configurations
+.eslintignore
+.eslintrc.json
+
+# Prettier configurations
+.prettierignore
+.prettierrc
+
+# Editor config
+.editorconfig
+
+# Ignore Dockerfile
+Dockerfile
+
+# Ignore dockerignore file itself
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Tests
+jest.config.ts
+jest.preset.js
+
+# Ignore the local environment files
+.env

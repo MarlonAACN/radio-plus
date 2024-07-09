@@ -27,6 +27,9 @@ function ConfigMenuToggleBarWidget({
         <button
           type="button"
           aria-label="toggle config dropdown menu"
+          aria-expanded={isOpen}
+          aria-controls="filter-wrapper"
+          aria-haspopup={true}
           title="toggle config dropdown menu"
           onClick={() => setIsOpen(!isOpen)}
           className="rounded-full transition-colors hover:bg-base-500/10"

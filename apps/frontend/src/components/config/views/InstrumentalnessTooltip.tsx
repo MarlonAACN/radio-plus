@@ -3,6 +3,7 @@ import { Tooltip } from '@/components/util/Tooltip';
 function InstrumentalnessTooltipView() {
   return (
     <Tooltip
+      id="instrumentalness-tooltip"
       options={{
         iconBackground: false,
         origin: 'left',

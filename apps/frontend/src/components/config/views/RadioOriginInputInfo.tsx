@@ -5,7 +5,10 @@ import { Tooltip } from '@/components/util/Tooltip';
 
 function RadioOriginInputTooltipView() {
   return (
-    <Tooltip options={{ iconBackground: true, origin: 'right', width: 'w-60' }}>
+    <Tooltip
+      id="radio-origin-input-tooltip"
+      options={{ iconBackground: true, origin: 'right', width: 'w-60' }}
+    >
       <ol type="1">
         <li>1. Right click a song</li>
         <li className="flex flex-row justify-start items-center gap-x-1.5 my-1">

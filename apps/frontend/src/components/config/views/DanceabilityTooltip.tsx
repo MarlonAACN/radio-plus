@@ -3,6 +3,7 @@ import { Tooltip } from '@/components/util/Tooltip';
 function DanceabilityTooltipView() {
   return (
     <Tooltip
+      id="danceability-tooltip"
       options={{
         iconBackground: false,
         origin: 'left',

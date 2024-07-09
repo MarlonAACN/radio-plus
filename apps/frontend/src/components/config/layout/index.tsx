@@ -64,7 +64,12 @@ function ConfigLayout({
   return (
     <>
       <div className="radio-plus-filter-spacer h-9"></div>
-      <div className="radio-plus-filter-wrapper z-[999] absolute top-0 left-0 w-full h-16 flex flex-col justify-end items-center">
+      <div
+        className="radio-plus-filter-wrapper z-[999] absolute top-0 left-0 w-full h-16 flex flex-col justify-end items-center"
+        aria-hidden={!isOpen}
+        id="filter-wrapper"
+        role="menu"
+      >
         <m.form
           onSubmit={(e) => formSubmitHandler(e)}
           initial={{

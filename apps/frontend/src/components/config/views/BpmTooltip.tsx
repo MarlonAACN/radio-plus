@@ -2,7 +2,10 @@ import { Tooltip } from '@/components/util/Tooltip';
 
 function BpmTooltipView() {
   return (
-    <Tooltip options={{ iconBackground: false, origin: 'left', width: 'w-96' }}>
+    <Tooltip
+      id="bpm-tooltip"
+      options={{ iconBackground: false, origin: 'left', width: 'w-96' }}
+    >
       <p className="pb-2">
         Defines a value of orentiation for the tracks that will be recommended,
         to be around the given BPM value.

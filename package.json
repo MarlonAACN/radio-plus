@@ -1,7 +1,7 @@
 {
   "name": "@radio-plus/source",
   "description": "Less search, more discovery.",
-  "version": "2.1.0",
+  "version": "2.0.1",
   "license": "MIT",
   "scripts": {
     "build:frontend": "nx build frontend"

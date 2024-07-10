@@ -76,7 +76,10 @@ function BpmSliderWidget({
   }
 
   return (
-    <div className="radio-plus-bpm-slider-container relative w-full">
+    <div
+      className="radio-plus-bpm-slider-container relative w-full"
+      role="menuitem"
+    >
       <div className="relative w-fit flex flex-row justify-start items-center gap-x-4">
         <Switch
           checked={isEnabled}

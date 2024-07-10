@@ -3,6 +3,7 @@ import { Tooltip } from '@/components/util/Tooltip';
 function ValenceTooltipView() {
   return (
     <Tooltip
+      id="valence-tooltip"
       options={{
         iconBackground: false,
         origin: 'left',

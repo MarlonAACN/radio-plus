@@ -48,7 +48,10 @@ function RadioOriginInputWidget({
   }
 
   return (
-    <div className="radio-plus-radio-origin-input-container relative w-full">
+    <div
+      className="radio-plus-radio-origin-input-container relative w-full"
+      role="menuitem"
+    >
       <label
         htmlFor="radio-plus-radio-origin-input"
         className="block pb-2 pl-3"

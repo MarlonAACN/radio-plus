@@ -11,6 +11,7 @@ node_modules
 # secrets
 dist/apps/backend/.env
 *.env
+*.env.*
 
 # IDEs and editors
 /.idea

@@ -3,9 +3,11 @@ import { ReactNode, useState } from 'react';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { AnimatePresence, m } from 'framer-motion';
+import useKeypress from 'react-use-keypress';
 
 type TooltipProps = {
   children: ReactNode;
+  id: string;
   options: {
     iconBackground?: boolean;
     origin: 'left' | 'right';
@@ -14,8 +16,14 @@ type TooltipProps = {
   };
 };
 
-function Tooltip({ children, options }: TooltipProps) {
+function Tooltip({ children, id, options }: TooltipProps) {
   const [showInfo, setShowInfo] = useState<boolean>(false);
+
+  useKeypress('Escape', () => {
+    if (showInfo) {
+      setShowInfo(false);
+    }
+  });
 
   return (
     <div
@@ -26,14 +34,26 @@ function Tooltip({ children, options }: TooltipProps) {
         }
       )}
     >
-      <QuestionMarkCircleIcon
+      <button
+        type="button"
+        className="block"
+        onClick={() => setShowInfo(true)}
+        onFocus={() => setShowInfo(true)}
+        onBlur={() => setShowInfo(false)}
         onMouseEnter={() => setShowInfo(true)}
         onMouseLeave={() => setShowInfo(false)}
-        className="w-9 h-9 p-1 stroke-font-400 cursor-pointer"
-      />
+        aria-describedby={id}
+        aria-haspopup={true}
+        aria-expanded={showInfo}
+      >
+        <QuestionMarkCircleIcon className="w-9 h-9 p-1 stroke-font-400 cursor-pointer" />
+      </button>
       <AnimatePresence>
         {showInfo && (
           <m.div
+            id={id}
+            role="tooltip"
+            aria-hidden={!showInfo}
             initial={{ opacity: 0, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}

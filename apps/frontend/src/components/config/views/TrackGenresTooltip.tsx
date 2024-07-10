@@ -3,6 +3,7 @@ import { Tooltip } from '@/components/util/Tooltip';
 function TrackGenresTooltipView() {
   return (
     <Tooltip
+      id="track-genre-tooltip"
       options={{
         iconBackground: false,
         origin: 'left',
@@ -11,13 +12,14 @@ function TrackGenresTooltipView() {
       }}
     >
       <p className="pb-2">
-        Up to 5 music genres can be selected, which the algorithm then takes
-        into consideration.
+        You can spice up your recommendations by flavoring it with additional
+        tracks from genres of your choice. Up to 5 music genres can be selected,
+        which the algorithm then takes into consideration.
       </p>
       <p>
-        If genres are selected, that heavly differ from each other or the origin
-        track, the algorithm will return a mix of different tracks from each
-        genre.
+        The additional tracks from the selected genres will still respect your
+        selected filter options and will be added to your playlist that is based
+        on your origin track.
       </p>
     </Tooltip>
   );

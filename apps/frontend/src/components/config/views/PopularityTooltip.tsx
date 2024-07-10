@@ -3,6 +3,7 @@ import { Tooltip } from '@/components/util/Tooltip';
 function PopularityTooltipView() {
   return (
     <Tooltip
+      id="popularity-tooltip"
       options={{
         iconBackground: false,
         origin: 'left',

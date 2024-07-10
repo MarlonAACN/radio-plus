@@ -28,7 +28,10 @@ function FreshTracksCheckboxView({
   }
 
   return (
-    <div className="radio-plus-fresh-tracks-switch-container relative w-fit flex flex-row justify-start items-center gap-x-3 pl-3">
+    <div
+      className="radio-plus-fresh-tracks-switch-container relative w-fit flex flex-row justify-start items-center gap-x-3 pl-3"
+      role="menuitem"
+    >
       <Switch
         disabled={isLoading}
         checked={inputChangeTracker.freshTracks}

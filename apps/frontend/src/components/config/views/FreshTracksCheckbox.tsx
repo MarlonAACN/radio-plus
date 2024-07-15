@@ -9,12 +9,14 @@ type FreshTracksCheckboxProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 
 function FreshTracksCheckboxView({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: FreshTracksCheckboxProps) {
   /**
    * Updates the input tracker on change.
@@ -33,7 +35,7 @@ function FreshTracksCheckboxView({
       role="menuitem"
     >
       <Switch
-        disabled={isLoading}
+        disabled={isLoading || !menuIsOpen}
         checked={inputChangeTracker.freshTracks}
         onChange={switchToggleHandler}
         aria-label="Toggle to determine if recommended tracks should mostly be unknown."
@@ -48,7 +50,7 @@ function FreshTracksCheckboxView({
       <p className="peer-disabled:cursor-default cursor-pointer">
         Fresh tracks
       </p>
-      <FreshTrackTooltipView />
+      <FreshTrackTooltipView menuIsOpen={menuIsOpen} />
     </div>
   );
 }

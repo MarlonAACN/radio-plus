@@ -1,9 +1,11 @@
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function PopularityTooltipView() {
+function PopularityTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="popularity-tooltip"
+      disabled={!menuIsOpen}
       options={{
         iconBackground: false,
         origin: 'left',

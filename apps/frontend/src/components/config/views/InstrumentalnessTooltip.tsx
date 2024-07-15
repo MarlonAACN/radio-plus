@@ -1,9 +1,11 @@
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function InstrumentalnessTooltipView() {
+function InstrumentalnessTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="instrumentalness-tooltip"
+      disabled={!menuIsOpen}
       options={{
         iconBackground: false,
         origin: 'left',

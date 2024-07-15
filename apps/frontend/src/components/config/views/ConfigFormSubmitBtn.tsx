@@ -13,6 +13,7 @@ type FilterFormSubmitBtnProps = {
   userFetched: boolean;
   /** Don't allow config submits, if no track origin value is set. */
   radioOriginTrackinputValue: string | null;
+  menuIsOpen: boolean;
 };
 
 function ConfigFormSubmitBtnView({
@@ -22,6 +23,7 @@ function ConfigFormSubmitBtnView({
   playerWasTransferred,
   userFetched,
   radioOriginTrackinputValue,
+  menuIsOpen,
 }: FilterFormSubmitBtnProps) {
   // https://github.com/vercel/next.js/issues/35558
   const extraFirefoxProps = {
@@ -38,7 +40,8 @@ function ConfigFormSubmitBtnView({
         formHasErrors ||
         !playerWasTransferred ||
         !userFetched ||
-        !radioOriginTrackinputValue
+        !radioOriginTrackinputValue ||
+        !menuIsOpen
       }
       type="submit"
     >

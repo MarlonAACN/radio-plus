@@ -2,6 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 
 import { RadioPlus } from '@/types/RadioPlus';
 import { RadioPlusError } from '@/types/RadioPlus/Error';
+import { logger } from '@/util/Logger';
 
 class TrackFilter {
   /**
@@ -30,18 +31,33 @@ class TrackFilter {
   ): Array<Spotify.RecommendationTrackObject> {
     const filteredList: Array<Spotify.RecommendationTrackObject> = [];
 
+    const filterStats = {
+      recentTracks: 0,
+      topTracks: 0,
+      topArtists: 0,
+      followedArtists: 0,
+    };
+
     function trackIsknown(track: Spotify.RecommendationTrackObject): boolean {
-      if (userData.recentTracks.includes(track.id)) return true;
-      if (userData.topTracks.includes(track.id)) return true;
+      if (userData.recentTracks.includes(track.id)) {
+        filterStats.recentTracks += 1;
+        return true;
+      }
+      if (userData.topTracks.includes(track.id)) {
+        filterStats.topTracks += 1;
+        return true;
+      }
 
       // Only if ALL artists of a track is known to the user, return true.
       const artistIdSet = new Set(track.artists.map((artist) => artist.id));
       if (userData.topArtists.every((id) => artistIdSet.has(id))) {
+        filterStats.topArtists += 1;
         return true;
       }
 
       // If at least one artist is known return true.
       if (userData.followedArtists.some((id) => artistIdSet.has(id))) {
+        filterStats.followedArtists += 1;
         return true;
       }
 
@@ -53,6 +69,8 @@ class TrackFilter {
         filteredList.push(track);
       }
     }
+
+    logger.log('[FilterAnalytics] Filtered tracks origin:', filterStats);
 
     return filteredList;
   }

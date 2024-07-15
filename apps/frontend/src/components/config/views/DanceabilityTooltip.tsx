@@ -1,9 +1,11 @@
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function DanceabilityTooltipView() {
+function DanceabilityTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="danceability-tooltip"
+      disabled={!menuIsOpen}
       options={{
         iconBackground: false,
         origin: 'left',

@@ -8,6 +8,7 @@ import useKeypress from 'react-use-keypress';
 type TooltipProps = {
   children: ReactNode;
   id: string;
+  disabled?: boolean;
   options: {
     iconBackground?: boolean;
     origin: 'left' | 'right';
@@ -16,7 +17,7 @@ type TooltipProps = {
   };
 };
 
-function Tooltip({ children, id, options }: TooltipProps) {
+function Tooltip({ children, id, disabled = false, options }: TooltipProps) {
   const [showInfo, setShowInfo] = useState<boolean>(false);
 
   useKeypress('Escape', () => {
@@ -37,6 +38,7 @@ function Tooltip({ children, id, options }: TooltipProps) {
       <button
         type="button"
         className="block"
+        disabled={disabled}
         onClick={() => setShowInfo(true)}
         onFocus={() => setShowInfo(true)}
         onBlur={() => setShowInfo(false)}

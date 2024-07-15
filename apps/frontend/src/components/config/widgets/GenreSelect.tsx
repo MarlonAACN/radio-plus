@@ -18,12 +18,14 @@ type GenreSelectProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 
 function GenreSelectWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: GenreSelectProps) {
   const [fetchingGenres, setFetchingGenres] = useState<boolean>(false);
   /** before fetch null, on error fetch undefined, on success Array<string> */
@@ -104,7 +106,7 @@ function GenreSelectWidget({
       <div className="flex flex-row flex-wrap justify-between items-center gap-x-4 pr-3 pb-2 pl-3">
         <div className="flex flex-row flex-nowrap justify-start items-center">
           <p className="block pr-1">Genre shuffle</p>
-          <TrackGenresTooltipView />
+          <TrackGenresTooltipView menuIsOpen={menuIsOpen} />
         </div>
         <AnimatePresence>
           {inputChangeTracker.selectedGenres.length === 5 && (
@@ -137,7 +139,8 @@ function GenreSelectWidget({
               fetchingGenres ||
               genres === undefined ||
               genres === null ||
-              isLoading
+              isLoading ||
+              !menuIsOpen
             }
             className="w-full flex justify-between items-center gap-2 px-5 py-2.5 text-white bg-base-700 rounded-full transition-colors data-[hover]:bg-base-600 data-[open]:bg-base-600 data-[focus]:outline-1 data-[focus]:outline-primary-500"
           >
@@ -157,8 +160,9 @@ function GenreSelectWidget({
                   <button
                     onClick={() => onClickHandler(genre)}
                     disabled={
-                      !genreIsSelected &&
-                      inputChangeTracker.selectedGenres.length === 5
+                      (!genreIsSelected &&
+                        inputChangeTracker.selectedGenres.length === 5) ||
+                      !menuIsOpen
                     }
                     className={clsx(
                       'w-full flex flex-row justify-start items-center gap-x-2 px-5 py-2 text-left cursor-pointer',
@@ -186,6 +190,7 @@ function GenreSelectWidget({
         <GenreSelectedItemsView
           inputChangeTracker={inputChangeTracker}
           updateInputChangeTracker={updateInputChangeTracker}
+          menuIsOpen={menuIsOpen}
         />
       </div>
     </div>

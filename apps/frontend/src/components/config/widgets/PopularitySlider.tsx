@@ -17,11 +17,13 @@ type PopularitySliderProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 function PopularitySliderWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: PopularitySliderProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   /** number: set (0-100), null: disabled, undefined: untouched yet. */
@@ -126,6 +128,7 @@ function PopularitySliderWidget({
           checked={isEnabled}
           onChange={setIsEnabled}
           aria-label="Sets the popularity level for the recommended tracks."
+          disabled={!menuIsOpen}
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span
@@ -135,7 +138,7 @@ function PopularitySliderWidget({
         </Switch>
         <div className="flex flex-row flex-nowrap justify-start items-center">
           <p className="block pr-1">Popularity</p>
-          <PopularityTooltipView />
+          <PopularityTooltipView menuIsOpen={menuIsOpen} />
         </div>
       </div>
       <AnimatePresence>
@@ -168,8 +171,13 @@ function PopularitySliderWidget({
               aria-label="Desired popularity value"
               aria-valuemin={0}
               aria-valuemax={100}
+              title={
+                inputChangeTracker.popularity
+                  ? inputChangeTracker.popularity.toString()
+                  : undefined
+              }
               role="slider"
-              disabled={isLoading || !isEnabled}
+              disabled={isLoading || !isEnabled || !menuIsOpen}
               id="radio-plus-popularity-slider"
               className="range-slider flex-1"
             />

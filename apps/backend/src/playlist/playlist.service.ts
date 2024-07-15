@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { RADIO_PLUS_COVER_BASE64_JPEG } from '@/constants';
 import { SpotifyEndpointURLs } from '@/constants/SpotifyEndpointURLs';
+import { TrackService } from '@/track/track.service';
 import { RadioPlus } from '@/types/RadioPlus';
 import { RequestError } from '@/util/Error';
 import { SpotifyURI, SpotiyUriType } from '@/util/formatter/SpotifyURI';
@@ -11,6 +12,8 @@ import { throwIfDataIsSpotifyError } from '@/util/throwIfDataIsSpotifyError';
 
 @Injectable()
 export class PlaylistService {
+  constructor(private trackService: TrackService) {}
+
   /**
    * Creates a new playlist in the users account.
    * @param userId {string} The id of the current user.
@@ -274,6 +277,8 @@ export class PlaylistService {
     playlistId: string,
     accessToken: string
   ): Promise<void> {
+    logger.log('Setting playlist cover is currently disabled.');
+
     const requestParams = {
       method: 'PUT',
       headers: {
@@ -313,5 +318,80 @@ export class PlaylistService {
           )
         );
       });
+  }
+
+  public async analyzePlaylist(
+    playlistId: string,
+    accessToken: string
+  ): Promise<void> {
+    const playlist = await this.getPlaylist(playlistId, accessToken);
+    // Filter out items where obj.track is null
+    const filteredItems = playlist.tracks.items.filter(
+      (obj) => obj.track !== null
+    );
+
+    // Extract track IDs from the filtered items
+    const trackIds = filteredItems.map((obj) => obj.track!.id);
+
+    const danceabilityList: Array<number> = [];
+    const valenceList: Array<number> = [];
+    const bpmList: Array<number> = [];
+
+    logger.log(`Tracks in playlist: ${playlist.tracks.items.length}.`);
+
+    const tracksData = await this.trackService
+      .getSeveralTracksAudioFeatures(trackIds, accessToken)
+      .catch((err: RequestError) => {
+        logger.error(
+          '[getSeveralTracksAudioFeatures] Fetching several tracks audio data failed.',
+          err
+        );
+
+        return null;
+      });
+
+    if (tracksData === null) {
+      return;
+    }
+
+    for (const trackData of tracksData) {
+      danceabilityList.push(trackData.danceability);
+      valenceList.push(trackData.valence);
+      bpmList.push(trackData.tempo);
+    }
+
+    danceabilityList.sort((a, b) => a - b);
+
+    logger.log(
+      `Danceability list: ${danceabilityList[0]}, ${
+        danceabilityList[danceabilityList.length - 1]
+      }`
+    );
+    logger.log(
+      `Valence list: ${valenceList[0]}, ${valenceList[valenceList.length - 1]}`
+    );
+    logger.log(`BPM list: ${bpmList[0]}, ${bpmList[bpmList.length - 1]}`);
+
+    const sumDanceability = danceabilityList.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0
+    );
+
+    const sumValence = valenceList.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0
+    );
+
+    const sumBpm = bpmList.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0
+    );
+
+    logger.log(
+      `Average danceability: ${sumDanceability / danceabilityList.length}`
+    );
+    logger.log(`Average valence: ${sumValence / valenceList.length}`);
+    logger.log(`Average bpm: ${sumBpm / bpmList.length}`);
+    return;
   }
 }

@@ -18,11 +18,13 @@ type DanceabilitySliderProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 function DanceabilitySliderWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: DanceabilitySliderProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   /** number: set (0-1), null: disabled, undefined: untouched yet. */
@@ -131,6 +133,7 @@ function DanceabilitySliderWidget({
         <Switch
           checked={isEnabled}
           onChange={setIsEnabled}
+          disabled={!menuIsOpen}
           aria-label="Sets the danceability level for the recommended tracks."
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
@@ -141,7 +144,7 @@ function DanceabilitySliderWidget({
         </Switch>
         <div className="flex flex-row flex-nowrap justify-start items-center">
           <p className="block pr-1">Danceability</p>
-          <DanceabilityTooltipView />
+          <DanceabilityTooltipView menuIsOpen={menuIsOpen} />
         </div>
       </div>
       <AnimatePresence>
@@ -171,6 +174,11 @@ function DanceabilitySliderWidget({
               type="range"
               min={0}
               max={100}
+              title={
+                inputChangeTracker.danceability
+                  ? inputChangeTracker.danceability.toString()
+                  : undefined
+              }
               onChange={(e) => changeHandler(e)}
               value={
                 inputChangeTracker.danceability
@@ -183,7 +191,7 @@ function DanceabilitySliderWidget({
               aria-valuemin={0}
               aria-valuemax={100}
               role="slider"
-              disabled={isLoading || !isEnabled}
+              disabled={isLoading || !isEnabled || !menuIsOpen}
               id="radio-plus-danceability-slider"
               className="range-slider flex-1"
             />

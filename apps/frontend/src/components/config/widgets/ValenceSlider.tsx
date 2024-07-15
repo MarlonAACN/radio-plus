@@ -18,11 +18,13 @@ type ValenceSliderProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 function ValenceSliderWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: ValenceSliderProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   /** number: set, null: disabled, undefined: untouched yet. */
@@ -130,6 +132,7 @@ function ValenceSliderWidget({
           checked={isEnabled}
           onChange={setIsEnabled}
           aria-label="Sets mood of the recommended tracks."
+          disabled={!menuIsOpen}
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span
@@ -139,7 +142,7 @@ function ValenceSliderWidget({
         </Switch>
         <div className="flex flex-row flex-nowrap justify-start items-center">
           <p className="block pr-1">Mood</p>
-          <ValenceTooltipView />
+          <ValenceTooltipView menuIsOpen={menuIsOpen} />
         </div>
       </div>
       <AnimatePresence>
@@ -178,8 +181,13 @@ function ValenceSliderWidget({
               aria-label="Desired track mood"
               aria-valuemin={0}
               aria-valuemax={100}
+              title={
+                inputChangeTracker.valence
+                  ? inputChangeTracker.valence.toString()
+                  : undefined
+              }
               role="slider"
-              disabled={isLoading || !isEnabled}
+              disabled={isLoading || !isEnabled || !menuIsOpen}
               id="radio-plus-valence-slider"
               className="range-slider flex-1"
             />

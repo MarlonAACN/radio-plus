@@ -1,9 +1,11 @@
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function ValenceTooltipView() {
+function ValenceTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="valence-tooltip"
+      disabled={!menuIsOpen}
       options={{
         iconBackground: false,
         origin: 'left',

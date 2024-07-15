@@ -15,6 +15,8 @@ export const SpotifyEndpointURLs = {
     GetData: (id: string) => `https://api.spotify.com/v1/tracks/${id}`,
     GetAudioFeatures: (id: string) =>
       `https://api.spotify.com/v1/audio-features/${id}`,
+    GetSeveralAudioFeatures: (urlParams: URLSearchParams) =>
+      `https://api.spotify.com/v1/audio-features?${urlParams}`,
     IsSavedByUser: (urlParams: URLSearchParams) =>
       `https://api.spotify.com/v1/me/tracks/contains?${urlParams}`,
     SaveTrack: (urlParams: URLSearchParams) =>

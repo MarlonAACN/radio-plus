@@ -108,6 +108,51 @@ export class TrackService {
       });
   }
 
+  getSeveralTracksAudioFeatures(
+    ids: Array<string>,
+    accessToken: string
+  ): Promise<Array<RadioPlus.TrackAudioFeatures>> {
+    const requestParams = {
+      method: 'GET',
+      headers: {
+        Authorization: HttpHeader.getSpotifyBearerAuthorization(accessToken),
+      },
+    };
+
+    const urlParams = new URLSearchParams({
+      ids: ids.toString(),
+    });
+
+    return fetch(
+      SpotifyEndpointURLs.track.GetSeveralAudioFeatures(urlParams),
+      requestParams
+    )
+      .then((response) => {
+        return response.text();
+      })
+      .then((raw) => {
+        const data: { audio_features: Array<RadioPlus.TrackAudioFeatures> } =
+          raw ? JSON.parse(raw) : {};
+
+        throwIfDataIsSpotifyError(data);
+
+        return data.audio_features;
+      })
+      .catch((error: Spotify.Error) => {
+        logger.error(
+          `[getTrack] Failed to fetch several tracks audio features for ${ids.length} tracks.`,
+          error.message
+        );
+
+        return Promise.reject(
+          new RequestError(
+            error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+            `Failed to fetch several tracks audio features for ${ids.length} tracks.`
+          )
+        );
+      });
+  }
+
   /**
    * Fetches basic information from a spotify track.
    * @param id {string} The id of the desired track.

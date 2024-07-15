@@ -11,12 +11,14 @@ type RadioOriginInputProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 
 function RadioOriginInputWidget({
   formErrors,
   setFormErrors,
   isLoading,
+  menuIsOpen,
   inputChangeTracker,
   updateInputChangeTracker,
 }: RadioOriginInputProps) {
@@ -63,7 +65,7 @@ function RadioOriginInputWidget({
           autoComplete="off"
           id="radio-plus-radio-origin-input"
           name="radio-plus-radio-origin-input"
-          disabled={isLoading}
+          disabled={isLoading || !menuIsOpen}
           value={inputChangeTracker.radioOriginTrackUrl ?? ''}
           onChange={(e) => inputChangeHandler(e)}
           onFocus={() =>
@@ -79,7 +81,7 @@ function RadioOriginInputWidget({
           )}
         ></input>
         <div className="absolute top-0 right-2 h-full flex flex-col justify-center items-center">
-          <RadioOriginInputTooltipView />
+          <RadioOriginInputTooltipView menuIsOpen={menuIsOpen} />
         </div>
       </div>
       {formErrors.radioOriginTrackUrl ? (

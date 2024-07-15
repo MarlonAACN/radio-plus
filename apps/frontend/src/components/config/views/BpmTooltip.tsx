@@ -1,9 +1,11 @@
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function BpmTooltipView() {
+function BpmTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="bpm-tooltip"
+      disabled={!menuIsOpen}
       options={{ iconBackground: false, origin: 'left', width: 'w-96' }}
     >
       <p className="pb-2">

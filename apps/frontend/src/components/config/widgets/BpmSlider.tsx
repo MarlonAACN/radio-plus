@@ -17,11 +17,13 @@ type BpmSliderProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 function BpmSliderWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: BpmSliderProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   /** number: set, null: disabled, undefined: untouched yet. */
@@ -85,6 +87,7 @@ function BpmSliderWidget({
           checked={isEnabled}
           onChange={setIsEnabled}
           aria-label="Sets the amount of desired BMP for the recommended tracks."
+          disabled={!menuIsOpen}
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span
@@ -94,7 +97,7 @@ function BpmSliderWidget({
         </Switch>
         <div className="flex flex-row flex-nowrap justify-start items-center">
           <p className="block pr-1">BPM (Beats per minute)</p>
-          <BpmTooltipView />
+          <BpmTooltipView menuIsOpen={menuIsOpen} />
         </div>
       </div>
       <AnimatePresence>
@@ -124,6 +127,11 @@ function BpmSliderWidget({
               max={300}
               onChange={(e) => changeHandler(e)}
               value={inputChangeTracker.bpm ?? 20}
+              title={
+                inputChangeTracker.bpm
+                  ? inputChangeTracker.bpm.toString()
+                  : undefined
+              }
               aria-label="Desired beats per minute"
               aria-valuemin={20}
               aria-valuemax={300}

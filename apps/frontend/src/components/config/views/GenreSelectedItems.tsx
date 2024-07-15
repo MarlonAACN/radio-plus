@@ -8,11 +8,13 @@ import { ArrayManager } from '@/util/manager/ArrayManager';
 type GenreSelectedItemsProps = {
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 
 function GenreSelectedItemsView({
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: GenreSelectedItemsProps) {
   function removeGenreHandler(value: string) {
     updateInputChangeTracker({
@@ -40,6 +42,7 @@ function GenreSelectedItemsView({
               }}
               type="button"
               aria-label={`Removes selected genre ${genre} from the selection list.`}
+              disabled={!menuIsOpen}
               title={`Remove selected genre "${genre}"`}
               className="px-2.5 py-1 break-keep bg-base-600 rounded-full transition-colors hover:bg-primary-500"
               onClick={() => removeGenreHandler(genre)}

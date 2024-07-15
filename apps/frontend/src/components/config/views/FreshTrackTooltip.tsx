@@ -1,9 +1,11 @@
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function FreshTrackTooltipView() {
+function FreshTrackTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="fresh-tracks-tooltip"
+      disabled={!menuIsOpen}
       options={{ iconBackground: false, origin: 'left', width: 'w-96' }}
     >
       <p>

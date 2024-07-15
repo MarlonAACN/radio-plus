@@ -9,6 +9,7 @@ import { m, AnimatePresence } from 'framer-motion';
 
 type LogoutButtonProps = {
   logout: () => void;
+  menuIsOpen: boolean;
 };
 
 const cancelBtnVariants = {
@@ -23,7 +24,7 @@ const cancelBtnVariants = {
   },
 };
 
-function LogoutButtonView({ logout }: LogoutButtonProps) {
+function LogoutButtonView({ logout, menuIsOpen }: LogoutButtonProps) {
   const [shieldIsActive, setShieldIsActive] = useState<boolean>(true);
   const shieldTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -55,6 +56,7 @@ function LogoutButtonView({ logout }: LogoutButtonProps) {
             exit={{ rotate: 180, opacity: 0 }}
             transition={{ ease: 'easeIn', duration: 0.1 }}
             aria-label="logout shield that prevents logout on first click"
+            disabled={!menuIsOpen}
             title="logout"
             type="button"
             onClick={() => setShieldIsActive(false)}
@@ -73,6 +75,7 @@ function LogoutButtonView({ logout }: LogoutButtonProps) {
               exit={{ rotate: -180, opacity: 0 }}
               transition={{ ease: 'easeIn', duration: 0.1 }}
               aria-label="confirm logout"
+              disabled={!menuIsOpen}
               title="confirm logout"
               type="button"
               onClick={() => logout()}
@@ -87,6 +90,7 @@ function LogoutButtonView({ logout }: LogoutButtonProps) {
                 opacity: 0,
               }}
               aria-label="cancel logout"
+              disabled={!menuIsOpen}
               title="cancel logout"
               type="button"
               onClick={() => setShieldIsActive(true)}

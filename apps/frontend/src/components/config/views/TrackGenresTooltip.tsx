@@ -1,9 +1,11 @@
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function TrackGenresTooltipView() {
+function TrackGenresTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="track-genre-tooltip"
+      disabled={!menuIsOpen}
       options={{
         iconBackground: false,
         origin: 'left',

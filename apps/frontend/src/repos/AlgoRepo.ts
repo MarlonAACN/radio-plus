@@ -52,6 +52,25 @@ class AlgoRepo {
         return HttpHandler.error<RadioPlus.PlaylistUrl>(errResponse);
       });
   }
+
+  analyzePlaylist(id: string): Promise<void> {
+    return fetch(
+      this.router.get('analyzePlaylist').build({
+        v: 'v1',
+        playlistId: id,
+      }),
+      {
+        method: 'GET',
+        credentials: 'include',
+      }
+    )
+      .then((response: Response) => {
+        return HttpHandler.response<void>(response);
+      })
+      .catch((errResponse) => {
+        return HttpHandler.error<void>(errResponse);
+      });
+  }
 }
 
 export { AlgoRepo };

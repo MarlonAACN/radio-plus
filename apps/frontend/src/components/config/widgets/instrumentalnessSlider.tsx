@@ -18,11 +18,13 @@ type InstrumentalnessSliderProps = {
   isLoading: boolean;
   inputChangeTracker: RadioPlus.Config;
   updateInputChangeTracker: Dispatch<SetStateAction<RadioPlus.Config>>;
+  menuIsOpen: boolean;
 };
 function InstrumentalnessSliderWidget({
   isLoading,
   inputChangeTracker,
   updateInputChangeTracker,
+  menuIsOpen,
 }: InstrumentalnessSliderProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   /** number: set (0-1), null: disabled, undefined: untouched yet. */
@@ -134,6 +136,7 @@ function InstrumentalnessSliderWidget({
           checked={isEnabled}
           onChange={setIsEnabled}
           aria-label="Sets the instrumentalness level for the recommended tracks."
+          disabled={!menuIsOpen}
           className="group relative w-14 h-7 flex p-1 bg-base-600 rounded-full transition-colors duration-200 ease-in-out cursor-pointer focus:outline-none data-[checked]:bg-primary-500 data-[focus]:outline-1 data-[focus]:outline-white"
         >
           <span
@@ -143,7 +146,7 @@ function InstrumentalnessSliderWidget({
         </Switch>
         <div className="flex flex-row flex-nowrap justify-start items-center">
           <p className="block pr-1">Instrumentalness</p>
-          <InstrumentalnessTooltipView />
+          <InstrumentalnessTooltipView menuIsOpen={menuIsOpen} />
         </div>
       </div>
       <AnimatePresence>
@@ -184,8 +187,13 @@ function InstrumentalnessSliderWidget({
               aria-label="Desired instrumentalness value"
               aria-valuemin={0}
               aria-valuemax={100}
+              title={
+                inputChangeTracker.instrumentalness
+                  ? inputChangeTracker.instrumentalness.toString()
+                  : undefined
+              }
               role="slider"
-              disabled={isLoading || !isEnabled}
+              disabled={isLoading || !isEnabled || !menuIsOpen}
               id="radio-plus-instrumentalness-slider"
               className="range-slider flex-1"
             />

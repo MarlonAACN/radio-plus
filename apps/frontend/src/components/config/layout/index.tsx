@@ -64,12 +64,7 @@ function ConfigLayout({
   return (
     <>
       <div className="radio-plus-filter-spacer h-9"></div>
-      <div
-        className="radio-plus-filter-wrapper z-[999] absolute top-0 left-0 w-full h-16 flex flex-col justify-end items-center"
-        aria-hidden={!isOpen}
-        id="filter-wrapper"
-        role="menu"
-      >
+      <div className="radio-plus-filter-wrapper z-[999] absolute top-0 left-0 w-full h-16 flex flex-col justify-end items-center">
         <m.form
           onSubmit={(e) => formSubmitHandler(e)}
           initial={{
@@ -84,61 +79,77 @@ function ConfigLayout({
           variants={variants}
           className="radio-plus-filter-container absolute bottom-0 w-full h-fit flex flex-col justify-between items-start px-5 pt-5 overflow-hidden bg-base-800 rounded-b-xl sm:w-[calc(100%-3rem)] sm:px-6 md:w-4/5 max-w-4xl"
         >
-          <ConfigHeaderWidget logout={logout} />
-          <div className="w-full flex flex-col flex-nowrap justify-start items-start gap-y-5">
-            <RadioOriginInputWidget
-              formErrors={configForm.formErrors}
-              setFormErrors={configForm.setFormErrors}
+          <div
+            id="filter-menu"
+            className="w-full h-fit flex flex-col justify-between items-start"
+            role="menu"
+            aria-hidden={!isOpen}
+          >
+            <ConfigHeaderWidget logout={logout} menuIsOpen={isOpen} />
+            <div className="w-full flex flex-col flex-nowrap justify-start items-start gap-y-5">
+              <RadioOriginInputWidget
+                formErrors={configForm.formErrors}
+                setFormErrors={configForm.setFormErrors}
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+              <FreshTracksCheckboxView
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+              <GenreSelectWidget
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+              <BpmSliderWidget
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+              <DanceabilitySliderWidget
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+              <PopularitySliderWidget
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+              <ValenceSliderWidget
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+              <InstrumentalnessSliderWidget
+                isLoading={config.isLoading}
+                menuIsOpen={isOpen}
+                inputChangeTracker={configForm.inputChangeTracker}
+                updateInputChangeTracker={configForm.setInputChangeTracker}
+              />
+            </div>
+            <ConfigFormSubmitBtnView
               isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
-            />
-            <FreshTracksCheckboxView
-              isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
-            />
-            <GenreSelectWidget
-              isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
-            />
-            <BpmSliderWidget
-              isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
-            />
-            <DanceabilitySliderWidget
-              isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
-            />
-            <PopularitySliderWidget
-              isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
-            />
-            <ValenceSliderWidget
-              isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
-            />
-            <InstrumentalnessSliderWidget
-              isLoading={config.isLoading}
-              inputChangeTracker={configForm.inputChangeTracker}
-              updateInputChangeTracker={configForm.setInputChangeTracker}
+              menuIsOpen={isOpen}
+              formHasErrors={configForm.formHasErrors}
+              formHoldsNewData={configForm.formHoldsNewData}
+              playerWasTransferred={playerWasTransferred}
+              userFetched={userFetched}
+              radioOriginTrackinputValue={
+                configForm.inputChangeTracker.radioOriginTrackUrl
+              }
             />
           </div>
-          <ConfigFormSubmitBtnView
-            isLoading={config.isLoading}
-            formHasErrors={configForm.formHasErrors}
-            formHoldsNewData={configForm.formHoldsNewData}
-            playerWasTransferred={playerWasTransferred}
-            userFetched={userFetched}
-            radioOriginTrackinputValue={
-              configForm.inputChangeTracker.radioOriginTrackUrl
-            }
-          />
           <ConfigMenuToggleBarWidget
             isOpen={isOpen}
             setIsOpen={setIsOpen}

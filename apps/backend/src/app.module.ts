@@ -5,6 +5,7 @@ import { AlgoController } from '@/algo/algo.controller';
 import { GenreController } from '@/genre/genre.controller';
 import { AuthMiddleware } from '@/middleware/auth.middleware';
 import { PlayerController } from '@/player/player.controller';
+import { PlaylistController } from '@/playlist/playlist.controller';
 import { UserController } from '@/user/user.controller';
 
 import { AlgoModule } from './algo/algo.module';
@@ -42,7 +43,8 @@ export class AppModule implements NestModule {
         TrackController,
         AlgoController,
         UserController,
-        GenreController
+        GenreController,
+        PlaylistController
       );
   }
 }

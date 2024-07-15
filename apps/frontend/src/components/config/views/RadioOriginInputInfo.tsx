@@ -2,11 +2,13 @@ import { ArrowUpTrayIcon } from '@heroicons/react/20/solid';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 
 import { Tooltip } from '@/components/util/Tooltip';
+import { InputInfoTooltipProps } from '@/types/InputInfoTooltip';
 
-function RadioOriginInputTooltipView() {
+function RadioOriginInputTooltipView({ menuIsOpen }: InputInfoTooltipProps) {
   return (
     <Tooltip
       id="radio-origin-input-tooltip"
+      disabled={!menuIsOpen}
       options={{ iconBackground: true, origin: 'right', width: 'w-60' }}
     >
       <ol type="1">
